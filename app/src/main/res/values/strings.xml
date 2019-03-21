@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Essbar</string>
+    <string name="customerNumber">Kundennummer</string>
+    <string name="customerPassword">Paswort</string>
+    <string name="login">Anmelden</string>
+    <string name="error_occurred">Ein Fehler ist aufgetreten</string>
+    <string name="no_secure_lock_setup">Secure Lock Einstellungen fehlen. \'Einstellungen\' -> \'Sicherheit\' -> \'Screen Lock\'</string>
+    <string name="today">\u00A0(Heute)</string>
+
+    <array name="weekdays">
+        <item>Montag</item>
+        <item>Dienstag</item>
+        <item>Mittwoch</item>
+        <item>Donnerstag</item>
+        <item>Freitag</item>
+    </array>
+</resources>

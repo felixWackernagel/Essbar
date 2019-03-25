@@ -5,9 +5,11 @@ import android.util.Log;
 
 import javax.inject.Singleton;
 
+import androidx.lifecycle.ViewModelProvider;
 import dagger.Module;
 import dagger.Provides;
 import de.wackernagel.essbar.BuildConfig;
+import de.wackernagel.essbar.ui.viewModels.ViewModelFactory;
 import de.wackernagel.essbar.web.JSoupConverter;
 import de.wackernagel.essbar.web.LiveDataResourceCallAdapterFactory;
 import de.wackernagel.essbar.web.PreferencesCookieJar;
@@ -23,6 +25,12 @@ public class RetrofitModule {
 
     public RetrofitModule( final Application application ) {
         this.application = application;
+    }
+
+    @Provides
+    @Singleton
+    ViewModelProvider.Factory providerViewModelFactory( final WebService webService ) {
+        return new ViewModelFactory( webService );
     }
 
     @Provides

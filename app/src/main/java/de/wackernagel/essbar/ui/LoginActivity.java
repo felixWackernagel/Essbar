@@ -6,23 +6,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.jsoup.nodes.Document;
-
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import dagger.android.AndroidInjection;
 import de.wackernagel.essbar.EssbarPreferences;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.utils.EncryptionUtils;
-import de.wackernagel.essbar.web.Resource;
 import de.wackernagel.essbar.web.WebService;
 
 /**
@@ -79,16 +76,19 @@ public class LoginActivity extends AppCompatActivity {
         {
             @Override
             public void onDecryptionSuccess(String decryptedPassword) {
+                Log.i( "Essbar", "Decryption success " + decryptedPassword );
                 loginAtWebsite( username, decryptedPassword );
             }
 
             @Override
             public void onUserNotAuthenticatedForDecryption() {
+                Log.i( "Essbar", "User not authenticated during decryption." );
                 startAuthenticationActivity(REQUEST_CODE_FOR_SECURE_LOCK_LOGIN);
             }
 
             @Override
             public void onDecryptionError(Exception e) {
+                Log.e( "Essbar", "Error during decryption.", e );
                 Toast.makeText( LoginActivity.this, R.string.error_occurred, Toast.LENGTH_LONG ).show();
             }
         });
@@ -109,6 +109,7 @@ public class LoginActivity extends AppCompatActivity {
         {
             @Override
             public void onEncryptionSuccess(String encryptedPassword, String encryptionIV) {
+                Log.i( "Essbar", "Encryption success " + encryptedPassword );
                 EssbarPreferences.setEncryptedPassword(LoginActivity.this, encryptedPassword);
                 EssbarPreferences.setEncryptionIV(LoginActivity.this, encryptionIV);
                 EssbarPreferences.setUsername( LoginActivity.this, username );
@@ -117,11 +118,13 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onUserNotAuthenticatedForEncryption() {
+                Log.i( "Essbar", "User not authenticated during encryption." );
                 startAuthenticationActivity(REQUEST_CODE_FOR_CREDENTIAL_LOGIN);
             }
 
             @Override
             public void onEncryptionError(Exception e) {
+                Log.e( "Essbar", "Error during encryption.", e );
                 Toast.makeText( LoginActivity.this, R.string.error_occurred, Toast.LENGTH_LONG ).show();
             }
         });
@@ -147,12 +150,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginAtWebsite(String username, String password ) {
-        webService.login( username, password ).observe(this, new Observer<Resource<Document>>() {
-            @Override
-            public void onChanged( Resource<Document> resource ) {
+        webService.login( username, password ).observe(this, resource -> {
+            Log.i( "Essbar", "Login at website sucess? " + resource.isSuccess() );
             if( resource.isSuccess() ) {
                 startMainActivity();
-            }
             }
         });
     }

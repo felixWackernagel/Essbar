@@ -4,7 +4,6 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.UserNotAuthenticatedException;
 import android.util.Base64;
-import android.util.Log;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -69,10 +68,8 @@ public class EncryptionUtils {
         final KeyStore keyStore = KeyStore.getInstance( PROVIDER );
         keyStore.load( null );
         if( !keyStore.containsAlias( alias ) ) {
-            Log.e("Essbar", "Generate Key");
             return generateKey( alias );
         } else {
-            Log.e("Essbar", "Load Key");
             return ((KeyStore.SecretKeyEntry) keyStore.getEntry(alias, null)).getSecretKey();
         }
     }

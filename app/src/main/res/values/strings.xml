@@ -3,9 +3,13 @@
     <string name="customerNumber">Kundennummer</string>
     <string name="customerPassword">Paswort</string>
     <string name="login">Anmelden</string>
-    <string name="error_occurred">Ein Fehler ist aufgetreten</string>
-    <string name="no_secure_lock_setup">Secure Lock Einstellungen fehlen. \'Einstellungen\' -> \'Sicherheit\' -> \'Screen Lock\'</string>
     <string name="today">\u00A0(Heute)</string>
+    <string name="username_password_error">Ihre Anmeldung ist fehlgeschlagen. Prüfen Sie Kundennummer und Passwort?</string>
+    <string name="username_required_error">Ihre Kundennummer wird benötigt.</string>
+    <string name="password_required_error">Ihr Passwort wird benötigt.</string>
+    <string name="unknown_error">Ein Fehler ist aufgetreten</string>
+    <string name="no_secure_lock_error">Secure Lock Einstellungen fehlen. \'Einstellungen\' -> \'Sicherheit\' -> \'Screen Lock\'</string>
+    <string name="no_network_connection_error">Sie haben keine Internetverbindung.</string>
 
     <array name="weekdays">
         <item>Montag</item>

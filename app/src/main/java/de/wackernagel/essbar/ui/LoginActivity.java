@@ -9,22 +9,29 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+
+import org.jsoup.nodes.Document;
 
 import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import dagger.android.AndroidInjection;
 import de.wackernagel.essbar.EssbarPreferences;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.utils.EncryptionUtils;
+import de.wackernagel.essbar.utils.NetworkUtils;
 import de.wackernagel.essbar.web.WebService;
 
 /**
  * FIRST LOGIN:
- * - enter username and passwordView
+ * - enter username and passwordField
  * - authenticate to android to store password encrypted
  *
  * LOGIN AFTER FIRST SUCCESS
@@ -40,8 +47,11 @@ public class LoginActivity extends AppCompatActivity {
     private final int REQUEST_CODE_FOR_CREDENTIAL_LOGIN = 1;
     private final int REQUEST_CODE_FOR_SECURE_LOCK_LOGIN = 2;
 
-    private EditText usernameView;
-    private EditText passwordView;
+    private CoordinatorLayout coordinatorLayout;
+    private TextInputLayout usernameContainer;
+    private TextInputEditText usernameField;
+    private TextInputLayout passwordContainer;
+    private TextInputEditText passwordField;
     private Button loginButton;
 
     private KeyguardManager keyguardManager;
@@ -52,19 +62,39 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        usernameView = findViewById(R.id.usernameView);
-        passwordView = findViewById(R.id.passwordView);
+        coordinatorLayout = findViewById(R.id.coordinatorLayout);
+        usernameContainer = findViewById(R.id.usernameContainer);
+        usernameField = findViewById(R.id.usernameField);
+        passwordContainer = findViewById(R.id.passwordContainer);
+        passwordField = findViewById(R.id.passwordField);
         loginButton = findViewById(R.id.loginButton);
 
         keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
 
         if( !keyguardManager.isKeyguardSecure() ) {
-            Toast.makeText( this, R.string.no_secure_lock_setup, Toast.LENGTH_LONG ).show();
+            Snackbar.make( coordinatorLayout, R.string.no_secure_lock_error, Snackbar.LENGTH_LONG ).show();
         }
+    }
 
-        if( EssbarPreferences.getUsername( this ) != null && EssbarPreferences.getEncryptionIV( this ) != null && EssbarPreferences.getEncryptedPassword( this ) != null ) {
-            doLoginWithSecureLock();
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final boolean hasInternet = NetworkUtils.hasNetworkConnection( this );
+        enableForm( hasInternet );
+        if( hasInternet ) {
+            if (EssbarPreferences.getUsername(this) != null && EssbarPreferences.getEncryptionIV(this) != null && EssbarPreferences.getEncryptedPassword(this) != null) {
+                doLoginWithSecureLock();
+            }
+        } else {
+            Snackbar.make( coordinatorLayout, R.string.no_network_connection_error, Snackbar.LENGTH_LONG ).show();
         }
+    }
+
+    private void enableForm( boolean isEnabled ) {
+        usernameField.setEnabled( isEnabled );
+        passwordField.setEnabled( isEnabled );
+        loginButton.setEnabled( isEnabled );
     }
 
     private void doLoginWithSecureLock() {
@@ -89,20 +119,26 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDecryptionError(Exception e) {
                 Log.e( "Essbar", "Error during decryption.", e );
-                Toast.makeText( LoginActivity.this, R.string.error_occurred, Toast.LENGTH_LONG ).show();
+                Toast.makeText( LoginActivity.this, R.string.unknown_error, Toast.LENGTH_LONG ).show();
             }
         });
     }
 
     public void doLoginWithCredentials(final View view ) {
-        final String username = usernameView.getText().toString();
+        final String username = usernameField.getText().toString();
         if( TextUtils.isEmpty( username ) ) {
+            usernameContainer.setError( getString( R.string.username_required_error ) );
             return;
+        } else {
+            usernameContainer.setError( null );
         }
 
-        final String password = passwordView.getText().toString();
+        final String password = passwordField.getText().toString();
         if( TextUtils.isEmpty( password ) ) {
+            passwordContainer.setError( getString( R.string.password_required_error ) );
             return;
+        } else {
+            passwordContainer.setError( null );
         }
 
         EncryptionUtils.encrypt( password, ALIAS, new EncryptionUtils.EncryptionCallback()
@@ -125,7 +161,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onEncryptionError(Exception e) {
                 Log.e( "Essbar", "Error during encryption.", e );
-                Toast.makeText( LoginActivity.this, R.string.error_occurred, Toast.LENGTH_LONG ).show();
+                Toast.makeText( LoginActivity.this, R.string.unknown_error, Toast.LENGTH_LONG ).show();
             }
         });
     }
@@ -153,9 +189,19 @@ public class LoginActivity extends AppCompatActivity {
         webService.login( username, password ).observe(this, resource -> {
             Log.i( "Essbar", "Login at website sucess? " + resource.isSuccess() );
             if( resource.isSuccess() ) {
-                startMainActivity();
+                if( wasWebLoginSuccessful( resource.getResource() ) ) {
+                    startMainActivity();
+                } else {
+                    Snackbar.make( coordinatorLayout, getString( R.string.username_password_error), Snackbar.LENGTH_LONG ).show();
+                }
+            } else {
+                Snackbar.make( coordinatorLayout, resource.getError().getMessage(), Snackbar.LENGTH_LONG ).show();
             }
         });
+    }
+
+    private boolean wasWebLoginSuccessful( final Document document ) {
+        return document != null && document.select( "#login-info .fehler" ).size() == 0;
     }
 
     private void startMainActivity() {

@@ -14,6 +14,7 @@ import androidx.preference.PreferenceManager;
 public final class PreferenceUtils {
 
     private PreferenceUtils() {
+        // no instance needed
     }
 
     public static String getString(@NonNull final Context context, @NonNull final String key, final String fallback) {

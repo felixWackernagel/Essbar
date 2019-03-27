@@ -10,6 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 import de.wackernagel.essbar.BuildConfig;
 import de.wackernagel.essbar.ui.viewModels.ViewModelFactory;
+import de.wackernagel.essbar.web.NetworkConnectionInterceptor;
 import de.wackernagel.essbar.web.JSoupConverter;
 import de.wackernagel.essbar.web.LiveDataResourceCallAdapterFactory;
 import de.wackernagel.essbar.web.PreferencesCookieJar;
@@ -38,6 +39,7 @@ public class RetrofitModule {
     WebService provideWebservice() {
         final OkHttpClient.Builder client = new OkHttpClient.Builder();
         client.cookieJar( new PreferencesCookieJar( application ) );
+        client.addInterceptor( new NetworkConnectionInterceptor( application ) );
 
         addRequestLogging(client);
 
@@ -53,12 +55,7 @@ public class RetrofitModule {
 
     private void addRequestLogging(OkHttpClient.Builder client) {
         if (BuildConfig.DEBUG) {
-            final HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor( new HttpLoggingInterceptor.Logger() {
-                @Override
-                public void log( final String message ) {
-                    Log.i("Essbar", message);
-                }
-            } );
+            final HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(message -> Log.i("Essbar", message));
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
             client.addInterceptor(interceptor);
         }

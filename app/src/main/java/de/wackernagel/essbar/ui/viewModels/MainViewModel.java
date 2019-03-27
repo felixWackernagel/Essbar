@@ -25,7 +25,7 @@ public class MainViewModel extends ViewModel {
     };
 
     private final WebService webService;
-    private final MutableLiveData<List<MainActivity.ElementItem>> itemsLiveData;
+    private final MutableLiveData<List<MainActivity.MenuItem>> itemsLiveData;
 
     MainViewModel( final WebService webService ) {
         this.webService = webService;
@@ -33,20 +33,20 @@ public class MainViewModel extends ViewModel {
         itemsLiveData.setValue( Collections.emptyList() );
     }
 
-    public LiveData<List<MainActivity.ElementItem>> getMenuItems() {
+    public LiveData<List<MainActivity.MenuItem>> getMenuItems() {
         return Transformations.switchMap( webService.fetchMenus(), this::convertMenuTableToList);
     }
 
-    private LiveData<List<MainActivity.ElementItem>> convertMenuTableToList(final Resource<Document> resource) {
+    private LiveData<List<MainActivity.MenuItem>> convertMenuTableToList(final Resource<Document> resource) {
         if( resource != null && resource.getResource() != null ) {
             final Document menuPage = resource.getResource();
-            final List<MainActivity.ElementItem> allMenuItems = new ArrayList<>();
+            final List<MainActivity.MenuItem> allMenuItems = new ArrayList<>();
             for(int menuTypeIndex = 0; menuTypeIndex < menuTypeSelectors.length; menuTypeIndex++ ) {
                 final String menuTypeSelector = menuTypeSelectors[ menuTypeIndex ];
                 final Elements menuTypeElements = menuPage.select( menuTypeSelector );
                 for( int menuIndex = 0; menuIndex < menuTypeElements.size(); menuIndex++ ) {
                     final int menuItemIndex = menuTypeIndex + ( ( menuTypeIndex + 1 ) * menuIndex );
-                    allMenuItems.add( menuItemIndex, new MainActivity.ElementItem( menuTypeElements.get( menuIndex ) ) );
+                    allMenuItems.add( menuItemIndex, new MainActivity.MenuItem( menuTypeElements.get( menuIndex ) ) );
                 }
             }
             itemsLiveData.setValue( allMenuItems );

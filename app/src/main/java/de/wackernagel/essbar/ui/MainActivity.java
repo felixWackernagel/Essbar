@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         final String todayAsWord = getString( R.string.today );
         // Calendar starts with sunday with index 1
         final int currentDayOfWeek = GregorianCalendar.getInstance().get( Calendar.DAY_OF_WEEK ) - 2;
-        final ElementItemListAdapter adapter = new ElementItemListAdapter( new ElementItemCallback());
+        final MenuListAdapter adapter = new MenuListAdapter( new MenuItemCallback());
         final RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
         recyclerView.setHasFixedSize( false );
@@ -54,13 +54,13 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addItemDecoration( new SectionItemDecoration( this, false, new SectionItemDecoration.SectionCallback() {
             @Override
             public boolean isSection( int position ) {
-                // first item or current position and previous position have different weekdays
+                // first item or when current and previous position have different weekdays
                 return position <= 0 || adapter.getListItem( position - 1 ).getWeekday() != adapter.getListItem( position ).getWeekday();
             }
 
             @Override
             public CharSequence getSectionHeader( int position ) {
-                final ElementItem item = adapter.getListItem( position );
+                final MenuItem item = adapter.getListItem( position );
                 final String weekdayAsWord = localizedWeekdays[ item.getWeekday() ];
                 if( item.getWeekday() == currentDayOfWeek ) {
                     return weekdayAsWord.concat( todayAsWord );
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         final MainViewModel viewModel = new ViewModelProvider( this, viewModelFactory ).get( MainViewModel.class );
         viewModel.getMenuItems().observe(this, itemList -> {
-            for( ElementItem item : itemList ) {
+            for( MenuItem item : itemList ) {
                 if( item.isChecked() ) {
                     adapter.setItemChecked( item.getId() );
                 }
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         } );
     }
 
-    public static class ElementItem {
+    public static class MenuItem {
         private int id;
         private String menuName;
         private boolean enabled;
@@ -88,15 +88,12 @@ public class MainActivity extends AppCompatActivity {
         private int weekday;
         private int menuTyp;
 
-        public ElementItem( final Element element ) {
+        public MenuItem(final Element element ) {
             weekday = getWeekdayIndex( element );
             menuTyp = getMenuTypIndex( element );
-
-            this.id = menuTyp + ( weekday * 4 );
-
-            final Element checkbox = element.selectFirst( "div.controllElements > input[type='checkbox']" );
-            enabled = checkbox != null;
-            checked = enabled && checkbox.attr("checked").equalsIgnoreCase("checked");
+            id = menuTyp + ( weekday * 4 );
+            enabled = element.classNames().contains( "pointer" );
+            checked = element.classNames().contains( "gruen" );
 
             // remove all meta data
             element.select("div").remove();
@@ -133,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            ElementItem item = (ElementItem) o;
+            MenuItem item = (MenuItem) o;
             return id == item.id &&
                     enabled == item.enabled &&
                     checked == item.checked &&
@@ -179,25 +176,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    static class ElementItemViewHolder extends RecyclerView.ViewHolder {
+    static class MenuItemViewHolder extends RecyclerView.ViewHolder {
         CheckBox checkBox;
         TextView textView;
 
-        ElementItemViewHolder(@NonNull View itemView) {
+        MenuItemViewHolder(@NonNull View itemView) {
             super(itemView);
             textView = itemView.findViewById( R.id.textView );
             checkBox = itemView.findViewById( R.id.checkbox );
         }
     }
 
-    public static class ElementItemCallback extends DiffUtil.ItemCallback<ElementItem> {
+    public static class MenuItemCallback extends DiffUtil.ItemCallback<MenuItem> {
         @Override
-        public boolean areItemsTheSame(@NonNull ElementItem oldItem, @NonNull ElementItem newItem) {
+        public boolean areItemsTheSame(@NonNull MenuItem oldItem, @NonNull MenuItem newItem) {
             return oldItem.getId() == newItem.getId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull ElementItem oldItem, @NonNull ElementItem newItem) {
+        public boolean areContentsTheSame(@NonNull MenuItem oldItem, @NonNull MenuItem newItem) {
             return oldItem.getWeekday() == newItem.getWeekday() &&
                     TextUtils.equals( oldItem.getMenuName(), newItem.getMenuName() ) &&
                     oldItem.getMenuTyp() == newItem.getMenuTyp() &&
@@ -206,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class ElementItemListAdapter extends ListAdapter<ElementItem, ElementItemViewHolder> {
+    public static class MenuListAdapter extends ListAdapter<MenuItem, MenuItemViewHolder> {
         private final SparseBooleanArray checkedItems;
 
-        ElementItemListAdapter(@NonNull DiffUtil.ItemCallback<ElementItem> diffCallback) {
+        MenuListAdapter(@NonNull DiffUtil.ItemCallback<MenuItem> diffCallback) {
             super(diffCallback);
             this.checkedItems = new SparseBooleanArray();
             setHasStableIds( true );
@@ -220,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
             return Integer.valueOf( getItem( position ).getId() ).longValue();
         }
 
-        ElementItem getListItem( int position ) {
+        MenuItem getListItem(int position ) {
             return getItem( position );
         }
 
@@ -230,13 +227,13 @@ public class MainActivity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public ElementItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ElementItemViewHolder(LayoutInflater.from( parent.getContext() ).inflate( R.layout.item_menu, parent, false ));
+        public MenuItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new MenuItemViewHolder(LayoutInflater.from( parent.getContext() ).inflate( R.layout.item_menu, parent, false ));
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ElementItemViewHolder holder, int position) {
-            final ElementItem item = getItem( position );
+        public void onBindViewHolder(@NonNull MenuItemViewHolder holder, int position) {
+            final MenuItem item = getItem( position );
             holder.textView.setText( item.getMenuName() );
             holder.checkBox.setEnabled( item.isEnabled() );
             holder.checkBox.setChecked( checkedItems.get( item.getId() ) );

@@ -24,7 +24,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-public class EncryptionUtils {
+public final class EncryptionUtils {
 
     private static final String PROVIDER = "AndroidKeyStore";
     private static final String CHARSET = "UTF-8";
@@ -44,6 +44,10 @@ public class EncryptionUtils {
         void onUserNotAuthenticatedForDecryption();
 
         void onDecryptionError(Exception e );
+    }
+
+    private EncryptionUtils() {
+        // no instance needed
     }
 
     public static void encrypt( final String dataToEncrypt, final String alias, final EncryptionCallback callback ) {

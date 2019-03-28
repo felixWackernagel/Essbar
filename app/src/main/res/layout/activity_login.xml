@@ -10,12 +10,25 @@
     tools:context=".ui.LoginActivity"
     tools:ignore="UnusedAttribute">
 
+    <TextView
+        android:id="@+id/offlineContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawablePadding="16dp"
+        android:drawableTop="@drawable/ic_cloud_off_black_96dp"
+        android:text="@string/no_network_connection_error"
+        android:drawableTint="@color/colorAccent"
+        android:textSize="18sp"
+        android:visibility="gone"/>
+
     <LinearLayout
+        android:id="@+id/formContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/view_space">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/usernameContainer"
@@ -39,7 +52,7 @@
             android:id="@+id/passwordContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/view_space"
             app:errorEnabled="true"
             app:errorTextAppearance="@style/ErrorTextAppearance"
             app:hintTextAppearance="@style/HintTextAppearance">
@@ -58,11 +71,10 @@
             android:id="@+id/loginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/view_space"
             android:onClick="doLoginWithCredentials"
             android:text="@string/login"
-            android:textColor="@android:color/white"
-            android:theme="@style/RaisedButton" />
+            style="@style/Widget.AppCompat.Button.Colored"/>
 
     </LinearLayout>
 

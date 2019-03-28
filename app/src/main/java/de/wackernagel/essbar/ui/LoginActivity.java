@@ -9,6 +9,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -48,6 +50,8 @@ public class LoginActivity extends AppCompatActivity {
     private final int REQUEST_CODE_FOR_SECURE_LOCK_LOGIN = 2;
 
     private CoordinatorLayout coordinatorLayout;
+    private TextView offlineContainer;
+    private LinearLayout formContainer;
     private TextInputLayout usernameContainer;
     private TextInputEditText usernameField;
     private TextInputLayout passwordContainer;
@@ -63,6 +67,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         coordinatorLayout = findViewById(R.id.coordinatorLayout);
+        offlineContainer = findViewById(R.id.offlineContainer);
+        formContainer = findViewById(R.id.formContainer);
         usernameContainer = findViewById(R.id.usernameContainer);
         usernameField = findViewById(R.id.usernameField);
         passwordContainer = findViewById(R.id.passwordContainer);
@@ -81,20 +87,17 @@ public class LoginActivity extends AppCompatActivity {
         super.onResume();
 
         final boolean hasInternet = NetworkUtils.hasNetworkConnection( this );
-        enableForm( hasInternet );
+        showOfflineState( hasInternet );
         if( hasInternet ) {
             if (EssbarPreferences.getUsername(this) != null && EssbarPreferences.getEncryptionIV(this) != null && EssbarPreferences.getEncryptedPassword(this) != null) {
                 doLoginWithSecureLock();
             }
-        } else {
-            Snackbar.make( coordinatorLayout, R.string.no_network_connection_error, Snackbar.LENGTH_LONG ).show();
         }
     }
 
-    private void enableForm( boolean isEnabled ) {
-        usernameField.setEnabled( isEnabled );
-        passwordField.setEnabled( isEnabled );
-        loginButton.setEnabled( isEnabled );
+    private void showOfflineState(boolean hasInternet ) {
+        offlineContainer.setVisibility( hasInternet ? View.GONE : View.VISIBLE );
+        formContainer.setVisibility( hasInternet ? View.VISIBLE : View.GONE );
     }
 
     private void doLoginWithSecureLock() {

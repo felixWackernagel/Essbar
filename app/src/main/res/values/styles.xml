@@ -8,10 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="RaisedButton" parent="Theme.AppCompat.Light">
-        <item name="colorButtonNormal">@color/colorAccent</item>
-    </style>
-
     <style name="ErrorTextAppearance" parent="TextAppearance.AppCompat.Small">
         <item name="android:textColor">@color/colorError</item>
     </style>

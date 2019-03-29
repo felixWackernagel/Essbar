@@ -15,6 +15,6 @@ public interface WebService {
     LiveData<Resource<Document>> login( @Field("Login_Name") String username, @Field("Login_Passwort") String password );
 
     @GET( "/index.php?m=2;0" )
-    LiveData<Resource<Document>> fetchMenus();
+    LiveData<Resource<Document>> requestMenusDocument();
 
 }

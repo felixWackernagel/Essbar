@@ -10,6 +10,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.HasActivityInjector;
 import de.wackernagel.essbar.dagger.DaggerApplicationComponent;
 import de.wackernagel.essbar.dagger.RetrofitModule;
+import de.wackernagel.essbar.dagger.RoomModule;
 
 public class EssbarApplication extends Application implements HasActivityInjector {
 
@@ -22,6 +23,7 @@ public class EssbarApplication extends Application implements HasActivityInjecto
 
         DaggerApplicationComponent
                 .builder()
+                .roomModule( new RoomModule( this ) )
                 .retrofitModule( new RetrofitModule( this ) )
                 .build()
                 .inject( this );

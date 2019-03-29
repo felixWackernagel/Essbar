@@ -25,7 +25,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import dagger.android.AndroidInjection;
-import de.wackernagel.essbar.EssbarPreferences;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.utils.EncryptionUtils;
 import de.wackernagel.essbar.utils.NetworkUtils;
@@ -85,14 +84,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        final boolean hasInternet = NetworkUtils.hasNetworkConnection( this );
-        showOfflineState( hasInternet );
-        if( hasInternet ) {
-            if (EssbarPreferences.getUsername(this) != null && EssbarPreferences.getEncryptionIV(this) != null && EssbarPreferences.getEncryptedPassword(this) != null) {
-                doLoginWithSecureLock();
-            }
-        }
+        showOfflineState( NetworkUtils.hasNetworkConnection( this ) );
     }
 
     private void showOfflineState(boolean hasInternet ) {
@@ -100,11 +92,8 @@ public class LoginActivity extends AppCompatActivity {
         formContainer.setVisibility( hasInternet ? View.VISIBLE : View.GONE );
     }
 
-    private void doLoginWithSecureLock() {
-        final String username = EssbarPreferences.getUsername( this );
-        final String encryptedPassword = EssbarPreferences.getEncryptedPassword( this );
-        final String encryptionIV = EssbarPreferences.getEncryptionIV( this );
-
+    // triggered by click on customer
+    private void doLoginWithSecureLock( final String username, final String encryptedPassword, final String encryptionIV ) {
         EncryptionUtils.decrypt(encryptedPassword, ALIAS, encryptionIV, new EncryptionUtils.DecryptionCallback()
         {
             @Override
@@ -149,9 +138,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onEncryptionSuccess(String encryptedPassword, String encryptionIV) {
                 Log.i( "Essbar", "Encryption success " + encryptedPassword );
-                EssbarPreferences.setEncryptedPassword(LoginActivity.this, encryptedPassword);
-                EssbarPreferences.setEncryptionIV(LoginActivity.this, encryptionIV);
-                EssbarPreferences.setUsername( LoginActivity.this, username );
+                // TODO insert customer
                 loginAtWebsite( username, password );
             }
 
@@ -182,7 +169,8 @@ public class LoginActivity extends AppCompatActivity {
             if( requestCode == REQUEST_CODE_FOR_CREDENTIAL_LOGIN) {
                 doLoginWithCredentials( loginButton );
             } else if( requestCode == REQUEST_CODE_FOR_SECURE_LOCK_LOGIN) {
-                doLoginWithSecureLock();
+                // TODO handle result
+                doLoginWithSecureLock( "", "", "" );
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

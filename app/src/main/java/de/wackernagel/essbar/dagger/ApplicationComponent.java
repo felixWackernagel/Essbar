@@ -8,6 +8,6 @@ import dagger.android.AndroidInjector;
 import de.wackernagel.essbar.EssbarApplication;
 
 @Singleton
-@Component(modules = {AndroidInjectionModule.class, RetrofitModule.class, ActivityModule.class} )
+@Component(modules = {AndroidInjectionModule.class, RetrofitModule.class, ActivityModule.class, RoomModule.class} )
 public interface ApplicationComponent extends AndroidInjector<EssbarApplication> {
 }

@@ -4,22 +4,22 @@ import javax.inject.Singleton;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import de.wackernagel.essbar.web.WebService;
+import de.wackernagel.essbar.repository.EssbarRepository;
 
 @Singleton
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
-    private final WebService webService;
+    private final EssbarRepository repository;
 
-    public ViewModelFactory( final WebService webService ) {
-        this.webService = webService;
+    public ViewModelFactory( final EssbarRepository repository ) {
+        this.repository = repository;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
         if( modelClass.isAssignableFrom( MainViewModel.class ) ) {
-            return (T) new MainViewModel( webService );
+            return (T) new MainViewModel( repository );
         }
         throw new IllegalArgumentException( "Unsupported ViewModel class." );
     }

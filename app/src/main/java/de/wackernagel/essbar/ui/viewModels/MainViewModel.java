@@ -11,9 +11,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
+import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.MainActivity;
 import de.wackernagel.essbar.web.Resource;
-import de.wackernagel.essbar.web.WebService;
 
 public class MainViewModel extends ViewModel {
 
@@ -24,20 +24,20 @@ public class MainViewModel extends ViewModel {
             "tr.menue-line-Vesper > td.menue-Vesper"
     };
 
-    private final WebService webService;
+    private final EssbarRepository repository;
     private final MutableLiveData<List<MainActivity.MenuItem>> itemsLiveData;
 
-    MainViewModel( final WebService webService ) {
-        this.webService = webService;
+    MainViewModel( final EssbarRepository repository ) {
+        this.repository = repository;
         itemsLiveData = new MutableLiveData<>();
         itemsLiveData.setValue( Collections.emptyList() );
     }
 
     public LiveData<List<MainActivity.MenuItem>> getMenuItems() {
-        return Transformations.switchMap( webService.fetchMenus(), this::convertMenuTableToList);
+        return Transformations.switchMap( repository.getMenusDocument(), this::getMenusList);
     }
 
-    private LiveData<List<MainActivity.MenuItem>> convertMenuTableToList(final Resource<Document> resource) {
+    private LiveData<List<MainActivity.MenuItem>> getMenusList(final Resource<Document> resource) {
         if( resource != null && resource.getResource() != null ) {
             final Document menuPage = resource.getResource();
             final List<MainActivity.MenuItem> allMenuItems = new ArrayList<>();

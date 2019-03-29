@@ -9,6 +9,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation" : "$projectDir/schemas".toString()]
+            }
+        }
     }
     buildTypes {
         release {
@@ -30,18 +35,30 @@ android {
 }
 
 dependencies {
+
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+
     implementation 'com.google.android.material:material:1.0.0'
+
     implementation 'androidx.preference:preference:1.1.0-alpha02'
+
+    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha02'
+
     implementation 'androidx.lifecycle:lifecycle-runtime:2.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
+
     implementation 'org.jsoup:jsoup:1.11.3'
+
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.11'
     implementation 'com.google.dagger:dagger-android:2.15'

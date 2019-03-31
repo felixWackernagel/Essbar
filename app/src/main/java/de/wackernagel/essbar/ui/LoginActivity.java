@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,28 +26,32 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import dagger.android.AndroidInjection;
+import de.wackernagel.essbar.EssbarPreferences;
 import de.wackernagel.essbar.R;
+import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.EncryptionUtils;
 import de.wackernagel.essbar.utils.NetworkUtils;
-import de.wackernagel.essbar.web.WebService;
+import de.wackernagel.essbar.utils.SectionItemDecoration;
+import de.wackernagel.essbar.utils.ViewUtils;
 
-/**
- * FIRST LOGIN:
- * - enter username and passwordField
- * - authenticate to android to store password encrypted
- *
- * LOGIN AFTER FIRST SUCCESS
- * - authenticate to android to get password decrypted
- */
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String ALIAS = "Essbar";
 
     @Inject
-    WebService webService;
+    ViewModelProvider.Factory viewModelFactory;
 
-    private final int REQUEST_CODE_FOR_CREDENTIAL_LOGIN = 1;
+    private LoginViewModel viewModel;
+
+    private final int REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION = 1;
     private final int REQUEST_CODE_FOR_SECURE_LOCK_LOGIN = 2;
 
     private CoordinatorLayout coordinatorLayout;
@@ -55,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText usernameField;
     private TextInputLayout passwordContainer;
     private TextInputEditText passwordField;
+    private CheckBox saveCredentials;
     private Button loginButton;
 
     private KeyguardManager keyguardManager;
@@ -73,12 +80,72 @@ public class LoginActivity extends AppCompatActivity {
         passwordContainer = findViewById(R.id.passwordContainer);
         passwordField = findViewById(R.id.passwordField);
         loginButton = findViewById(R.id.loginButton);
+        saveCredentials = findViewById(R.id.saveCredentials);
+
+        viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
+        usernameField.setText( viewModel.getUsername() );
+        usernameField.setOnFocusChangeListener((v, hasFocus) -> {
+            if( !hasFocus ) {
+                final String oldValue = viewModel.getUsername();
+                final String newValue = ViewUtils.getString( usernameField );
+                if( !TextUtils.equals( oldValue, newValue ) ) {
+                    if( TextUtils.isEmpty( newValue ) ) {
+                        usernameContainer.setError( getString( R.string.username_required_error ) );
+                    } else {
+                        usernameContainer.setError( null );
+                        viewModel.setUsername( newValue );
+                    }
+                }
+            }
+        });
+        passwordField.setText( viewModel.getPassword() );
+        passwordField.setOnFocusChangeListener((v, hasFocus) -> {
+            if( !hasFocus ) {
+                final String oldValue = viewModel.getPassword();
+                final String newValue = ViewUtils.getString( passwordField );
+                if( !TextUtils.equals( oldValue, newValue ) ) {
+                    if( TextUtils.isEmpty( newValue ) ) {
+                        passwordContainer.setError( getString( R.string.password_required_error ) );
+                    } else {
+                        passwordContainer.setError( null );
+                        viewModel.setPassword( newValue );
+                    }
+                }
+            }
+        });
+
+        final CustomerListAdapter adapter = new CustomerListAdapter();
+        adapter.setOnCustomerClickListener(customer -> {
+            viewModel.setCustomer( customer );
+            doDecryption();
+        });
+        final RecyclerView recyclerView = findViewById( R.id.recyclerView );
+        recyclerView.setLayoutManager( new LinearLayoutManager( this ));
+        recyclerView.setHasFixedSize( true );
+        recyclerView.setAdapter( adapter );
+        recyclerView.addItemDecoration( new SectionItemDecoration( this, false, new SectionItemDecoration.SectionCallback() {
+            @Override
+            public boolean isSection( int position ) {
+                return position <= 0;
+            }
+
+            @Override
+            public CharSequence getSectionHeader( int position ) {
+                return getString(R.string.profile_section);
+            }
+        }) );
+        viewModel.getAllCustomers().observe( this, (list) -> {
+            Log.e("Essbar", "Customer result " + (list != null ? list.size() : "null")  );
+            adapter.submitList(list);
+        } );
 
         keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
 
         if( !keyguardManager.isKeyguardSecure() ) {
             Snackbar.make( coordinatorLayout, R.string.no_secure_lock_error, Snackbar.LENGTH_LONG ).show();
         }
+
+        EssbarPreferences.setCookie( this, null );
     }
 
     @Override
@@ -87,19 +154,20 @@ public class LoginActivity extends AppCompatActivity {
         showOfflineState( NetworkUtils.hasNetworkConnection( this ) );
     }
 
-    private void showOfflineState(boolean hasInternet ) {
-        offlineContainer.setVisibility( hasInternet ? View.GONE : View.VISIBLE );
-        formContainer.setVisibility( hasInternet ? View.VISIBLE : View.GONE );
+    private void showOfflineState( boolean hasInternet ) {
+        offlineContainer.setVisibility( hasInternet ? GONE : VISIBLE );
+        formContainer.setVisibility( hasInternet ? VISIBLE : GONE );
     }
 
-    // triggered by click on customer
-    private void doLoginWithSecureLock( final String username, final String encryptedPassword, final String encryptionIV ) {
-        EncryptionUtils.decrypt(encryptedPassword, ALIAS, encryptionIV, new EncryptionUtils.DecryptionCallback()
+    private void doDecryption() {
+        EncryptionUtils.decrypt( viewModel.getCustomer().getEncryptedPassword(), ALIAS, viewModel.getCustomer().getEncryptionIv(), new EncryptionUtils.DecryptionCallback()
         {
             @Override
             public void onDecryptionSuccess(String decryptedPassword) {
                 Log.i( "Essbar", "Decryption success " + decryptedPassword );
-                loginAtWebsite( username, decryptedPassword );
+                viewModel.setUsername( viewModel.getCustomer().getNumber() );
+                viewModel.setPassword( decryptedPassword );
+                loginAtWebsite();
             }
 
             @Override
@@ -111,41 +179,49 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onDecryptionError(Exception e) {
                 Log.e( "Essbar", "Error during decryption.", e );
-                Toast.makeText( LoginActivity.this, R.string.unknown_error, Toast.LENGTH_LONG ).show();
+                showError( getString( R.string.unknown_error ) );
             }
         });
     }
 
     public void doLoginWithCredentials(final View view ) {
-        final String username = usernameField.getText().toString();
+        showError( null );
+
+        final String username = ViewUtils.getString( usernameField );
         if( TextUtils.isEmpty( username ) ) {
             usernameContainer.setError( getString( R.string.username_required_error ) );
             return;
         } else {
             usernameContainer.setError( null );
         }
+        viewModel.setUsername( username );
 
-        final String password = passwordField.getText().toString();
+        final String password = ViewUtils.getString( passwordField );
         if( TextUtils.isEmpty( password ) ) {
             passwordContainer.setError( getString( R.string.password_required_error ) );
             return;
         } else {
             passwordContainer.setError( null );
         }
+        viewModel.setPassword( password );
 
-        EncryptionUtils.encrypt( password, ALIAS, new EncryptionUtils.EncryptionCallback()
+        loginAtWebsite();
+    }
+
+    private void doEncryption() {
+        EncryptionUtils.encrypt( viewModel.getPassword(), ALIAS, new EncryptionUtils.EncryptionCallback()
         {
             @Override
             public void onEncryptionSuccess(String encryptedPassword, String encryptionIV) {
                 Log.i( "Essbar", "Encryption success " + encryptedPassword );
-                // TODO insert customer
-                loginAtWebsite( username, password );
+                viewModel.insertCustomer( encryptedPassword, encryptionIV );
+                startMainActivity();
             }
 
             @Override
             public void onUserNotAuthenticatedForEncryption() {
                 Log.i( "Essbar", "User not authenticated during encryption." );
-                startAuthenticationActivity(REQUEST_CODE_FOR_CREDENTIAL_LOGIN);
+                startAuthenticationActivity(REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION);
             }
 
             @Override
@@ -165,30 +241,69 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if( resultCode == Activity.RESULT_OK ) {
-            if( requestCode == REQUEST_CODE_FOR_CREDENTIAL_LOGIN) {
-                doLoginWithCredentials( loginButton );
+        Log.i("Essbar", "requestCode=" + requestCode + ", resultCode=" + resultCode );
+        if( resultCode == Activity.RESULT_CANCELED ) {
+            if( requestCode == REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION ) {
+                startMainActivity();
             } else if( requestCode == REQUEST_CODE_FOR_SECURE_LOCK_LOGIN) {
-                // TODO handle result
-                doLoginWithSecureLock( "", "", "" );
+                showError( getString( R.string.decryption_canceled_error ) );
+            }
+        }
+        if( resultCode == Activity.RESULT_OK ) {
+            if( requestCode == REQUEST_CODE_FOR_SECURE_LOCK_LOGIN) {
+                doDecryption();
+            } else if( requestCode == REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION ) {
+                doEncryption();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void loginAtWebsite(String username, String password ) {
-        webService.login( username, password ).observe(this, resource -> {
-            Log.i( "Essbar", "Login at website sucess? " + resource.isSuccess() );
+    private void loginAtWebsite() {
+        usernameField.setEnabled( false );
+        passwordField.setEnabled( false );
+        saveCredentials.setEnabled( false );
+        loginButton.setEnabled( false );
+
+        viewModel.getLoginDocument().observe(this, resource -> {
             if( resource.isSuccess() ) {
                 if( wasWebLoginSuccessful( resource.getResource() ) ) {
-                    startMainActivity();
+                    if( saveCredentials.isChecked() ) {
+                        viewModel.findCustomerName( resource.getResource() );
+                        doEncryption();
+                    } else {
+                        startMainActivity();
+                    }
                 } else {
-                    Snackbar.make( coordinatorLayout, getString( R.string.username_password_error), Snackbar.LENGTH_LONG ).show();
+                    showError( getString( R.string.username_password_error) );
                 }
             } else {
-                Snackbar.make( coordinatorLayout, resource.getError().getMessage(), Snackbar.LENGTH_LONG ).show();
+                final String message = ( resource.getError() != null ? resource.getError().getMessage() : getString( R.string.unknown_error ) );
+                Log.e( "Essbar", message );
+                showError( message );
             }
-        });
+
+            usernameField.setEnabled( true );
+            passwordField.setEnabled( true );
+            saveCredentials.setEnabled( true );
+            loginButton.setEnabled( true );
+        } );
+    }
+
+    private void showError( @Nullable final String message ) {
+        if( message != null && !TextUtils.isEmpty( message ) ) {
+            Snackbar snackbar = Snackbar.make( coordinatorLayout, message, Snackbar.LENGTH_LONG);
+            View snackbarView = snackbar.getView();
+            snackbarView.setBackgroundColor( getColor( R.color.colorErrorLight ) );
+            TextView textView = snackbarView.findViewById( com.google.android.material.R.id.snackbar_text);
+            textView.setLineSpacing(0f ,1.4f);
+            textView.setGravity(Gravity.CENTER_VERTICAL);
+            textView.setCompoundDrawablesWithIntrinsicBounds( ContextCompat.getDrawable( this, R.drawable.ic_error_outline_black_24dp ), null, null, null );
+            textView.setCompoundDrawableTintList( ContextCompat.getColorStateList( this, R.color.colorError ) );
+            textView.setCompoundDrawablePadding( getResources().getDimensionPixelSize( R.dimen.view_space ) );
+            textView.setTextColor( ContextCompat.getColor( this, R.color.colorError ) );
+            snackbar.show();
+        }
     }
 
     private boolean wasWebLoginSuccessful( final Document document ) {

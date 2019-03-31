@@ -4,6 +4,9 @@
     android:id="@+id/list_item_section_text"
     android:layout_width="match_parent"
     android:layout_height="@dimen/section_height"
+    android:gravity="center_vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
+    android:textSize="14sp"
+    android:textColor="@color/textColorPrimary"
     tools:text="5 Items"/>

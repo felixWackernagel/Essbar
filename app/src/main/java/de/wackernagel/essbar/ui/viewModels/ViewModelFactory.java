@@ -20,6 +20,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     public <T extends ViewModel> T create(Class<T> modelClass) {
         if( modelClass.isAssignableFrom( MainViewModel.class ) ) {
             return (T) new MainViewModel( repository );
+        } else if( modelClass.isAssignableFrom( LoginViewModel.class ) ) {
+            return (T) new LoginViewModel( repository );
         }
         throw new IllegalArgumentException( "Unsupported ViewModel class." );
     }

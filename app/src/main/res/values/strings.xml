@@ -4,12 +4,16 @@
     <string name="customerPassword">Paswort</string>
     <string name="login">Anmelden</string>
     <string name="today">\u00A0(Heute)</string>
+    <string name="customer_name_number">%1$s (%2$s)</string>
     <string name="username_password_error">Ihre Anmeldung ist fehlgeschlagen. Prüfen Sie Kundennummer und Passwort?</string>
     <string name="username_required_error">Ihre Kundennummer wird benötigt.</string>
     <string name="password_required_error">Ihr Passwort wird benötigt.</string>
     <string name="unknown_error">Ein Fehler ist aufgetreten</string>
     <string name="no_secure_lock_error">Secure Lock Einstellungen fehlen. \'Einstellungen\' -> \'Sicherheit\' -> \'Screen Lock\'</string>
     <string name="no_network_connection_error">Sie haben keine Internetverbindung.</string>
+    <string name="decryption_canceled_error">Sie müssen sich authentifizieren damit wir Ihr Passwort entschlüsseln können.</string>
+    <string name="save_credentials">Kundendaten speichern?\n(Ihr Passwort wird dabei verschlüsselt)</string>
+    <string name="profile_section">Gespeicherte Kundendaten</string>
 
     <array name="weekdays">
         <item>Montag</item>

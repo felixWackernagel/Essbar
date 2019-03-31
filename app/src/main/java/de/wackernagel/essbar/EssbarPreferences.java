@@ -2,7 +2,6 @@ package de.wackernagel.essbar;
 
 import android.content.Context;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import de.wackernagel.essbar.utils.PreferenceUtils;
@@ -16,7 +15,7 @@ public final class EssbarPreferences {
         return PreferenceUtils.getString( context, COOKIE, null );
     }
 
-    public static void setCookie( final Context context, @Nonnull final String cookie ) {
+    public static void setCookie( final Context context, @Nullable final String cookie ) {
         PreferenceUtils.setString( context, COOKIE, cookie );
     }
 }

@@ -1,32 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="48dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="@dimen/view_space"
-        android:paddingEnd="@dimen/view_space"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:layout_marginEnd="48dp"
+        android:layout_gravity="center_vertical|start"
+        android:lineSpacingMultiplier="1.4"
+        android:textSize="16sp"
+        android:textColor="@color/textColorPrimary"
+        tools:text="Frühstück" />
 
-        <CheckBox
-            android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/view_space"
-            tools:enabled="false"/>
+    <CheckBox
+        android:id="@+id/checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:checked="true"/>
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Frühstück"/>
-
-    </LinearLayout>
-
-</androidx.cardview.widget.CardView>
+</FrameLayout>

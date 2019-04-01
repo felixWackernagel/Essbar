@@ -18,8 +18,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        if( modelClass.isAssignableFrom( MainViewModel.class ) ) {
-            return (T) new MainViewModel( repository );
+        if( modelClass.isAssignableFrom( MenuViewModel.class ) ) {
+            return (T) new MenuViewModel( repository );
         } else if( modelClass.isAssignableFrom( LoginViewModel.class ) ) {
             return (T) new LoginViewModel( repository );
         }

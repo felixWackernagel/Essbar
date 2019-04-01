@@ -1,110 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinatorLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:descendantFocusability="beforeDescendants"
-    android:focusableInTouchMode="true"
-    tools:context=".ui.LoginActivity"
-    tools:ignore="UnusedAttribute">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <TextView
-        android:id="@+id/offlineContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:drawablePadding="16dp"
-        android:drawableTop="@drawable/ic_cloud_off_black_96dp"
-        android:text="@string/no_network_connection_error"
-        android:drawableTint="@color/colorAccent"
-        android:textSize="18sp"
-        android:visibility="gone"/>
-
-    <LinearLayout
-        android:id="@+id/formContainer"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="@dimen/view_space">
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        tools:context=".ui.LoginActivity"
+        tools:ignore="UnusedAttribute">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/usernameContainer"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/offlineContainer"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:errorEnabled="true"
-            app:errorTextAppearance="@style/ErrorTextAppearance"
-            app:hintTextAppearance="@style/HintTextAppearance">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/usernameField"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="@null"
-                android:hint="@string/customerNumber"
-                android:inputType="number" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/passwordContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/view_space"
-            app:errorEnabled="true"
-            app:errorTextAppearance="@style/ErrorTextAppearance"
-            app:hintTextAppearance="@style/HintTextAppearance"
-            app:passwordToggleContentDescription="@null"
-            app:passwordToggleDrawable="@drawable/ic_visibility_black_24dp"
-            app:passwordToggleEnabled="true"
-            app:passwordToggleTint="@color/colorAccent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/passwordField"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="@null"
-                android:hint="@string/customerPassword"
-                android:inputType="textPassword|textNoSuggestions"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_gravity="center"
+            android:drawablePadding="16dp"
+            android:drawableTop="@drawable/ic_cloud_off_black_96dp"
+            android:text="@string/no_network_connection_error"
+            android:drawableTint="@color/colorAccent"
+            android:textSize="18sp"
+            android:visibility="gone" />
 
         <LinearLayout
+            android:id="@+id/formContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/view_space"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/view_space">
 
-            <CheckBox
-                android:id="@+id/saveCredentials"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"/>
-
-            <TextView
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/usernameContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/save_credentials"/>
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/ErrorTextAppearance"
+                app:hintTextAppearance="@style/HintTextAppearance">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/usernameField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="@null"
+                    android:hint="@string/customerNumber"
+                    android:inputType="number" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/view_space"
+                app:errorEnabled="true"
+                app:errorTextAppearance="@style/ErrorTextAppearance"
+                app:hintTextAppearance="@style/HintTextAppearance"
+                app:passwordToggleContentDescription="@null"
+                app:passwordToggleDrawable="@drawable/ic_visibility_black_24dp"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="@color/colorAccent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/passwordField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="@null"
+                    android:hint="@string/customerPassword"
+                    android:inputType="textPassword|textNoSuggestions" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/view_space"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/saveCredentials"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save_credentials"
+                    android:lineSpacingMultiplier="1.2"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/loginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/view_space"
+                android:onClick="doLoginWithCredentials"
+                android:text="@string/login"
+                style="@style/Widget.AppCompat.Button.Colored" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_marginTop="@dimen/view_space"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/view_space"
-            android:onClick="doLoginWithCredentials"
-            android:text="@string/login"
-            style="@style/Widget.AppCompat.Button.Colored"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_marginTop="@dimen/view_space"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

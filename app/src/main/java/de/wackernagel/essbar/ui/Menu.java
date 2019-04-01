@@ -1,0 +1,101 @@
+package de.wackernagel.essbar.ui;
+
+import org.jsoup.nodes.Element;
+
+import java.util.Objects;
+
+public class Menu {
+    private int id;
+    private String menuName;
+    private boolean editable;
+    private boolean ordered;
+    private int weekday;
+    private int menuTyp;
+
+    public Menu(final Element element ) {
+        weekday = getWeekdayIndex( element );
+        menuTyp = getMenuTypIndex( element );
+        id = menuTyp + ( weekday * 4 );
+        editable = element.classNames().contains( "pointer" );
+        ordered = element.classNames().contains( "gruen" );
+
+        // remove all meta data
+        element.select("div").remove();
+
+        // remove braces
+        menuName = element.text().replaceAll("\\(.*?\\) ?", "");
+    }
+
+    String getMenuName() {
+        return menuName;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    boolean isEditable() {
+        return editable;
+    }
+
+    public boolean isOrdered() {
+        return ordered;
+    }
+
+    int getWeekday() {
+        return weekday;
+    }
+
+    int getMenuTyp() {
+        return menuTyp;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Menu item = (Menu) o;
+        return id == item.id &&
+                editable == item.editable &&
+                ordered == item.ordered &&
+                weekday == item.weekday &&
+                menuTyp == item.menuTyp &&
+                Objects.equals(menuName, item.menuName);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id, menuName, editable, ordered, weekday, menuTyp);
+    }
+
+    private static int getMenuTypIndex(final Element element ) {
+        if( element.classNames().contains("menue-Fruehstueck") ) {
+            return 1;
+        } else if( element.classNames().contains("menue-Obstfruehstueck") ) {
+            return 2;
+        } else if( element.classNames().contains("menue-Mittag") ) {
+            return 3;
+        } else if( element.classNames().contains("menue-Vesper") ) {
+            return 4;
+        } else {
+            throw new IllegalStateException("No known menu typ found.");
+        }
+    }
+
+    private static int getWeekdayIndex( final Element element ) {
+        if( element.classNames().contains("weekday-1") ) {
+            return 0;
+        } else if( element.classNames().contains("weekday-2") ) {
+            return 1;
+        } else if( element.classNames().contains("weekday-3") ) {
+            return 2;
+        } else if( element.classNames().contains("weekday-4") ) {
+            return 3;
+        } else if( element.classNames().contains("weekday-5") ) {
+            return 4;
+        } else {
+            throw new IllegalStateException("No known weekday found.");
+        }
+    }
+}

@@ -3,13 +3,13 @@ package de.wackernagel.essbar.dagger;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 import de.wackernagel.essbar.ui.LoginActivity;
-import de.wackernagel.essbar.ui.MainActivity;
+import de.wackernagel.essbar.ui.MenuActivity;
 
 @Module
 public abstract class ActivityModule {
 
     @ContributesAndroidInjector
-    abstract MainActivity contributeMainActivityInjector();
+    abstract MenuActivity contributeMainActivityInjector();
 
     @ContributesAndroidInjector
     abstract LoginActivity contributeLoginActivityInjector();

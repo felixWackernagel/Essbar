@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "beadf79398b1cb8771fcd8e3772d7f9b",
+    "identityHash": "926103b87dbada6a71cf011b441acf6e",
     "entities": [
       {
         "tableName": "customers",
@@ -45,14 +45,23 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_customers_number",
+            "unique": true,
+            "columnNames": [
+              "number"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_customers_number` ON `${TABLE_NAME}` (`number`)"
+          }
+        ],
         "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"beadf79398b1cb8771fcd8e3772d7f9b\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"926103b87dbada6a71cf011b441acf6e\")"
     ]
   }
 }

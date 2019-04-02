@@ -2,13 +2,17 @@ package de.wackernagel.essbar.room;
 
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity( tableName = "customers" )
+@Entity( tableName = "customers",
+         indices = { @Index( value = "number", unique = true ) } )
 public class Customer {
     @PrimaryKey( autoGenerate = true)
     private long id;
@@ -35,7 +39,7 @@ public class Customer {
         this.name = name;
     }
 
-    public Customer( final long id, @NonNull final String number, @NonNull final String encryptionIv, @NonNull final String encryptedPassword, @NonNull final String name ) {
+    Customer( final long id, @NonNull final String number, @NonNull final String encryptionIv, @NonNull final String encryptedPassword, @NonNull final String name ) {
         this.id = id;
         this.number = number;
         this.encryptionIv = encryptionIv;
@@ -86,6 +90,7 @@ public class Customer {
     }
 
     @Override
+    @Nonnull
     public String toString() {
         return "Customer{" +
                 "id=" + id +

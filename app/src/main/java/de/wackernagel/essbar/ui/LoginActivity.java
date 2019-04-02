@@ -30,8 +30,8 @@ import de.wackernagel.essbar.EssbarPreferences;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.ActivityLoginBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
+import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
 import de.wackernagel.essbar.utils.EncryptionUtils;
-import de.wackernagel.essbar.utils.NetworkUtils;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 import de.wackernagel.essbar.utils.ViewUtils;
 
@@ -48,6 +48,9 @@ public class LoginActivity extends AppCompatActivity {
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
+    @Inject
+    ConnectivityLifecycleObserver connectivityLifecycleObserver;
+
     private LoginViewModel viewModel;
 
     private ActivityLoginBinding binding;
@@ -62,35 +65,9 @@ public class LoginActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
 
         binding.usernameField.setText( viewModel.getUsername() );
-        binding.usernameField.setOnFocusChangeListener((v, hasFocus) -> {
-            if( !hasFocus ) {
-                final String oldValue = viewModel.getUsername();
-                final String newValue = ViewUtils.getString( binding.usernameField );
-                if( !TextUtils.equals( oldValue, newValue ) ) {
-                    if( TextUtils.isEmpty( newValue ) ) {
-                        binding.usernameContainer.setError( getString( R.string.username_required_error ) );
-                    } else {
-                        binding.usernameContainer.setError( null );
-                        viewModel.setUsername( newValue );
-                    }
-                }
-            }
-        });
         binding.passwordField.setText( viewModel.getPassword() );
-        binding.passwordField.setOnFocusChangeListener((v, hasFocus) -> {
-            if( !hasFocus ) {
-                final String oldValue = viewModel.getPassword();
-                final String newValue = ViewUtils.getString( binding.passwordField );
-                if( !TextUtils.equals( oldValue, newValue ) ) {
-                    if( TextUtils.isEmpty( newValue ) ) {
-                        binding.passwordContainer.setError( getString( R.string.password_required_error ) );
-                    } else {
-                        binding.passwordContainer.setError( null );
-                        viewModel.setPassword( newValue );
-                    }
-                }
-            }
-        });
+        ViewUtils.addRequiredValidationOnBlur( binding.usernameContainer, viewModel::getUsername, viewModel::setUsername, R.string.username_required_error );
+        ViewUtils.addRequiredValidationOnBlur( binding.passwordContainer, viewModel::getPassword, viewModel::setPassword, R.string.password_required_error );
 
         final CustomerListAdapter adapter = new CustomerListAdapter();
         adapter.setOnCustomerClickListener(customer -> {
@@ -121,12 +98,9 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         EssbarPreferences.setCookie( this, null );
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        showOfflineState( NetworkUtils.hasNetworkConnection( this ) );
+        getLifecycle().addObserver( connectivityLifecycleObserver );
+        connectivityLifecycleObserver.getConnectedStatus().observe( this, this::showOfflineState );
     }
 
     private void showOfflineState( boolean hasInternet ) {
@@ -135,8 +109,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void doDecryption() {
-        EncryptionUtils.decrypt( viewModel.getCustomer().getEncryptedPassword(), KEYSTORE_ALIAS, viewModel.getCustomer().getEncryptionIv(), new EncryptionUtils.DecryptionCallback()
-        {
+        EncryptionUtils.decrypt( viewModel.getCustomer().getEncryptedPassword(), KEYSTORE_ALIAS, viewModel.getCustomer().getEncryptionIv(), new EncryptionUtils.DecryptionCallback() {
             @Override
             public void onDecryptionSuccess(String decryptedPassword) {
                 viewModel.setUsername( viewModel.getCustomer().getNumber() );
@@ -158,31 +131,14 @@ public class LoginActivity extends AppCompatActivity {
 
     public void doLoginWithCredentials(final View view ) {
         showError( null );
-
-        final String username = ViewUtils.getString( binding.usernameField );
-        if( TextUtils.isEmpty( username ) ) {
-            binding.usernameContainer.setError( getString( R.string.username_required_error ) );
-            return;
-        } else {
-            binding.usernameContainer.setError( null );
+        if( ViewUtils.validateRequiredValue( binding.usernameContainer, viewModel::setUsername, R.string.username_required_error ) &&
+            ViewUtils.validateRequiredValue( binding.passwordContainer, viewModel::setPassword, R.string.password_required_error ) ) {
+            loginAtWebsite();
         }
-        viewModel.setUsername( username );
-
-        final String password = ViewUtils.getString( binding.passwordField );
-        if( TextUtils.isEmpty( password ) ) {
-            binding.passwordContainer.setError( getString( R.string.password_required_error ) );
-            return;
-        } else {
-            binding.passwordContainer.setError( null );
-        }
-        viewModel.setPassword( password );
-
-        loginAtWebsite();
     }
 
     private void doEncryption() {
-        EncryptionUtils.encrypt( viewModel.getPassword(), KEYSTORE_ALIAS, new EncryptionUtils.EncryptionCallback()
-        {
+        EncryptionUtils.encrypt( viewModel.getPassword(), KEYSTORE_ALIAS, new EncryptionUtils.EncryptionCallback() {
             @Override
             public void onEncryptionSuccess(String encryptedPassword, String encryptionIV) {
                 viewModel.insertCustomer( encryptedPassword, encryptionIV );
@@ -228,10 +184,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginAtWebsite() {
-        binding.usernameField.setEnabled( false );
-        binding.passwordField.setEnabled( false );
-        binding.saveCredentials.setEnabled( false );
-        binding.loginButton.setEnabled( false );
+        setFormEnabled( false );
 
         viewModel.getLoginDocument().observe(this, resource -> {
             if( resource.isSuccess() ) {
@@ -251,11 +204,15 @@ public class LoginActivity extends AppCompatActivity {
                 showError( message );
             }
 
-            binding.usernameField.setEnabled( true );
-            binding.passwordField.setEnabled( true );
-            binding.saveCredentials.setEnabled( true );
-            binding.loginButton.setEnabled( true );
+            setFormEnabled( true );
         } );
+    }
+
+    private void setFormEnabled( boolean isEnabled ) {
+        binding.usernameField.setEnabled( isEnabled );
+        binding.passwordField.setEnabled( isEnabled );
+        binding.saveCredentials.setEnabled( isEnabled );
+        binding.loginButton.setEnabled( isEnabled );
     }
 
     private void showError( @Nullable final String message ) {

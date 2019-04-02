@@ -12,15 +12,24 @@ import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.room.AppDatabase;
 import de.wackernagel.essbar.room.CustomerDao;
 import de.wackernagel.essbar.ui.viewModels.ViewModelFactory;
+import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
 import de.wackernagel.essbar.web.WebService;
 
 @Module
 public class RoomModule {
 
     private final AppDatabase database;
+    private final ConnectivityLifecycleObserver connectivityLifecycleObserver;
 
     public RoomModule( final Application application ) {
         this.database = Room.databaseBuilder( application, AppDatabase.class, "essbar.db" ).build();
+        this.connectivityLifecycleObserver = new ConnectivityLifecycleObserver( application );
+    }
+
+    @Provides
+    @Singleton
+    ConnectivityLifecycleObserver providerConnectivityLifecycleObserver() {
+        return connectivityLifecycleObserver;
     }
 
     @Provides

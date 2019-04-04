@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -298,8 +299,8 @@ public class LoginActivity extends AppCompatActivity {
             TextView textView = snackbarView.findViewById( com.google.android.material.R.id.snackbar_text);
             textView.setLineSpacing(0f ,1.4f);
             textView.setGravity(Gravity.CENTER_VERTICAL);
-            textView.setCompoundDrawablesWithIntrinsicBounds( ContextCompat.getDrawable( this, R.drawable.ic_error_outline_black_24dp ), null, null, null );
-            textView.setCompoundDrawableTintList( ContextCompat.getColorStateList( this, R.color.colorError ) );
+            textView.setCompoundDrawablesWithIntrinsicBounds( AppCompatResources.getDrawable( this, R.drawable.ic_error_outline_black_24dp ), null, null, null );
+            textView.setCompoundDrawableTintList( AppCompatResources.getColorStateList( this, R.color.colorError ) );
             textView.setCompoundDrawablePadding( getResources().getDimensionPixelSize( R.dimen.view_space ) );
             textView.setTextColor( ContextCompat.getColor( this, R.color.colorError ) );
             snackbar.show();

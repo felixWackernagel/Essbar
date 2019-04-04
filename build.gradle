@@ -15,10 +15,6 @@ buildscript {
     }
 }
 
-ext {
-    roomVersion = '2.1.0-alpha04'
-}
-
 allprojects {
     repositories {
         google()

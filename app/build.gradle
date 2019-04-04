@@ -34,8 +34,12 @@ android {
     }
 }
 
-dependencies {
+ext {
+    roomVersion = '2.1.0-alpha04'
+    lifecycleVersion = '2.0.0'
+}
 
+dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
@@ -43,16 +47,16 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.1.0-alpha02'
 
-    implementation "androidx.room:room-runtime:$rootProject.roomVersion"
-    annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha02'
 
-    implementation 'androidx.lifecycle:lifecycle-runtime:2.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    annotationProcessor 'androidx.lifecycle:lifecycle-compiler:2.0.0'
+    implementation "androidx.lifecycle:lifecycle-runtime:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
 
     implementation 'org.jsoup:jsoup:1.11.3'
 

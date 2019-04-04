@@ -57,8 +57,6 @@
                 app:errorEnabled="true"
                 app:errorTextAppearance="@style/ErrorTextAppearance"
                 app:hintTextAppearance="@style/HintTextAppearance"
-                app:passwordToggleContentDescription="@null"
-                app:passwordToggleDrawable="@drawable/ic_visibility_black_24dp"
                 app:passwordToggleEnabled="true"
                 app:passwordToggleTint="@color/colorAccent">
 
@@ -100,7 +98,7 @@
                 android:layout_marginTop="@dimen/view_space"
                 android:onClick="doLoginWithCredentials"
                 android:text="@string/login"
-                style="@style/Widget.AppCompat.Button.Colored" />
+                style="@style/Widget.MaterialComponents.Button" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"

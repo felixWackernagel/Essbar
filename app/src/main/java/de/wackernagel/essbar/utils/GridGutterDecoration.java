@@ -66,14 +66,26 @@ public class GridGutterDecoration extends RecyclerView.ItemDecoration {
             outRect.right = gutterSize - (column + 1) * gutterSize / spanCount;
         }
 
-        outRect.bottom = gutterSize;
+        // round down if gutterSize is a odd number
+        int halfGutterSize = ( (gutterSize % 2) == 0 ? (gutterSize / 2) : ( (gutterSize - 1) / 2 ) );
+        outRect.top = halfGutterSize;
+        outRect.bottom = halfGutterSize;
 
-        if( isFirstRow && gutterOutsideTopAndBottom ) {
-            outRect.top = gutterSize;
+        if( isFirstRow ) {
+            if( gutterOutsideTopAndBottom ) {
+                outRect.top = gutterSize;
+            } else {
+                outRect.top = 0;
+            }
+
         }
 
-        if( isLastRow && !gutterOutsideTopAndBottom ) {
-            outRect.bottom = 0;
+        if( isLastRow ) {
+            if( gutterOutsideTopAndBottom ) {
+                outRect.bottom = gutterSize;
+            } else {
+                outRect.bottom = 0;
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.AndroidInjection;
 import de.wackernagel.essbar.R;
@@ -36,11 +37,11 @@ public class MenuActivity extends AppCompatActivity {
         final int currentDayOfWeek = GregorianCalendar.getInstance().get( Calendar.DAY_OF_WEEK ) - 2;
 
         final MenuListAdapter adapter = new MenuListAdapter();
-
         binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
-        binding.recyclerView.setHasFixedSize( false );
+        binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
         binding.recyclerView.addItemDecoration( new GridGutterDecoration( getResources().getDimensionPixelSize( R.dimen.view_space ), 1, false, true ) );
+        binding.recyclerView.addItemDecoration( new DividerItemDecoration( this, DividerItemDecoration.VERTICAL));
         binding.recyclerView.addItemDecoration( new SectionItemDecoration( this, false, new SectionItemDecoration.SectionCallback() {
             @Override
             public boolean isSection( int position ) {
@@ -60,6 +61,5 @@ public class MenuActivity extends AppCompatActivity {
         }) );
 
         viewModel.getMenuItems().observe(this, adapter::submitList);
-        viewModel.getCheckedMenuItems().observe( this, adapter::setCheckedItems );
     }
 }

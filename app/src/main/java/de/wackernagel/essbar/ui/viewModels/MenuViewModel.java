@@ -1,7 +1,5 @@
 package de.wackernagel.essbar.ui.viewModels;
 
-import android.util.SparseBooleanArray;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
@@ -28,14 +26,11 @@ public class MenuViewModel extends ViewModel {
 
     private final EssbarRepository repository;
     private final MutableLiveData<List<Menu>> itemsLiveData;
-    private final MutableLiveData<SparseBooleanArray> checkedItemsLiveData;
 
     MenuViewModel(final EssbarRepository repository ) {
         this.repository = repository;
         itemsLiveData = new MutableLiveData<>();
         itemsLiveData.setValue( Collections.emptyList() );
-        checkedItemsLiveData = new MutableLiveData<>();
-        checkedItemsLiveData.setValue( new SparseBooleanArray( 0 ) );
     }
 
     public LiveData<List<Menu>> getMenuItems() {
@@ -57,22 +52,5 @@ public class MenuViewModel extends ViewModel {
             itemsLiveData.setValue( allMenuItems );
         }
         return itemsLiveData;
-    }
-
-    public LiveData<SparseBooleanArray> getCheckedMenuItems() {
-        return Transformations.switchMap( itemsLiveData, this::getOrderedMenus );
-    }
-
-    private LiveData<SparseBooleanArray> getOrderedMenus( final List<Menu> menuList ) {
-        if( menuList != null && !menuList.isEmpty() ) {
-            final SparseBooleanArray checkedItems = new SparseBooleanArray( menuList.size() );
-            for (Menu item : menuList ) {
-                if( item.isOrdered() ) {
-                    checkedItems.put( item.getId(), true );
-                }
-            }
-            checkedItemsLiveData.setValue( checkedItems );
-        }
-        return checkedItemsLiveData;
     }
 }

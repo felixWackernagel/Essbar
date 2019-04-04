@@ -22,7 +22,7 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
 
     MenuListAdapter() {
         super( new MenuItemCallback() );
-        this.checkedItems = new SparseBooleanArray();
+        this.checkedItems = new SparseBooleanArray( 20 );
         setHasStableIds( true );
     }
 
@@ -34,6 +34,11 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
     @Override
     public void submitList(@Nullable List<Menu> list) {
         super.submitList(list);
+        if( list != null ) {
+            for( Menu item : list ) {
+                checkedItems.put( item.getId(), item.isOrdered() );
+            }
+        }
     }
 
     Menu getListItem(int position ) {
@@ -56,22 +61,9 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
             // Check if change was by button press or setter based.
             if( buttonView.isPressed() ) {
                 final int clickedItemId = getItem( holder.getAdapterPosition() ).getId();
-                if( checkedItems.get( clickedItemId ) ) {
-                    checkedItems.delete( clickedItemId );
-                } else {
-                    checkedItems.put( clickedItemId, true );
-                }
+                checkedItems.put( clickedItemId, !checkedItems.get( clickedItemId ) );
             }
         });
-    }
-
-    void setCheckedItems( final SparseBooleanArray checkedItems) {
-        if( checkedItems == null ) {
-            this.checkedItems = new SparseBooleanArray( getItemCount() );
-        } else {
-            this.checkedItems = checkedItems;
-        }
-        notifyDataSetChanged();
     }
 
     static class MenuViewHolder extends RecyclerView.ViewHolder {

@@ -26,7 +26,7 @@ public class Menu {
         menuName = element.text().replaceAll("\\(.*?\\) ?", "");
     }
 
-    String getMenuName() {
+    public String getMenuName() {
         return menuName;
     }
 
@@ -34,7 +34,7 @@ public class Menu {
         return id;
     }
 
-    boolean isEditable() {
+    public boolean isEditable() {
         return editable;
     }
 

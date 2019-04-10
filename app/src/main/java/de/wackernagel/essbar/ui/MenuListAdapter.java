@@ -3,19 +3,20 @@ package de.wackernagel.essbar.ui;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.TextView;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import de.wackernagel.essbar.R;
+
+import static de.wackernagel.essbar.BR.obj;
 
 public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewHolder> {
     private SparseBooleanArray checkedItems;
@@ -45,35 +46,51 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
         return getItem( position );
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return R.layout.item_menu;
+    }
+
     @NonNull
     @Override
     public MenuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new MenuViewHolder(LayoutInflater.from( parent.getContext() ).inflate( R.layout.item_menu, parent, false ));
+        final LayoutInflater layoutInflater = LayoutInflater.from( parent.getContext() );
+        final ViewDataBinding binding = DataBindingUtil.inflate( layoutInflater, viewType, parent, false );
+        return new MenuViewHolder( binding );
     }
 
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         final Menu item = getItem( position );
-        holder.textView.setText( item.getMenuName() );
-        holder.checkBox.setEnabled( item.isEditable() );
-        holder.checkBox.setChecked( checkedItems.get( item.getId() ) );
-        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked ) -> {
-            // Check if change was by button press or setter based.
-            if( buttonView.isPressed() ) {
-                final int clickedItemId = getItem( holder.getAdapterPosition() ).getId();
-                checkedItems.put( clickedItemId, !checkedItems.get( clickedItemId ) );
-            }
-        });
+        holder.binding.setVariable( obj, item );
+
+        // DONE in Databinding
+        //        holder.binding.textView.setText( item.getMenuName() );
+
+        // TODO
+        // https://medium.com/@alzahm/thank-you-for-your-great-post-i-learned-a-lot-e24de2371166
+//        holder.binding.imageView.setVisibility( item.isEditable() ? View.GONE : View.VISIBLE );
+
+//        holder.binding.checkbox.setVisibility( item.isEditable() ? View.VISIBLE : View.GONE );
+//        holder.binding.checkbox.setEnabled( item.isEditable() );
+//        holder.binding.checkbox.setChecked( checkedItems.get( item.getId() ) );
+//        holder.binding.checkbox.setOnCheckedChangeListener((buttonView, isChecked ) -> {
+//            // Check if change was by button press or setter based.
+//            if( buttonView.isPressed() ) {
+//                final int clickedItemId = getItem( holder.getAdapterPosition() ).getId();
+//                checkedItems.put( clickedItemId, !checkedItems.get( clickedItemId ) );
+//            }
+//        });
+
+        holder.binding.executePendingBindings(); // run binding immediately
     }
 
     static class MenuViewHolder extends RecyclerView.ViewHolder {
-        CheckBox checkBox;
-        TextView textView;
+        final ViewDataBinding binding;
 
-        MenuViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textView = itemView.findViewById( R.id.textView );
-            checkBox = itemView.findViewById( R.id.checkbox );
+        MenuViewHolder(@NonNull ViewDataBinding binding) {
+            super( binding.getRoot() );
+            this.binding = binding;
         }
     }
 

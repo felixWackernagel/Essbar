@@ -40,8 +40,7 @@ public class MenuActivity extends AppCompatActivity {
         binding.recyclerView.setLayoutManager( new LinearLayoutManager( this ) );
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
-        binding.recyclerView.addItemDecoration( new GridGutterDecoration( getResources().getDimensionPixelSize( R.dimen.view_space ), 1, false, true ) );
-        binding.recyclerView.addItemDecoration( new DividerItemDecoration( this, DividerItemDecoration.VERTICAL));
+        //binding.recyclerView.addItemDecoration( new DividerItemDecoration( this, DividerItemDecoration.VERTICAL));
         binding.recyclerView.addItemDecoration( new SectionItemDecoration( this, false, new SectionItemDecoration.SectionCallback() {
             @Override
             public boolean isSection( int position ) {

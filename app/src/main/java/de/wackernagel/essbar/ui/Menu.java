@@ -38,7 +38,7 @@ public class Menu {
         return editable;
     }
 
-    public boolean isOrdered() {
+    boolean isOrdered() {
         return ordered;
     }
 

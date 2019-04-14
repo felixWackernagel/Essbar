@@ -1,6 +1,7 @@
 package de.wackernagel.essbar.ui;
 
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.util.Objects;
 
@@ -11,6 +12,7 @@ public class Menu {
     private boolean ordered;
     private int weekday;
     private int menuTyp;
+    private boolean paused;
 
     public Menu(final Element element ) {
         weekday = getWeekdayIndex( element );
@@ -19,11 +21,18 @@ public class Menu {
         editable = element.classNames().contains( "pointer" );
         ordered = element.classNames().contains( "gruen" );
 
-        // remove all meta data
-        element.select("div").remove();
+        final Elements deliveryPause = element.select(".zustellpause");
+        paused = !deliveryPause.isEmpty();
+        if( paused ) {
+            menuName = deliveryPause.get( 0 ).text().replaceAll("\\(.*?\\) ?", "");
+        } else {
+            // remove all meta data
+            element.select("div").remove();
 
-        // remove braces
-        menuName = element.text().replaceAll("\\(.*?\\) ?", "");
+            // remove braces
+            menuName = element.text().replaceAll("\\(.*?\\) ?", "");
+        }
+
     }
 
     public String getMenuName() {
@@ -38,8 +47,12 @@ public class Menu {
         return editable;
     }
 
-    boolean isOrdered() {
+    public boolean isOrdered() {
         return ordered;
+    }
+
+    public boolean isPaused() {
+        return paused;
     }
 
     int getWeekday() {

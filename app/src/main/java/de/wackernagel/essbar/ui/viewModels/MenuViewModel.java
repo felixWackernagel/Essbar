@@ -1,6 +1,7 @@
 package de.wackernagel.essbar.ui.viewModels;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import de.wackernagel.essbar.repository.EssbarRepository;
+import de.wackernagel.essbar.ui.KW;
 import de.wackernagel.essbar.ui.Menu;
 import de.wackernagel.essbar.web.Resource;
 
@@ -25,12 +27,20 @@ public class MenuViewModel extends ViewModel {
     };
 
     private final EssbarRepository repository;
+
     private final MutableLiveData<List<Menu>> itemsLiveData;
+    private final MutableLiveData<List<KW>> kwsLiveData;
 
     MenuViewModel(final EssbarRepository repository ) {
         this.repository = repository;
         itemsLiveData = new MutableLiveData<>();
         itemsLiveData.setValue( Collections.emptyList() );
+        kwsLiveData = new MutableLiveData<>();
+        kwsLiveData.setValue( Collections.emptyList() );
+    }
+
+    public LiveData<List<KW>> getKwItems() {
+        return kwsLiveData;
     }
 
     public LiveData<List<Menu>> getMenuItems() {
@@ -40,8 +50,14 @@ public class MenuViewModel extends ViewModel {
     private LiveData<List<Menu>> getMenusList(final Resource<Document> resource) {
         if( resource != null && resource.getResource() != null ) {
             final Document menuPage = resource.getResource();
+            final List<KW> kwItems = new ArrayList<>();
+            for( Element option : menuPage.select( "#select_woche > select > option" ) ) {
+                kwItems.add( new KW( option ) );
+            }
+            kwsLiveData.setValue( kwItems );
+
             final List<Menu> allMenuItems = new ArrayList<>();
-            for(int menuTypeIndex = 0; menuTypeIndex < menuTypeSelectors.length; menuTypeIndex++ ) {
+            for( int menuTypeIndex = 0; menuTypeIndex < menuTypeSelectors.length; menuTypeIndex++ ) {
                 final String menuTypeSelector = menuTypeSelectors[ menuTypeIndex ];
                 final Elements menuTypeElements = menuPage.select( menuTypeSelector );
                 for( int menuIndex = 0; menuIndex < menuTypeElements.size(); menuIndex++ ) {

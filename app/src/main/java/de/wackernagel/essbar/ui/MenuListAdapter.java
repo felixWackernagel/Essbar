@@ -51,7 +51,7 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
 
     @Override
     public int getItemViewType(int position) {
-        if( getItem( position ).getMenuTyp() == 3 )
+        if( getItem( position ).getMenuTyp() == 3 && !getItem( position ).isPaused() )
             return R.layout.item_menu_lunch;
         return R.layout.item_menu;
     }

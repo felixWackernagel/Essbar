@@ -2,13 +2,21 @@ package de.wackernagel.essbar.ui;
 
 import org.jsoup.nodes.Element;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class KW {
+    private final SimpleDateFormat formatter = new SimpleDateFormat( "ww dd.MM.yyyy EEE", Locale.getDefault());
+
     private final String value;
+    private final Date startDate;
     private final boolean selected;
     private final String name;
 
     public KW( final Element element ) {
         this.value = element.attr("value" );
+        this.startDate = new Date( Long.valueOf( value ) * 1000 ); // value is date in seconds
         this.selected = element.classNames().contains( "selected" );
         this.name = formatName( element.text() );
     }
@@ -21,6 +29,10 @@ public class KW {
 
     public String getValue() {
         return value;
+    }
+
+    public Date getStartDate() {
+        return startDate;
     }
 
     public String getName() {

@@ -30,6 +30,10 @@ public class EssbarRepository {
         return webService.requestMenusDocument();
     }
 
+    public LiveData<Resource<Document>> getMenusDocumentByDate( final String date ) {
+        return webService.requestMenuDocumentByDate( date );
+    }
+
     public LiveData<Resource<Document>> getLoginDocument( final String username, final String password ) {
         return webService.requestLoginDocument( username, password );
     }

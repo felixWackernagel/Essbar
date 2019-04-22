@@ -15,6 +15,11 @@
     <string name="decryption_canceled_error">Sie müssen sich authentifizieren damit wir Ihr Passwort entschlüsseln können.</string>
     <string name="save_credentials">Kundendaten speichern?\n(Ihr Passwort wird dabei verschlüsselt)</string>
     <string name="profile_section">Gespeicherte Kundendaten</string>
+    <plurals name="changed_orders">
+        <item quantity="one">%1$d Menü</item>
+        <item quantity="other">%1$d Menüs</item>
+    </plurals>
+    <string name="action_menu_change">Ändern</string>
 
     <array name="weekdays">
         <item>Montag</item>

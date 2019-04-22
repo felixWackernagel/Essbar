@@ -19,23 +19,12 @@
         android:layout_width="match_parent"
         android:layout_height="56dp">
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_gravity="start|center_vertical"
-            android:src="@drawable/ic_shopping_cart_black_24dp"
-            android:tint="@color/colorAccent"
-            android:contentDescription="@null"
-            android:visibility="@{obj.ordered ? View.VISIBLE : View.GONE}"/>
-
         <TextView
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="16dp"
             android:layout_marginEnd="56dp"
             android:text="@{obj.menuName}"
             tools:text="Frühstück"
@@ -51,6 +40,18 @@
             android:checked="@{adapter.isMenuChecked( obj.id )}"
             android:onCheckedChanged="@{holder::onCheckedChanged}"
             tools:checked="true" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/ic_shopping_cart_black_24dp"
+            android:tint="@color/colorAccent"
+            android:contentDescription="@null"
+            android:visibility="@{!obj.editable &amp;&amp; obj.ordered ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone"/>
 
     </FrameLayout>
 </layout>

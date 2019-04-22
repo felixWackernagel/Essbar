@@ -111,4 +111,17 @@ public class Menu {
             throw new IllegalStateException("No known weekday found.");
         }
     }
+
+    @Override
+    public String toString() {
+        return "Menu{" +
+                "id=" + id +
+                ", menuName='" + menuName + '\'' +
+                ", editable=" + editable +
+                ", ordered=" + ordered +
+                ", weekday=" + weekday +
+                ", menuTyp=" + menuTyp +
+                ", paused=" + paused +
+                '}';
+    }
 }

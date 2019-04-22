@@ -12,9 +12,12 @@ public interface WebService {
 
     @FormUrlEncoded
     @POST( "/index.php?ear_a=akt_login" )
-    LiveData<Resource<Document>> requestLoginDocument(@Field("Login_Name") String username, @Field("Login_Passwort") String password );
+    LiveData<Resource<Document>> requestLoginDocument( @Field("Login_Name") String username, @Field("Login_Passwort") String password );
 
     @GET( "/index.php?m=2;0" )
     LiveData<Resource<Document>> requestMenusDocument();
 
+    @FormUrlEncoded
+    @POST( "/index.php?m=2;0" )
+    LiveData<Resource<Document>> requestMenuDocumentByDate( @Field("sel_datum") String selectedDate );
 }

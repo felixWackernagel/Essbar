@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 
-import java.util.List;
+import javax.annotation.Nonnull;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,7 +22,19 @@ import static de.wackernagel.essbar.BR.holder;
 import static de.wackernagel.essbar.BR.obj;
 
 public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewHolder> {
+
+    public interface OnOrderStatusChangedListener {
+        /**
+         * Called every time the checkbox on the menu item is clicked.
+         *
+         * @param menu which was changed
+         * @param isOrdered as new value of menu
+         */
+        void onOrderStatusChanged(Menu menu, boolean isOrdered );
+    }
+
     private SparseBooleanArray checkedItems;
+    private OnOrderStatusChangedListener menuStatusChangedListener;
 
     MenuListAdapter() {
         super( new MenuItemCallback() );
@@ -30,19 +42,18 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
         setHasStableIds( true );
     }
 
-    @Override
-    public long getItemId(int position) {
-        return Integer.valueOf( getItem( position ).getId() ).longValue();
+    void setCheckedItems( @Nonnull final SparseBooleanArray checkedItems ) {
+        this.checkedItems = checkedItems;
+        notifyDataSetChanged();
+    }
+
+    void setOnMenuStatusChangedListener( @Nullable final OnOrderStatusChangedListener menuStatusChangedListener ) {
+        this.menuStatusChangedListener = menuStatusChangedListener;
     }
 
     @Override
-    public void submitList(@Nullable List<Menu> list) {
-        super.submitList(list);
-        if( list != null ) {
-            for( Menu item : list ) {
-                checkedItems.put( item.getId(), item.isOrdered() );
-            }
-        }
+    public long getItemId(int position) {
+        return Integer.valueOf( getItem( position ).getId() ).longValue();
     }
 
     Menu getListItem(int position ) {
@@ -62,7 +73,7 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
         final LayoutInflater layoutInflater = LayoutInflater.from( parent.getContext() );
         final ViewDataBinding binding = DataBindingUtil.inflate( layoutInflater, viewType, parent, false );
         binding.setVariable( adapter, this );
-        return new MenuViewHolder( binding, checkedItems);
+        return new MenuViewHolder( binding );
     }
 
     public boolean isMenuChecked( int menuId ) {
@@ -72,22 +83,24 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
     @Override
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         final Menu item = getItem( position );
-        holder.bind( item );
+        holder.bind( item, checkedItems, menuStatusChangedListener );
     }
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
         final ViewDataBinding binding;
-        final SparseBooleanArray checkedItems;
         Menu menu;
+        SparseBooleanArray orderedMenus;
+        OnOrderStatusChangedListener menuStatusChangedListener;
 
-        MenuViewHolder(@NonNull ViewDataBinding binding, SparseBooleanArray checkedItems) {
+        MenuViewHolder(@NonNull ViewDataBinding binding) {
             super( binding.getRoot() );
             this.binding = binding;
-            this.checkedItems = checkedItems;
         }
 
-        void bind( final Menu menu ) {
+        void bind(final Menu menu, final SparseBooleanArray orderedMenus, final OnOrderStatusChangedListener menuStatusChangedListener ) {
             this.menu = menu;
+            this.orderedMenus = orderedMenus;
+            this.menuStatusChangedListener = menuStatusChangedListener;
             binding.setVariable( obj, menu );
             binding.setVariable( holder, this );
             binding.executePendingBindings(); // run binding immediately
@@ -97,7 +110,12 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             // Check if change was by button press or setter based.
             if( buttonView.isPressed() ) {
-                checkedItems.put( menu.getId(), !checkedItems.get( menu.getId() ) );
+                final boolean isOrdered = !orderedMenus.get( menu.getId() );
+                orderedMenus.put( menu.getId(), isOrdered );
+
+                if( menuStatusChangedListener != null ) {
+                    menuStatusChangedListener.onOrderStatusChanged( menu, isOrdered );
+                }
             }
         }
     }

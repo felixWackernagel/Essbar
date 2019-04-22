@@ -2,6 +2,8 @@ package de.wackernagel.essbar.web;
 
 import javax.annotation.Nullable;
 
+import androidx.annotation.NonNull;
+
 public class Resource<T> {
     private T resource;
     private Throwable error;
@@ -33,5 +35,11 @@ public class Resource<T> {
         final Resource<T> resource = new Resource<>();
         resource.error = error;
         return resource;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Resource [success=" + isSuccess() + "]";
     }
 }

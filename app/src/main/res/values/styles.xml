@@ -1,15 +1,21 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="ToolbarAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
+        <item name="actionModeBackground">@color/colorPrimaryDark</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
     <style name="ErrorTextAppearance" parent="TextAppearance.AppCompat.Small">

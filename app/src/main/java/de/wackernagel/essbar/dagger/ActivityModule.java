@@ -8,7 +8,7 @@ import de.wackernagel.essbar.ui.MenuActivity;
 @Module
 public abstract class ActivityModule {
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
     abstract MenuActivity contributeMainActivityInjector();
 
     @ContributesAndroidInjector

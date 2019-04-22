@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -124,8 +125,18 @@ public class MenuViewModel extends ViewModel {
         return numberOfChangedOrders;
     }
 
-    public void loadCalendarWeek( @Nullable final String dateOfCalendarWeekInSeconds ) {
-        calendarWeek.setValue( dateOfCalendarWeekInSeconds );
+    public void loadCurrentCalendarWeek() {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.DAY_OF_WEEK, Calendar.MONDAY );
+        calendar.set( Calendar.HOUR_OF_DAY, 0 );
+        calendar.set( Calendar.MINUTE, 0 );
+        calendar.set( Calendar.SECOND, 0 );
+        final String dateInSeconds = String.valueOf( calendar.getTimeInMillis() / 1000 );
+        loadCalendarWeek( dateInSeconds );
+    }
+
+    public void loadCalendarWeek( @Nullable final String startDateOfCalendarWeekInSeconds ) {
+        calendarWeek.setValue( startDateOfCalendarWeekInSeconds );
     }
 
     public void incrementNumberOfChangedOrders() {

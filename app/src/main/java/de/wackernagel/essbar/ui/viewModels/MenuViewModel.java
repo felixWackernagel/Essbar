@@ -37,6 +37,7 @@ public class MenuViewModel extends ViewModel {
 
     private final MutableLiveData<String> calendarWeek;
 
+    private final LiveData<Resource<Document>> document;
     private final LiveData<List<Menu>> menus;
     private final LiveData<SparseBooleanArray> menusOrderStatus;
     private final LiveData<List<KW>> calendarWeeks;
@@ -48,10 +49,10 @@ public class MenuViewModel extends ViewModel {
         numberOfChangedOrders = new MutableLiveData<>();
         numberOfChangedOrders.setValue( 0 );
 
-        final LiveData<Resource<Document>> documentLiveData = Transformations.switchMap(calendarWeek, this::getMenuDocument );
-        menus = Transformations.switchMap( documentLiveData, this::getMenusList );
+        document = Transformations.switchMap(calendarWeek, this::getMenuDocument );
+        menus = Transformations.switchMap(document, this::getMenusList );
         menusOrderStatus = Transformations.switchMap(menus, this::getCheckedMenus );
-        calendarWeeks = Transformations.switchMap( documentLiveData, this::getCalendarWeekList);
+        calendarWeeks = Transformations.switchMap(document, this::getCalendarWeekList);
     }
 
     private LiveData<Resource<Document>> getMenuDocument( final String calendarWeek ) {
@@ -107,6 +108,28 @@ public class MenuViewModel extends ViewModel {
             result.setValue( Collections.emptyList() );
         }
         return result;
+    }
+
+    public LiveData<Resource<Document>> getMenuReviewDocument() {
+        final StringBuilder formPayloadBuilder = new StringBuilder();
+        final List<Menu> allMenus = menus.getValue();
+        if( allMenus != null && !allMenus.isEmpty() ) {
+            formPayloadBuilder.append("m_alt=");
+            formPayloadBuilder.append("&starttag=").append( document.getValue().getResource().selectFirst("input[name=starttag]").attr("value"));
+            formPayloadBuilder.append("&endtag=").append( document.getValue().getResource().selectFirst("input[name=endtag]").attr("value"));
+            for( Menu menu : allMenus ) {
+                if( menu.getInputName() == null ) {
+                    continue;
+                }
+                formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 0 );
+                // skip second input if value has changed
+                if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) == menu.isOrdered() ) {
+                    formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 1 );
+                }
+            }
+            formPayloadBuilder.append("&btn_bestellen=Weiter");
+        }
+        return repository.getMenuConfirmationDocument( formPayloadBuilder.toString() );
     }
 
     public LiveData<List<Menu>> getMenus() {

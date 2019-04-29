@@ -12,7 +12,6 @@ import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 import de.wackernagel.essbar.R;
-import de.wackernagel.essbar.databinding.ActivityMenuBinding;
 
 public class MenuActivity extends AppCompatActivity implements HasSupportFragmentInjector {
 
@@ -24,7 +23,8 @@ public class MenuActivity extends AppCompatActivity implements HasSupportFragmen
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
 
-        final ActivityMenuBinding binding = DataBindingUtil.setContentView( this, R.layout.activity_menu);
+        DataBindingUtil.setContentView( this, R.layout.activity_menu);
+
         if( savedInstanceState == null ) {
             getSupportFragmentManager().beginTransaction().replace( R.id.container, MenuListFragment.newInstance(), "menu-list").commit();
         }

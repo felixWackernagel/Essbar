@@ -3,9 +3,12 @@ package de.wackernagel.essbar.web;
 import org.jsoup.nodes.Document;
 
 import androidx.lifecycle.LiveData;
+import okhttp3.RequestBody;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
 public interface WebService {
@@ -16,6 +19,10 @@ public interface WebService {
 
     @GET( "/index.php?m=2;0" )
     LiveData<Resource<Document>> requestMenusDocument();
+
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @POST( "/index.php?m=2;0" )
+    LiveData<Resource<Document>> requestMenuConfirmationDocument( @Body RequestBody formData );
 
     @FormUrlEncoded
     @POST( "/index.php?m=2;0" )

@@ -5,6 +5,10 @@ import org.jsoup.select.Elements;
 
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
+
+import androidx.annotation.Nullable;
+
 public class Menu {
     private int id;
     private String menuName;
@@ -13,6 +17,8 @@ public class Menu {
     private int weekday;
     private int menuTyp;
     private boolean paused;
+    private String inputName;
+    private String price;
 
     public Menu(final Element element ) {
         weekday = getWeekdayIndex( element );
@@ -20,6 +26,17 @@ public class Menu {
         id = menuTyp + ( weekday * 4 );
         editable = element.classNames().contains( "pointer" );
         ordered = element.classNames().contains( "gruen" );
+        if( editable ) {
+            final Elements hiddenFields = element.select( "input[type='hidden']" );
+            if( hiddenFields != null && hiddenFields.size() == 1 ) {
+                inputName = hiddenFields.get( 0 ).attr( "name" );
+            }
+        }
+
+        final Element priceCell = element.siblingElements().get( 0 );
+        priceCell.select( "span" ).remove();
+        priceCell.select( "br" ).remove();
+        price = priceCell.text();
 
         final Elements deliveryPause = element.select(".zustellpause");
         paused = !deliveryPause.isEmpty();
@@ -63,23 +80,13 @@ public class Menu {
         return menuTyp;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Menu item = (Menu) o;
-        return id == item.id &&
-                editable == item.editable &&
-                ordered == item.ordered &&
-                weekday == item.weekday &&
-                menuTyp == item.menuTyp &&
-                Objects.equals(menuName, item.menuName);
+    @Nullable
+    public String getInputName() {
+        return inputName;
     }
 
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(id, menuName, editable, ordered, weekday, menuTyp);
+    public String getPrice() {
+        return price;
     }
 
     private static int getMenuTypIndex(final Element element ) {
@@ -113,6 +120,27 @@ public class Menu {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Menu menu = (Menu) o;
+        return id == menu.id &&
+                editable == menu.editable &&
+                ordered == menu.ordered &&
+                weekday == menu.weekday &&
+                menuTyp == menu.menuTyp &&
+                paused == menu.paused &&
+                Objects.equals(menuName, menu.menuName) &&
+                Objects.equals(inputName, menu.inputName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, menuName, editable, ordered, weekday, menuTyp, paused, inputName);
+    }
+
+    @Nonnull
+    @Override
     public String toString() {
         return "Menu{" +
                 "id=" + id +
@@ -122,6 +150,7 @@ public class Menu {
                 ", weekday=" + weekday +
                 ", menuTyp=" + menuTyp +
                 ", paused=" + paused +
+                ", inputName='" + inputName + '\'' +
                 '}';
     }
 }

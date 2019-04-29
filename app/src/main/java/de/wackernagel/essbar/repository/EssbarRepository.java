@@ -9,6 +9,8 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.room.CustomerDao;
 import de.wackernagel.essbar.web.Resource;
 import de.wackernagel.essbar.web.WebService;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 public class EssbarRepository {
 
@@ -36,6 +38,10 @@ public class EssbarRepository {
 
     public LiveData<Resource<Document>> getLoginDocument( final String username, final String password ) {
         return webService.requestLoginDocument( username, password );
+    }
+
+    public LiveData<Resource<Document>> getMenuConfirmationDocument(final String formPayload ) {
+        return webService.requestMenuConfirmationDocument( RequestBody.create( MediaType.parse( "text/plain" ), formPayload ) );
     }
 
     public void insertCustomer( final Customer customer ) {

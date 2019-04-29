@@ -20,6 +20,7 @@
         <item quantity="other">%1$d Menüs</item>
     </plurals>
     <string name="action_menu_change">Ändern</string>
+    <string name="menu_name_and_price">%s (%s)</string>
 
     <array name="weekdays">
         <item>Montag</item>

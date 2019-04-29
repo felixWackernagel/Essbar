@@ -38,7 +38,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="56dp"
             android:lineSpacingMultiplier="1.2"
-            android:text="@{obj.menuName}"
+            android:text="@{@string/menu_name_and_price(obj.menuName, obj.price)}"
             tools:text="Hartweizen Nudeln mit Tomatenpesto auf Hackfleisch"
             style="@style/ListItemSecondary"/>
 

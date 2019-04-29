@@ -12,14 +12,13 @@ import android.widget.AdapterView;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
@@ -28,7 +27,7 @@ import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 
-public class MenuListFragment extends Fragment implements AdapterView.OnItemSelectedListener, ActionMode.Callback {
+public class MenuListFragment extends ToolbarFragment implements AdapterView.OnItemSelectedListener, ActionMode.Callback {
 
     static MenuListFragment newInstance() {
         final MenuListFragment fragment = new MenuListFragment();
@@ -43,14 +42,6 @@ public class MenuListFragment extends Fragment implements AdapterView.OnItemSele
     private MenuViewModel viewModel;
     private ToolbarSpinnerAdapter<KW> calendarWeeksAdapter;
     private ActionMode actionMode;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        if( !( context instanceof AppCompatActivity ) ) {
-            throw new IllegalStateException( "MenuListFragment can only be attached to a AppCompatActivity." );
-        }
-        super.onAttach(context);
-    }
 
     @Nullable
     @Override
@@ -76,9 +67,9 @@ public class MenuListFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     private void setupToolbar() {
-        ( (AppCompatActivity) requireActivity() ).setSupportActionBar(binding.toolbar);
+        setSupportActionBar(binding.toolbar);
 
-        final ActionBar actionBar = ( (AppCompatActivity) requireActivity() ).getSupportActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         Context themedContext = getContext();
         if( actionBar != null ) {
             actionBar.setDisplayShowTitleEnabled(false);
@@ -99,7 +90,7 @@ public class MenuListFragment extends Fragment implements AdapterView.OnItemSele
         binding.toolbarSpinner.setAdapter(calendarWeeksAdapter);
         binding.toolbarSpinner.setOnItemSelectedListener(this );
 
-        viewModel.getCalendarWeeks().observe(this, calendarWeeks -> {
+        viewModel.getCalendarWeeks().observe( getViewLifecycleOwner(), calendarWeeks -> {
             binding.toolbarSpinner.setOnItemSelectedListener( null );
             calendarWeeksAdapter.setItems( calendarWeeks );
             binding.toolbarSpinner.setSelection( findIndexOfSelectedItem( calendarWeeks ), false );
@@ -124,16 +115,10 @@ public class MenuListFragment extends Fragment implements AdapterView.OnItemSele
         final String todayAsWord = getString( R.string.today );
 
         final MenuListAdapter adapter = new MenuListAdapter();
-        adapter.setOnMenuStatusChangedListener( ( (menu, isOrdered) -> {
-            if( menu.isOrdered() != isOrdered ) {
-                viewModel.incrementNumberOfChangedOrders();
-            } else {
-                viewModel.decrementNumberOfChangedOrders();
-            }
-        } ) );
-        viewModel.getMenusOrderStatus().observe( this, adapter::setCheckedItems );
+        adapter.setOnMenuStatusChangedListener( this::updateNumberOfChangedMenus );
+        viewModel.getMenusOrderStatus().observe( getViewLifecycleOwner(), adapter::setCheckedItems );
 
-        binding.recyclerView.setLayoutManager( new LinearLayoutManager( getContext() ) );
+        binding.recyclerView.setLayoutManager( new LinearLayoutManager( null ) );
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
         binding.recyclerView.addItemDecoration( new SectionItemDecoration( requireContext(), false, new SectionItemDecoration.SectionCallback() {
@@ -160,13 +145,21 @@ public class MenuListFragment extends Fragment implements AdapterView.OnItemSele
             }
         }) );
 
-        viewModel.getMenus().observe(this, adapter::submitList);
+        viewModel.getMenus().observe( getViewLifecycleOwner(), adapter::submitList);
+    }
+
+    private void updateNumberOfChangedMenus( @Nonnull final Menu menu, final boolean isOrdered ) {
+        if( menu.isOrdered() != isOrdered ) {
+            viewModel.incrementNumberOfChangedOrders();
+        } else {
+            viewModel.decrementNumberOfChangedOrders();
+        }
     }
 
     private void setupContextualActionBar() {
-        viewModel.getNumberOfChangedOrders().observe( this, (changedOrdersCount) -> {
+        viewModel.getNumberOfChangedOrders().observe( getViewLifecycleOwner(), (changedOrdersCount) -> {
             if( changedOrdersCount > 0 && actionMode == null ) {
-                actionMode = ( (AppCompatActivity) requireActivity() ).startSupportActionMode(this );
+                actionMode = startSupportActionMode(this );
             } else if( actionMode != null ) {
                 if( changedOrdersCount == 0 ) {
                     actionMode.finish();
@@ -203,7 +196,8 @@ public class MenuListFragment extends Fragment implements AdapterView.OnItemSele
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch( item.getItemId() ) {
-            case R.id.action_change:
+            case R.id.action_change_menus_order_status:
+                MenuConfirmationFragment.newInstance().show( requireFragmentManager(), MenuConfirmationFragment.TAG );
                 return true;
 
             default:

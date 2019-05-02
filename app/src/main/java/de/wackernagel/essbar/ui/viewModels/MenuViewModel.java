@@ -18,7 +18,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import de.wackernagel.essbar.repository.EssbarRepository;
-import de.wackernagel.essbar.ui.KW;
+import de.wackernagel.essbar.ui.CalendarWeek;
 import de.wackernagel.essbar.ui.Menu;
 import de.wackernagel.essbar.web.Resource;
 
@@ -40,7 +40,7 @@ public class MenuViewModel extends ViewModel {
     private final LiveData<Resource<Document>> document;
     private final LiveData<List<Menu>> menus;
     private final LiveData<SparseBooleanArray> menusOrderStatus;
-    private final LiveData<List<KW>> calendarWeeks;
+    private final LiveData<List<CalendarWeek>> calendarWeeks;
     private final MutableLiveData<Integer> numberOfChangedOrders;
 
     MenuViewModel( final EssbarRepository repository ) {
@@ -95,15 +95,15 @@ public class MenuViewModel extends ViewModel {
         return result;
     }
 
-    private LiveData<List<KW>> getCalendarWeekList( final Resource<Document> resource) {
-        final MutableLiveData<List<KW>> result = new MutableLiveData<>();
+    private LiveData<List<CalendarWeek>> getCalendarWeekList(final Resource<Document> resource) {
+        final MutableLiveData<List<CalendarWeek>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
             final Document menuPage = resource.getResource();
-            final List<KW> kwItems = new ArrayList<>();
+            final List<CalendarWeek> calendarWeekItems = new ArrayList<>();
             for( Element option : menuPage.select(CALENDAR_WEEK_SELECTOR) ) {
-                kwItems.add( new KW( option ) );
+                calendarWeekItems.add( new CalendarWeek( option ) );
             }
-            result.setValue( kwItems );
+            result.setValue(calendarWeekItems);
         } else {
             result.setValue( Collections.emptyList() );
         }
@@ -140,7 +140,7 @@ public class MenuViewModel extends ViewModel {
         return menusOrderStatus;
     }
 
-    public LiveData<List<KW>> getCalendarWeeks() {
+    public LiveData<List<CalendarWeek>> getCalendarWeeks() {
         return calendarWeeks;
     }
 

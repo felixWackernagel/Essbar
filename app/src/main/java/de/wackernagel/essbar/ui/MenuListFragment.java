@@ -2,7 +2,11 @@ package de.wackernagel.essbar.ui;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +31,8 @@ import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 
+import static de.wackernagel.essbar.utils.ViewUtils.spToPx;
+
 public class MenuListFragment extends ToolbarFragment implements AdapterView.OnItemSelectedListener, ActionMode.Callback {
 
     static MenuListFragment newInstance() {
@@ -40,7 +46,7 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
 
     private FragmentMenuListBinding binding;
     private MenuViewModel viewModel;
-    private ToolbarSpinnerAdapter<KW> calendarWeeksAdapter;
+    private ToolbarSpinnerAdapter<CalendarWeek> calendarWeeksAdapter;
     private ActionMode actionMode;
 
     @Nullable
@@ -76,15 +82,22 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
             themedContext = actionBar.getThemedContext();
         }
 
-        calendarWeeksAdapter = new ToolbarSpinnerAdapter<KW>( themedContext ) {
+        calendarWeeksAdapter = new ToolbarSpinnerAdapter<CalendarWeek>( themedContext ) {
             @Override
-            String getTitle(int position) {
-                return getItem( position ).getName();
-            }
+            CharSequence getTitle( final int position, boolean forDropDown ) {
+                final CalendarWeek item = getItem( position );
+                if( forDropDown ) {
+                    return item.getDateRange();
+                }
 
-            @Override
-            int getIconVisibility(int position) {
-                return getItem( position ).isSelected() ? View.VISIBLE : View.GONE;
+                // style like Title and Subtitle
+                final String selectedTitle = getString( R.string.menu_fragment_title, item.getDateRange() );
+                final int spanStart = selectedTitle.length() - item.getDateRange().length();
+                final int spanEnd = selectedTitle.length();
+                final SpannableStringBuilder ssb = new SpannableStringBuilder( selectedTitle );
+                ssb.setSpan( new AbsoluteSizeSpan( spToPx( 16f, requireContext() ) ), spanStart, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ssb.setSpan( new TypefaceSpan( "sans-serif" /* roboto regular */ ), spanStart, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                return ssb;
             }
         };
         binding.toolbarSpinner.setAdapter(calendarWeeksAdapter);
@@ -98,11 +111,11 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         });
     }
 
-    private int findIndexOfSelectedItem( final List<KW> kws) {
-        if( kws != null ) {
-            final int size = kws.size();
+    private int findIndexOfSelectedItem( final List<CalendarWeek> calendarWeeks) {
+        if( calendarWeeks != null ) {
+            final int size = calendarWeeks.size();
             for( int index = 0; index < size; index++ ) {
-                if( kws.get( index ).isSelected() ) {
+                if( calendarWeeks.get( index ).isSelected() ) {
                     return index;
                 }
             }
@@ -131,10 +144,10 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
             @Override
             public CharSequence getSectionHeader( int position ) {
                 final Menu item = adapter.getListItem( position );
-                final KW kw = calendarWeeksAdapter.getItem( binding.toolbarSpinner.getSelectedItemPosition() );
+                final CalendarWeek calendarWeek = calendarWeeksAdapter.getItem( binding.toolbarSpinner.getSelectedItemPosition() );
                 final Calendar calendar = Calendar.getInstance();
-                // kw start date is monday
-                calendar.setTime( kw.getStartDate() );
+                // calendarWeek start date is monday
+                calendar.setTime( calendarWeek.getStartDate() );
                 // weekday is a integer i.e. monday is 0
                 calendar.add( Calendar.DAY_OF_WEEK, item.getWeekday() );
                 final String weekdayAsWord = localizedWeekdays[ item.getWeekday() ];

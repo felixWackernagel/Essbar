@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,12 +50,8 @@ public class ToolbarSpinnerAdapter<T> extends BaseAdapter {
         return position;
     }
 
-    String getTitle( int position ) {
+    CharSequence getTitle( int position, boolean forDropDown ) {
         return position >= 0 && position < items.size() ? String.valueOf( items.get( position ) ) : "";
-    }
-
-    int getIconVisibility( int position ) {
-        return View.GONE;
     }
 
     @Override
@@ -78,12 +73,7 @@ public class ToolbarSpinnerAdapter<T> extends BaseAdapter {
         }
 
         final TextView textView = item.findViewById( android.R.id.text1 );
-        textView.setText( getTitle( position) );
-
-        final ImageView imageView = item.findViewById( android.R.id.icon );
-        if( imageView != null ) {
-            imageView.setVisibility( getIconVisibility( position ) );
-        }
+        textView.setText( getTitle( position, "DROPDOWN".equals( tag ) ) );
         return item;
     }
 }

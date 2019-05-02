@@ -11,4 +11,5 @@
     <color name="textOnPrimary">#DE000000</color>
     <color name="textOnAccent">#DEFFFFFF</color>
     <color name="icon">#6E6E6E</color>
+    <color name="spinnerSelected">#14000000</color>
 </resources>

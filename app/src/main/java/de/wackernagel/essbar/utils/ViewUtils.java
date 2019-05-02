@@ -1,9 +1,13 @@
 package de.wackernagel.essbar.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.widget.EditText;
 
 import com.google.android.material.textfield.TextInputLayout;
+
+import javax.annotation.Nonnull;
 
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
@@ -53,5 +57,13 @@ public final class ViewUtils {
             }
         }
         return false;
+    }
+
+    public static int spToPx( float sp, @Nonnull final Context context ) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
+    }
+
+    public static int dpToPx( float dp, @Nonnull final Context context) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 }

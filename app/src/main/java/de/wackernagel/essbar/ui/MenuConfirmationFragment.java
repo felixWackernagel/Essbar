@@ -2,9 +2,12 @@ package de.wackernagel.essbar.ui;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.util.Calendar;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -12,10 +15,12 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuConfirmationBinding;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
+import de.wackernagel.essbar.utils.SectionItemDecoration;
 
 public class MenuConfirmationFragment extends DialogFragment {
 
@@ -52,19 +57,52 @@ public class MenuConfirmationFragment extends DialogFragment {
 
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
 
+        setupToolbar();
+        setupRecyclerView();
+
+        if( savedInstanceState == null ) {
+            viewModel.loadChangedMenusToConfirm();
+        }
+    }
+
+    private void setupToolbar() {
         binding.toolbar.setNavigationIcon( R.drawable.ic_close_black_24dp );
         binding.toolbar.setNavigationOnClickListener(v -> dismiss());
-        binding.toolbar.setTitle( "Bestelländerungen" );
-
-        viewModel.getMenuReviewDocument().observe(getViewLifecycleOwner(), resource -> {
-            if( resource != null && resource.isSuccess() ) {
-                binding.textView.setText( resource.getResource().toString() );
-            } else if( resource != null ) {
-                binding.textView.setText( resource.getError().toString() );
-            } else {
-                binding.textView.setText( "no resource error" );
+        binding.toolbar.setTitle( R.string.menu_confirmation_fragment_title );
+        binding.toolbar.inflateMenu( R.menu.menu_confirmation_menu );
+        binding.toolbar.setOnMenuItemClickListener(item -> {
+            switch( item.getItemId() ) {
+                case R.id.action_buy:
+                    return true;
+                default:
+                    return false;
             }
         });
+    }
+
+    private void setupRecyclerView() {
+        final ChangedMenuListAdapter adapter = new ChangedMenuListAdapter();
+        binding.recyclerView.setLayoutManager( new LinearLayoutManager( null ) );
+        binding.recyclerView.setHasFixedSize( true );
+        binding.recyclerView.setAdapter( adapter );
+        binding.recyclerView.addItemDecoration( new SectionItemDecoration( requireContext(), false, new SectionItemDecoration.SectionCallback() {
+            @Override
+            public boolean isSection( int position ) {
+                if( position < 0 ) {
+                    return false;
+                }
+                // first item or when current and previous position have different weekdays
+                return position == 0 || adapter.getListItem( position - 1 ).getWeekday() != adapter.getListItem( position ).getWeekday();
+            }
+
+            @Override
+            public CharSequence getSectionHeader( int position ) {
+                final ChangedMenu item = adapter.getListItem( position );
+                final String[] localizedWeekdays = getResources().getStringArray( R.array.weekdays );
+                return localizedWeekdays[ item.getWeekday() ];
+            }
+        }) );
+        viewModel.getChangedMenusToConfirm().observe( getViewLifecycleOwner(), adapter::submitList );
     }
 
     @Override

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="menu"
+            type="de.wackernagel.essbar.ui.ChangedMenu"/>
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginEnd="56dp"
+            android:text="@{menu.name}"
+            style="@style/ListItemTitle"
+            tools:text="Obstfrühstück"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/ic_add_shopping_cart_black_24dp"
+            android:tint="@color/colorAccent"
+            android:contentDescription="@null"
+            android:visibility="@{menu.nowOrdered}"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
+            android:src="@drawable/ic_remove_shopping_cart_black_24dp"
+            android:tint="@color/colorAccent"
+            android:contentDescription="@null"
+            android:visibility="@{!menu.nowOrdered}"/>
+
+    </FrameLayout>
+</layout>

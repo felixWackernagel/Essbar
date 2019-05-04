@@ -19,6 +19,7 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.CalendarWeek;
+import de.wackernagel.essbar.ui.ChangedMenu;
 import de.wackernagel.essbar.ui.Menu;
 import de.wackernagel.essbar.web.Resource;
 
@@ -33,26 +34,35 @@ public class MenuViewModel extends ViewModel {
 
     private static String CALENDAR_WEEK_SELECTOR = "#select_woche > select > option";
 
+    private static String CHANGED_MENUS_SELECTOR = "form .best_table_top tr[class^=auflistung]";
+
     private final EssbarRepository repository;
 
     private final MutableLiveData<String> calendarWeek;
 
-    private final LiveData<Resource<Document>> document;
+    private final LiveData<Resource<Document>> menusDocument;
     private final LiveData<List<Menu>> menus;
     private final LiveData<SparseBooleanArray> menusOrderStatus;
     private final LiveData<List<CalendarWeek>> calendarWeeks;
     private final MutableLiveData<Integer> numberOfChangedOrders;
+
+    private final MutableLiveData<String> menusToChange;
+    private final LiveData<Resource<Document>> menuConfirmationDocument;
+    private final LiveData<List<ChangedMenu>> changedMenusToConfirm;
 
     MenuViewModel( final EssbarRepository repository ) {
         this.repository = repository;
         calendarWeek = new MutableLiveData<>();
         numberOfChangedOrders = new MutableLiveData<>();
         numberOfChangedOrders.setValue( 0 );
+        menusToChange = new MutableLiveData<>();
 
-        document = Transformations.switchMap(calendarWeek, this::getMenuDocument );
-        menus = Transformations.switchMap(document, this::getMenusList );
+        menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
+        menus = Transformations.switchMap(menusDocument, this::getMenusList );
         menusOrderStatus = Transformations.switchMap(menus, this::getCheckedMenus );
-        calendarWeeks = Transformations.switchMap(document, this::getCalendarWeekList);
+        calendarWeeks = Transformations.switchMap(menusDocument, this::getCalendarWeekList);
+        menuConfirmationDocument = Transformations.switchMap( menusToChange, this::getMenuConfirmationDocument );
+        changedMenusToConfirm = Transformations.switchMap( menuConfirmationDocument, this::getChangedMenuList );
     }
 
     private LiveData<Resource<Document>> getMenuDocument( final String calendarWeek ) {
@@ -110,26 +120,23 @@ public class MenuViewModel extends ViewModel {
         return result;
     }
 
-    public LiveData<Resource<Document>> getMenuReviewDocument() {
-        final StringBuilder formPayloadBuilder = new StringBuilder();
-        final List<Menu> allMenus = menus.getValue();
-        if( allMenus != null && !allMenus.isEmpty() ) {
-            formPayloadBuilder.append("m_alt=");
-            formPayloadBuilder.append("&starttag=").append( document.getValue().getResource().selectFirst("input[name=starttag]").attr("value"));
-            formPayloadBuilder.append("&endtag=").append( document.getValue().getResource().selectFirst("input[name=endtag]").attr("value"));
-            for( Menu menu : allMenus ) {
-                if( menu.getInputName() == null ) {
-                    continue;
-                }
-                formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 0 );
-                // skip second input if value has changed
-                if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) == menu.isOrdered() ) {
-                    formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 1 );
-                }
+    private LiveData<Resource<Document>> getMenuConfirmationDocument( final String payload ) {
+        return repository.getMenuConfirmationDocument( payload );
+    }
+
+    private LiveData<List<ChangedMenu>> getChangedMenuList( final Resource<Document> resource ) {
+        final MutableLiveData<List<ChangedMenu>> result = new MutableLiveData<>();
+        if( resource != null && resource.isSuccess() ) {
+            final Document menuConfirmationPage = resource.getResource();
+            final List<ChangedMenu> changedMenus = new ArrayList<>();
+            for( Element tableRow : menuConfirmationPage.select( CHANGED_MENUS_SELECTOR ) ) {
+                changedMenus.add( new ChangedMenu( tableRow ) );
             }
-            formPayloadBuilder.append("&btn_bestellen=Weiter");
+            result.setValue(changedMenus);
+        } else {
+            result.setValue( Collections.emptyList() );
         }
-        return repository.getMenuConfirmationDocument( formPayloadBuilder.toString() );
+        return result;
     }
 
     public LiveData<List<Menu>> getMenus() {
@@ -146,6 +153,10 @@ public class MenuViewModel extends ViewModel {
 
     public LiveData<Integer> getNumberOfChangedOrders() {
         return numberOfChangedOrders;
+    }
+
+    public LiveData<List<ChangedMenu>> getChangedMenusToConfirm() {
+        return changedMenusToConfirm;
     }
 
     public void loadCurrentCalendarWeek() {
@@ -175,5 +186,27 @@ public class MenuViewModel extends ViewModel {
             numberOfChangedOrders.setValue( 0 );
             loadCalendarWeek( calendarWeek.getValue() );
         }
+    }
+
+    public void loadChangedMenusToConfirm() {
+        final StringBuilder formPayloadBuilder = new StringBuilder();
+        final List<Menu> allMenus = menus.getValue();
+        if( allMenus != null && !allMenus.isEmpty() ) {
+            formPayloadBuilder.append("m_alt=");
+            formPayloadBuilder.append("&starttag=").append( menusDocument.getValue().getResource().selectFirst("input[name=starttag]").attr("value"));
+            formPayloadBuilder.append("&endtag=").append( menusDocument.getValue().getResource().selectFirst("input[name=endtag]").attr("value"));
+            for( Menu menu : allMenus ) {
+                if( menu.getInputName() == null ) {
+                    continue;
+                }
+                formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 0 );
+                // skip second input if value has changed
+                if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) == menu.isOrdered() ) {
+                    formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 1 );
+                }
+            }
+            formPayloadBuilder.append("&btn_bestellen=Weiter");
+        }
+        menusToChange.setValue( formPayloadBuilder.toString() );
     }
 }

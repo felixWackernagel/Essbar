@@ -137,8 +137,11 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         binding.recyclerView.addItemDecoration( new SectionItemDecoration( requireContext(), false, new SectionItemDecoration.SectionCallback() {
             @Override
             public boolean isSection( int position ) {
+                if( position < 0 ) {
+                    return false;
+                }
                 // first item or when current and previous position have different weekdays
-                return position <= 0 || adapter.getListItem( position - 1 ).getWeekday() != adapter.getListItem( position ).getWeekday();
+                return position == 0 || adapter.getListItem( position - 1 ).getWeekday() != adapter.getListItem( position ).getWeekday();
             }
 
             @Override

@@ -11,4 +11,9 @@ public class BindingAdapterUtils {
         view.setVisibility(value ? View.VISIBLE : View.GONE);
     }
 
+    @BindingAdapter("edit")
+    public static void setEdit(CheckableFrameLayout view, Boolean value) {
+        view.setChecked(value);
+    }
+
 }

@@ -15,16 +15,21 @@ public interface WebService {
 
     @FormUrlEncoded
     @POST( "/index.php?ear_a=akt_login" )
-    LiveData<Resource<Document>> requestLoginDocument( @Field("Login_Name") String username, @Field("Login_Passwort") String password );
+    LiveData<Resource<Document>> postLoginData(@Field("Login_Name") String username, @Field("Login_Passwort") String password );
 
     @GET( "/index.php?m=2;0" )
-    LiveData<Resource<Document>> requestMenusDocument();
-
-    @Headers("Content-Type: application/x-www-form-urlencoded")
-    @POST( "/index.php?m=2;0" )
-    LiveData<Resource<Document>> requestMenuConfirmationDocument( @Body RequestBody formData );
+    LiveData<Resource<Document>> getMenus();
 
     @FormUrlEncoded
     @POST( "/index.php?m=2;0" )
-    LiveData<Resource<Document>> requestMenuDocumentByDate( @Field("sel_datum") String selectedDate );
+    LiveData<Resource<Document>> postMenusStartDate(@Field("sel_datum") String selectedDate );
+
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @POST( "/index.php?m=2;0" )
+    LiveData<Resource<Document>> postChangedMenus(@Body RequestBody formData );
+
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @POST( "/index.php?m=2;0" )
+    LiveData<Resource<Document>> postConfirmedMenus( @Body RequestBody formData );
+
 }

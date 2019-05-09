@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -14,10 +15,12 @@
             type="de.wackernagel.essbar.ui.MenuListAdapter"/>
     </data>
 
-    <FrameLayout
+    <de.wackernagel.essbar.utils.CheckableFrameLayout
+        android:background="@drawable/spinner_item_dropdown_selector"
         android:layout_width="match_parent"
         android:layout_height="88dp"
-        android:paddingTop="16dp">
+        android:paddingTop="16dp"
+        app:edit="@{holder.isChanged()}">
 
         <TextView
             android:layout_width="match_parent"
@@ -64,5 +67,5 @@
             android:visibility="@{!obj.editable &amp;&amp; obj.ordered}"
             tools:visibility="gone"/>
 
-    </FrameLayout>
+    </de.wackernagel.essbar.utils.CheckableFrameLayout>
 </layout>

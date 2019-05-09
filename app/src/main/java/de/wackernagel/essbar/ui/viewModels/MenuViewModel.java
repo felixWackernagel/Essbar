@@ -21,6 +21,7 @@ import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.CalendarWeek;
 import de.wackernagel.essbar.ui.ChangedMenu;
 import de.wackernagel.essbar.ui.Menu;
+import de.wackernagel.essbar.utils.SingleLiveEvent;
 import de.wackernagel.essbar.web.Resource;
 
 public class MenuViewModel extends ViewModel {
@@ -50,19 +51,30 @@ public class MenuViewModel extends ViewModel {
     private final LiveData<Resource<Document>> menuConfirmationDocument;
     private final LiveData<List<ChangedMenu>> changedMenusToConfirm;
 
+    private final MutableLiveData<String> confirmedMenus;
+    private final LiveData<Boolean> successfulOrder;
+
     MenuViewModel( final EssbarRepository repository ) {
         this.repository = repository;
+
+        // menus
         calendarWeek = new MutableLiveData<>();
         numberOfChangedOrders = new MutableLiveData<>();
         numberOfChangedOrders.setValue( 0 );
-        menusToChange = new MutableLiveData<>();
-
         menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
         menus = Transformations.switchMap(menusDocument, this::getMenusList );
         menusOrderStatus = Transformations.switchMap(menus, this::getCheckedMenus );
         calendarWeeks = Transformations.switchMap(menusDocument, this::getCalendarWeekList);
-        menuConfirmationDocument = Transformations.switchMap( menusToChange, this::getMenuConfirmationDocument );
+
+        // menus > order confirmation
+        menusToChange = new MutableLiveData<>();
+        menuConfirmationDocument = Transformations.switchMap( menusToChange, repository::getMenuConfirmationDocument );
         changedMenusToConfirm = Transformations.switchMap( menuConfirmationDocument, this::getChangedMenuList );
+
+        // order confirmation > thank you
+        confirmedMenus = new MutableLiveData<>();
+        final LiveData<Resource<Document>> thankYouDocument = Transformations.switchMap( confirmedMenus, repository::postConfirmedMenus );
+        successfulOrder = Transformations.switchMap( thankYouDocument, this::getOrderStatusFromThankYouDocument );
     }
 
     private LiveData<Resource<Document>> getMenuDocument( final String calendarWeek ) {
@@ -120,10 +132,6 @@ public class MenuViewModel extends ViewModel {
         return result;
     }
 
-    private LiveData<Resource<Document>> getMenuConfirmationDocument( final String payload ) {
-        return repository.getMenuConfirmationDocument( payload );
-    }
-
     private LiveData<List<ChangedMenu>> getChangedMenuList( final Resource<Document> resource ) {
         final MutableLiveData<List<ChangedMenu>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
@@ -135,6 +143,21 @@ public class MenuViewModel extends ViewModel {
             result.setValue(changedMenus);
         } else {
             result.setValue( Collections.emptyList() );
+        }
+        return result;
+    }
+
+    private LiveData<Boolean> getOrderStatusFromThankYouDocument( final Resource<Document> resource ) {
+        final SingleLiveEvent<Boolean> result = new SingleLiveEvent<>();
+        if( resource != null && resource.isSuccess() ) {
+            final Document thankYouPage = resource.getResource();
+            if( thankYouPage.select( ".bestellfortschritt.bestellfortschritt2" ).size() > 0 ) {
+                result.setValue( Boolean.TRUE );
+            } else {
+                result.setValue( Boolean.FALSE );
+            }
+        } else {
+            result.setValue( Boolean.FALSE );
         }
         return result;
     }
@@ -157,6 +180,10 @@ public class MenuViewModel extends ViewModel {
 
     public LiveData<List<ChangedMenu>> getChangedMenusToConfirm() {
         return changedMenusToConfirm;
+    }
+
+    public LiveData<Boolean> getSuccessfulOrder() {
+        return successfulOrder;
     }
 
     public void loadCurrentCalendarWeek() {
@@ -200,13 +227,31 @@ public class MenuViewModel extends ViewModel {
                     continue;
                 }
                 formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 0 );
-                // skip second input if value has changed
-                if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) == menu.isOrdered() ) {
+                // add second input only if menu is ordered or was already ordered
+                if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) ) {
                     formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 1 );
                 }
             }
             formPayloadBuilder.append("&btn_bestellen=Weiter");
         }
         menusToChange.setValue( formPayloadBuilder.toString() );
+    }
+
+    public void postChangedAndConfirmedMenus() {
+        final Resource<Document> menuConfirmationDocument = this.menuConfirmationDocument.getValue();
+        if( menuConfirmationDocument != null && menuConfirmationDocument.isSuccess() ) {
+            final Document page = menuConfirmationDocument.getResource();
+            final StringBuilder sb = new StringBuilder();
+            for( Element input : page.select( "form .block input" ) ) {
+                // add each input name and value
+                if( sb.length() > 0 ) {
+                    sb.append( "&" );
+                }
+                sb.append( input.attr("name") );
+                sb.append( "=" );
+                sb.append( input.attr("value") );
+            }
+            confirmedMenus.setValue( sb.toString() );
+        }
     }
 }

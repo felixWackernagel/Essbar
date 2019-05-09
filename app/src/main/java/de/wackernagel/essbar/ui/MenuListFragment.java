@@ -213,7 +213,7 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch( item.getItemId() ) {
             case R.id.action_change_menus_order_status:
-                MenuConfirmationFragment.newInstance().show( requireFragmentManager(), MenuConfirmationFragment.TAG );
+                MenuConfirmationFragment.newInstance().show( requireFragmentManager().beginTransaction(), MenuConfirmationFragment.TAG );
                 return true;
 
             default:

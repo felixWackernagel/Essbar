@@ -29,19 +29,23 @@ public class EssbarRepository {
     }
 
     public LiveData<Resource<Document>> getMenusDocument() {
-        return webService.requestMenusDocument();
+        return webService.getMenus();
     }
 
     public LiveData<Resource<Document>> getMenusDocumentByDate( final String date ) {
-        return webService.requestMenuDocumentByDate( date );
+        return webService.postMenusStartDate( date );
     }
 
     public LiveData<Resource<Document>> getLoginDocument( final String username, final String password ) {
-        return webService.requestLoginDocument( username, password );
+        return webService.postLoginData( username, password );
     }
 
     public LiveData<Resource<Document>> getMenuConfirmationDocument(final String formPayload ) {
-        return webService.requestMenuConfirmationDocument( RequestBody.create( MediaType.parse( "text/plain" ), formPayload ) );
+        return webService.postChangedMenus( RequestBody.create( MediaType.parse( "text/plain" ), formPayload ) );
+    }
+
+    public LiveData<Resource<Document>> postConfirmedMenus( final String formPayload ) {
+        return webService.postConfirmedMenus( RequestBody.create( MediaType.parse( "text/plain" ), formPayload ) );
     }
 
     public void insertCustomer( final Customer customer ) {

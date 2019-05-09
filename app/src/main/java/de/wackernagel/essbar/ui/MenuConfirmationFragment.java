@@ -2,12 +2,9 @@ package de.wackernagel.essbar.ui;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Calendar;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -56,6 +53,15 @@ public class MenuConfirmationFragment extends DialogFragment {
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel.getSuccessfulOrder().observe( getViewLifecycleOwner(), success -> {
+        {
+            // FIXME on second change this closes the fragment immediat
+            if( Boolean.TRUE.equals( success ) ) {
+                viewModel.resetChangedOrders();
+                dismiss();
+            }
+        }
+        });
 
         setupToolbar();
         setupRecyclerView();
@@ -73,6 +79,7 @@ public class MenuConfirmationFragment extends DialogFragment {
         binding.toolbar.setOnMenuItemClickListener(item -> {
             switch( item.getItemId() ) {
                 case R.id.action_buy:
+                    viewModel.postChangedAndConfirmedMenus();
                     return true;
                 default:
                     return false;
@@ -88,16 +95,15 @@ public class MenuConfirmationFragment extends DialogFragment {
         binding.recyclerView.addItemDecoration( new SectionItemDecoration( requireContext(), false, new SectionItemDecoration.SectionCallback() {
             @Override
             public boolean isSection( int position ) {
-                if( position < 0 ) {
-                    return false;
-                }
+                final int itemPosition = Math.max( 0, position );
                 // first item or when current and previous position have different weekdays
-                return position == 0 || adapter.getListItem( position - 1 ).getWeekday() != adapter.getListItem( position ).getWeekday();
+                return itemPosition == 0 || adapter.getListItem( Math.max( 0, itemPosition - 1 ) ).getWeekday() != adapter.getListItem( itemPosition ).getWeekday();
             }
 
             @Override
             public CharSequence getSectionHeader( int position ) {
-                final ChangedMenu item = adapter.getListItem( position );
+                final int itemPosition = Math.max( 0, position );
+                final ChangedMenu item = adapter.getListItem( itemPosition );
                 final String[] localizedWeekdays = getResources().getStringArray( R.array.weekdays );
                 return localizedWeekdays[ item.getWeekday() ];
             }
@@ -117,5 +123,4 @@ public class MenuConfirmationFragment extends DialogFragment {
             dialog.getWindow().setLayout( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT );
         }
     }
-
 }

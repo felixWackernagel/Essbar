@@ -116,7 +116,14 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
                 if( menuStatusChangedListener != null ) {
                     menuStatusChangedListener.onOrderStatusChanged( menu, isOrdered );
                 }
+
+                // redraw background with new drawable-state
+                binding.invalidateAll();
             }
+        }
+
+        public boolean isChanged() {
+            return menu.isOrdered() != orderedMenus.get( menu.getId() );
         }
     }
 

@@ -21,7 +21,7 @@ import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.CalendarWeek;
 import de.wackernagel.essbar.ui.ChangedMenu;
 import de.wackernagel.essbar.ui.Menu;
-import de.wackernagel.essbar.utils.SingleLiveEvent;
+import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.Resource;
 
 public class MenuViewModel extends ViewModel {
@@ -52,7 +52,7 @@ public class MenuViewModel extends ViewModel {
     private final LiveData<List<ChangedMenu>> changedMenusToConfirm;
 
     private final MutableLiveData<String> confirmedMenus;
-    private final LiveData<Boolean> successfulOrder;
+    private final LiveData<Event<Boolean>> successfulOrder;
 
     MenuViewModel( final EssbarRepository repository ) {
         this.repository = repository;
@@ -147,17 +147,17 @@ public class MenuViewModel extends ViewModel {
         return result;
     }
 
-    private LiveData<Boolean> getOrderStatusFromThankYouDocument( final Resource<Document> resource ) {
-        final SingleLiveEvent<Boolean> result = new SingleLiveEvent<>();
+    private LiveData<Event<Boolean>> getOrderStatusFromThankYouDocument( final Resource<Document> resource ) {
+        final MutableLiveData<Event<Boolean>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
             final Document thankYouPage = resource.getResource();
             if( thankYouPage.select( ".bestellfortschritt.bestellfortschritt2" ).size() > 0 ) {
-                result.setValue( Boolean.TRUE );
+                result.setValue( new Event<>( Boolean.TRUE ) );
             } else {
-                result.setValue( Boolean.FALSE );
+                result.setValue( new Event<>( Boolean.FALSE ) );
             }
         } else {
-            result.setValue( Boolean.FALSE );
+            result.setValue( new Event<>( Boolean.FALSE ) );
         }
         return result;
     }
@@ -182,7 +182,7 @@ public class MenuViewModel extends ViewModel {
         return changedMenusToConfirm;
     }
 
-    public LiveData<Boolean> getSuccessfulOrder() {
+    public LiveData<Event<Boolean>> getSuccessfulOrder() {
         return successfulOrder;
     }
 

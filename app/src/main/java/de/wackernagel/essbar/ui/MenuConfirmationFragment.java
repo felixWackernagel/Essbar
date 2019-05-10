@@ -53,10 +53,9 @@ public class MenuConfirmationFragment extends DialogFragment {
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
-        viewModel.getSuccessfulOrder().observe( getViewLifecycleOwner(), success -> {
+        viewModel.getSuccessfulOrder().observe( getViewLifecycleOwner(), successEvent -> {
         {
-            // FIXME on second change this closes the fragment immediat
-            if( Boolean.TRUE.equals( success ) ) {
+            if( Boolean.TRUE.equals( successEvent.getContentIfNotHandled() ) ) {
                 viewModel.resetChangedOrders();
                 dismiss();
             }

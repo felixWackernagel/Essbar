@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 
 import java.util.Calendar;
@@ -23,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
@@ -48,6 +50,7 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
     private MenuViewModel viewModel;
     private ToolbarSpinnerAdapter<CalendarWeek> calendarWeeksAdapter;
     private ActionMode actionMode;
+    private int statusBarColor;
 
     @Nullable
     @Override
@@ -201,6 +204,11 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         final Integer quantity = viewModel.getNumberOfChangedOrders().getValue();
         final int quantityValue = quantity == null ? 0 : quantity;
         mode.setTitle( getResources().getQuantityString( R.plurals.changed_orders, quantityValue, quantityValue ) );
+
+        final Window window = requireActivity().getWindow();
+        statusBarColor = window.getStatusBarColor();
+        window.setStatusBarColor(ContextCompat.getColor( requireContext(), R.color.actionModeStatusBar));
+
         return true;
     }
 
@@ -223,6 +231,7 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
+        requireActivity().getWindow().setStatusBarColor(statusBarColor);
         actionMode = null;
         viewModel.resetChangedOrders();
     }

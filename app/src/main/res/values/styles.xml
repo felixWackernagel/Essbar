@@ -2,7 +2,7 @@
 
     <style name="AppTheme" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
@@ -11,8 +11,15 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!-- color statusbar icons dark -->
         <item name="android:windowLightStatusBar">true</item>
 
+        <!-- transparent statusbar color -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
+        <!-- contextual action mode styles -->
         <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
         <item name="actionModeBackground">@color/colorPrimaryDark</item>
         <item name="windowActionModeOverlay">true</item>
@@ -20,7 +27,7 @@
 
     <style name="FullScreenDialogTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:windowNoTitle">true</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/colorPrimary</item>
         <item name="colorPrimary">@color/colorPrimary</item>
 
         <!-- Set this to true if you want Full Screen without status bar -->
@@ -32,8 +39,12 @@
         <item name="android:windowBackground">@android:color/white</item>
 
         <!-- Additionally if you want animations when dialog opening -->
-        <!--<item name="android:windowEnterAnimation">@anim/slide_up</item>-->
-        <!--<item name="android:windowExitAnimation">@anim/slide_down</item>-->
+        <item name="android:windowAnimationStyle">@style/FullScreenDialogAnimations</item>
+    </style>
+
+    <style name="FullScreenDialogAnimations">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 
     <style name="ErrorTextAppearance" parent="TextAppearance.AppCompat.Small">

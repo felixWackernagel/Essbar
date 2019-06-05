@@ -11,7 +11,7 @@ public abstract class ActivityModule {
     @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
     abstract MenuActivity contributeMainActivityInjector();
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
     abstract LoginActivity contributeLoginActivityInjector();
 
 }

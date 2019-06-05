@@ -16,7 +16,7 @@
         android:name=".EssbarApplication"
         android:fullBackupContent="false"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.LoginActivity">
+        <activity android:name=".ui.LoginActivity" android:theme="@style/LoginAppTheme" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -70,4 +70,8 @@ public class LoginViewModel extends ViewModel {
     public LiveData<List<Customer>> getAllCustomers() {
         return repository.getAllCustomers();
     }
+
+    public LiveData<Integer> getCustomersCount() {
+        return repository.getCustomersCount();
+    }
 }

@@ -51,4 +51,8 @@ public class EssbarRepository {
     public void insertCustomer( final Customer customer ) {
         executors.diskIO().execute( () -> customerDao.insertCustomer( customer ) );
     }
+
+    public LiveData<Integer> getCustomersCount() {
+        return customerDao.customersCount();
+    }
 }

@@ -50,6 +50,8 @@ dependencies {
 
     implementation 'androidx.preference:preference:1.1.0-alpha02'
 
+    implementation 'com.romandanylyk:pageindicatorview:1.0.3'
+
     implementation "androidx.room:room-runtime:$roomVersion"
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
 

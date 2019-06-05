@@ -13,4 +13,5 @@
     <color name="icon">#6E6E6E</color>
     <color name="spinnerSelected">#14000000</color>
     <color name="actionModeStatusBar">#689F38</color>
+    <color name="darkBackground">#99000000</color>
 </resources>

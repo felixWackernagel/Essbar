@@ -24,6 +24,7 @@ import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.ActivityLoginBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
+import de.wackernagel.essbar.utils.ViewUtils;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -39,26 +40,27 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
     @Inject
     ConnectivityLifecycleObserver connectivityLifecycleObserver;
 
-    private LoginViewModel viewModel;
-
     private ActivityLoginBinding binding;
-
-    private KeyguardManager keyguardManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView( this, R.layout.activity_login );
-        viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
 
-        keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
-
+        final KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
         if( !keyguardManager.isKeyguardSecure() ) {
             Snackbar.make( binding.coordinatorLayout, R.string.no_secure_lock_error, Snackbar.LENGTH_LONG ).show();
         }
 
+        final int spaceInPixel = ViewUtils.dpToPx( 16, this );
         binding.viewPager.setAdapter( new LoginPagerAdapter( getSupportFragmentManager() ) );
+        binding.viewPager.setPageMargin( spaceInPixel );
+        binding.viewPager.setPadding( spaceInPixel, 0 , spaceInPixel, 0 );
+        binding.viewPager.setClipToPadding( false );
+
+
+        final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
         viewModel.getCustomersCount().observe( this, (count) -> {
             binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 );
         });

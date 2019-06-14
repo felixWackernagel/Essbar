@@ -73,15 +73,18 @@ public class CustomerListAdapter extends ListAdapter<Customer, CustomerListAdapt
     }
 
     static class CustomerViewHolder extends RecyclerView.ViewHolder {
-        private TextView textView;
+        private TextView nameTextView;
+        private TextView numberTextView;
 
         CustomerViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.textView);
+            nameTextView = itemView.findViewById(R.id.nameTextView);
+            numberTextView = itemView.findViewById(R.id.numerTextView);
         }
 
         void bindCustomer( final Customer customer ) {
-            textView.setText( textView.getContext().getString( R.string.customer_name_number, customer.getName(), customer.getNumber() ) );
+            nameTextView.setText( customer.getName() );
+            numberTextView.setText( customer.getNumber() );
         }
     }
 }

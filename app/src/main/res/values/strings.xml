@@ -13,7 +13,7 @@
     <string name="password_required_error">Ihr Passwort wird benötigt.</string>
     <string name="unknown_error">Ein Fehler ist aufgetreten</string>
     <string name="no_secure_lock_error">Secure Lock Einstellungen fehlen. \'Einstellungen\' -> \'Sicherheit\' -> \'Screen Lock\'</string>
-    <string name="no_network_connection_error">Keine Internetverbindung.</string>
+    <string name="no_network_connection_error">Sie brauchen eine Internetverbindung.</string>
     <string name="decryption_canceled_error">Sie müssen sich authentifizieren damit wir Ihr Passwort entschlüsseln können.</string>
     <string name="save_credentials">Kundendaten verschlüsselt speichern?</string>
     <string name="profile_section">Gespeicherte Kundendaten</string>

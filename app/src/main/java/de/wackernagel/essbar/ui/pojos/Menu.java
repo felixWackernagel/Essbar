@@ -1,12 +1,11 @@
-package de.wackernagel.essbar.ui;
+package de.wackernagel.essbar.ui.pojos;
 
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.Objects;
 
-import javax.annotation.Nonnull;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class Menu {
@@ -14,16 +13,16 @@ public class Menu {
     private String menuName;
     private boolean editable;
     private boolean ordered;
-    private int weekday;
-    private int menuTyp;
+    private Weekday weekday;
+    private Type typ;
     private boolean paused;
     private String inputName;
     private String price;
 
     public Menu(final Element element ) {
-        weekday = getWeekdayIndex( element );
-        menuTyp = getMenuTypIndex( element );
-        id = menuTyp + ( weekday * 4 );
+        weekday = Weekday.from( element.classNames() );
+        typ = Type.from( element.classNames() );
+        id = typ.getNumber() + ( weekday.getNumber() * 4 );
         editable = element.classNames().contains( "pointer" );
         ordered = element.classNames().contains( "gruen" );
         if( editable ) {
@@ -72,12 +71,12 @@ public class Menu {
         return paused;
     }
 
-    int getWeekday() {
+    public Weekday getWeekday() {
         return weekday;
     }
 
-    int getMenuTyp() {
-        return menuTyp;
+    public Type getTyp() {
+        return typ;
     }
 
     @Nullable
@@ -89,34 +88,20 @@ public class Menu {
         return price;
     }
 
-    private static int getMenuTypIndex(final Element element ) {
-        if( element.classNames().contains("menue-Fruehstueck") ) {
-            return 1;
-        } else if( element.classNames().contains("menue-Obstfruehstueck") ) {
-            return 2;
-        } else if( element.classNames().contains("menue-Mittag") ) {
-            return 3;
-        } else if( element.classNames().contains("menue-Vesper") ) {
-            return 4;
-        } else {
-            throw new IllegalStateException("No known menu typ found.");
-        }
-    }
-
-    private static int getWeekdayIndex( final Element element ) {
-        if( element.classNames().contains("weekday-1") ) {
-            return 0;
-        } else if( element.classNames().contains("weekday-2") ) {
-            return 1;
-        } else if( element.classNames().contains("weekday-3") ) {
-            return 2;
-        } else if( element.classNames().contains("weekday-4") ) {
-            return 3;
-        } else if( element.classNames().contains("weekday-5") ) {
-            return 4;
-        } else {
-            throw new IllegalStateException("No known weekday found.");
-        }
+    @NonNull
+    @Override
+    public String toString() {
+        return "Menu{" +
+                "id=" + id +
+                ", menuName='" + menuName + '\'' +
+                ", editable=" + editable +
+                ", ordered=" + ordered +
+                ", weekday=" + weekday +
+                ", typ=" + typ +
+                ", paused=" + paused +
+                ", inputName='" + inputName + '\'' +
+                ", price='" + price + '\'' +
+                '}';
     }
 
     @Override
@@ -127,30 +112,16 @@ public class Menu {
         return id == menu.id &&
                 editable == menu.editable &&
                 ordered == menu.ordered &&
-                weekday == menu.weekday &&
-                menuTyp == menu.menuTyp &&
                 paused == menu.paused &&
                 Objects.equals(menuName, menu.menuName) &&
-                Objects.equals(inputName, menu.inputName);
+                weekday == menu.weekday &&
+                typ == menu.typ &&
+                Objects.equals(inputName, menu.inputName) &&
+                Objects.equals(price, menu.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuName, editable, ordered, weekday, menuTyp, paused, inputName);
-    }
-
-    @Nonnull
-    @Override
-    public String toString() {
-        return "Menu{" +
-                "id=" + id +
-                ", menuName='" + menuName + '\'' +
-                ", editable=" + editable +
-                ", ordered=" + ordered +
-                ", weekday=" + weekday +
-                ", menuTyp=" + menuTyp +
-                ", paused=" + paused +
-                ", inputName='" + inputName + '\'' +
-                '}';
+        return Objects.hash(id, menuName, editable, ordered, weekday, typ, paused, inputName, price);
     }
 }

@@ -5,7 +5,7 @@
     <data>
         <variable
             name="menu"
-            type="de.wackernagel.essbar.ui.ChangedMenu"/>
+            type="de.wackernagel.essbar.ui.pojos.ChangedMenu"/>
     </data>
 
     <FrameLayout

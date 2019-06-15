@@ -1,4 +1,4 @@
-package de.wackernagel.essbar.ui;
+package de.wackernagel.essbar.ui.pojos;
 
 import org.jsoup.nodes.Element;
 

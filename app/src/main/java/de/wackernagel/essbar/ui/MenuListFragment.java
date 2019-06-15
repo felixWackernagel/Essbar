@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
+import de.wackernagel.essbar.ui.pojos.CalendarWeek;
+import de.wackernagel.essbar.ui.pojos.Menu;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 
@@ -155,8 +157,8 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
                 // calendarWeek start date is monday
                 calendar.setTime( calendarWeek.getStartDate() );
                 // weekday is a integer i.e. monday is 0
-                calendar.add( Calendar.DAY_OF_WEEK, item.getWeekday() );
-                final String weekdayAsWord = localizedWeekdays[ item.getWeekday() ];
+                calendar.add( Calendar.DAY_OF_WEEK, item.getWeekday().getNumber() );
+                final String weekdayAsWord = localizedWeekdays[ item.getWeekday().getNumber() ];
                 if( DateUtils.isToday( calendar.getTimeInMillis() ) ) {
                     return weekdayAsWord.concat( todayAsWord );
                 }
@@ -167,7 +169,7 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         viewModel.getMenus().observe( getViewLifecycleOwner(), adapter::submitList);
     }
 
-    private void updateNumberOfChangedMenus( @Nonnull final Menu menu, final boolean isOrdered ) {
+    private void updateNumberOfChangedMenus(@Nonnull final Menu menu, final boolean isOrdered ) {
         if( menu.isOrdered() != isOrdered ) {
             viewModel.incrementNumberOfChangedOrders();
         } else {

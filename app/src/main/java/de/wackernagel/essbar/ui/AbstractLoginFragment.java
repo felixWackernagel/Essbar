@@ -5,18 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import org.jsoup.nodes.Document;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
@@ -47,10 +41,6 @@ public class AbstractLoginFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity( intent );
         requireActivity().finish();
-    }
-
-    boolean wasWebLoginSuccessful( final Document document ) {
-        return document != null && document.select( "#login-info .fehler" ).size() == 0;
     }
 
     void showError(@Nullable final String message ) {

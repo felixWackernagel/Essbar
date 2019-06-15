@@ -20,6 +20,7 @@ import de.wackernagel.essbar.databinding.FragmentCustomerListBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.EncryptionUtils;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
+import de.wackernagel.essbar.web.DocumentParser;
 
 public class CustomersListFragment extends AbstractLoginFragment {
 
@@ -110,7 +111,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
     private void loginAtWebsite() {
         viewModel.getLoginDocument().observe(this, resource -> {
             if( resource.isSuccess() ) {
-                if( wasWebLoginSuccessful( resource.getResource() ) ) {
+                if( DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
                     startMainActivity();
                 } else {
                     showError( getString( R.string.username_password_error) );

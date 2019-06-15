@@ -20,6 +20,7 @@ import de.wackernagel.essbar.databinding.FragmentCustomerFormBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.EncryptionUtils;
 import de.wackernagel.essbar.utils.ViewUtils;
+import de.wackernagel.essbar.web.DocumentParser;
 
 public class CustomerFormFragment extends AbstractLoginFragment {
 
@@ -68,7 +69,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
 
         viewModel.getLoginDocument().observe(this, resource -> {
             if( resource.isSuccess() ) {
-                if( wasWebLoginSuccessful( resource.getResource() ) ) {
+                if( DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
                     if( binding.saveCredentials.isChecked() ) {
                         viewModel.findCustomerName( resource.getResource() );
                         doEncryption();

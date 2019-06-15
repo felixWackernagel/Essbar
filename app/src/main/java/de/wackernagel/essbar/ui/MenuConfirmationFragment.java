@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuConfirmationBinding;
+import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 

@@ -1,7 +1,6 @@
 package de.wackernagel.essbar.ui.viewModels;
 
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.util.List;
 
@@ -9,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.room.Customer;
+import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.Resource;
 
 public class LoginViewModel extends ViewModel {
@@ -63,14 +63,7 @@ public class LoginViewModel extends ViewModel {
      * @param document which contain the logged in username
      */
     public void findCustomerName( final Document document ) {
-        if( document != null ) {
-            final Element loginElement = document.selectFirst( "#form-login" );
-            if( loginElement != null ) {
-                loginElement.select( "b" ).remove();
-                loginElement.select( "a" ).remove();
-                customerName = loginElement.text();
-            }
-        }
+        customerName = DocumentParser.getLoginUsername( document );
     }
 
     public LiveData<List<Customer>> getAllCustomers() {

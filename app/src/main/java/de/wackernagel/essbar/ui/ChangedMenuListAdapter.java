@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import de.wackernagel.essbar.BR;
 import de.wackernagel.essbar.databinding.ItemChangedMenuBinding;
+import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 
 public class ChangedMenuListAdapter extends ListAdapter<ChangedMenu, ChangedMenuListAdapter.ChangedMenuViewHolder> {
 

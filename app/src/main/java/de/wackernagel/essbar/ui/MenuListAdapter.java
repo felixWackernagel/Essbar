@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 import de.wackernagel.essbar.R;
+import de.wackernagel.essbar.ui.pojos.Menu;
+import de.wackernagel.essbar.ui.pojos.Type;
 
 import static de.wackernagel.essbar.BR.adapter;
 import static de.wackernagel.essbar.BR.holder;
@@ -62,7 +64,7 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
 
     @Override
     public int getItemViewType(int position) {
-        if( getItem( position ).getMenuTyp() == 3 && !getItem( position ).isPaused() )
+        if( getItem( position ).getTyp() == Type.LUNCH && !getItem( position ).isPaused() )
             return R.layout.item_menu_lunch;
         return R.layout.item_menu;
     }
@@ -137,7 +139,7 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
         public boolean areContentsTheSame(@NonNull Menu oldItem, @NonNull Menu newItem) {
             return oldItem.getWeekday() == newItem.getWeekday() &&
                     TextUtils.equals( oldItem.getMenuName(), newItem.getMenuName() ) &&
-                    oldItem.getMenuTyp() == newItem.getMenuTyp() &&
+                    oldItem.getTyp() == newItem.getTyp() &&
                     oldItem.isOrdered() == newItem.isOrdered() &&
                     oldItem.isEditable() == newItem.isEditable();
         }

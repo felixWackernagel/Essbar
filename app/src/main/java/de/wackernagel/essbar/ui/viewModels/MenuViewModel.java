@@ -5,9 +5,7 @@ import android.util.SparseBooleanArray;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -18,24 +16,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import de.wackernagel.essbar.repository.EssbarRepository;
-import de.wackernagel.essbar.ui.CalendarWeek;
-import de.wackernagel.essbar.ui.ChangedMenu;
-import de.wackernagel.essbar.ui.Menu;
+import de.wackernagel.essbar.ui.pojos.CalendarWeek;
+import de.wackernagel.essbar.ui.pojos.ChangedMenu;
+import de.wackernagel.essbar.ui.pojos.Menu;
 import de.wackernagel.essbar.utils.Event;
+import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.Resource;
 
 public class MenuViewModel extends ViewModel {
-
-    private static String[] MENU_TYPE_SELECTORS = new String[] {
-            "tr.menue-line-Fruehstueck > td.menue-Fruehstueck",
-            "tr.menue-line-Obstfruehstueck > td.menue-Obstfruehstueck",
-            "tr.menue-line-Mittag > td.menue-Mittag",
-            "tr.menue-line-Vesper > td.menue-Vesper"
-    };
-
-    private static String CALENDAR_WEEK_SELECTOR = "#select_woche > select > option";
-
-    private static String CHANGED_MENUS_SELECTOR = "form .best_table_top tr[class^=auflistung]";
 
     private final EssbarRepository repository;
 
@@ -88,17 +76,7 @@ public class MenuViewModel extends ViewModel {
     private LiveData<List<Menu>> getMenusList( final Resource<Document> resource) {
         final MutableLiveData<List<Menu>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
-            final Document menuPage = resource.getResource();
-            final List<Menu> allMenuItems = new ArrayList<>();
-            for(int menuTypeIndex = 0; menuTypeIndex < MENU_TYPE_SELECTORS.length; menuTypeIndex++ ) {
-                final String menuTypeSelector = MENU_TYPE_SELECTORS[ menuTypeIndex ];
-                final Elements menuTypeElements = menuPage.select( menuTypeSelector );
-                for( int menuIndex = 0; menuIndex < menuTypeElements.size(); menuIndex++ ) {
-                    final int menuItemIndex = menuTypeIndex + ( ( menuTypeIndex + 1 ) * menuIndex );
-                    allMenuItems.add( menuItemIndex, new Menu( menuTypeElements.get( menuIndex ) ) );
-                }
-            }
-            result.setValue( allMenuItems );
+            result.setValue( DocumentParser.getMenuList( resource.getResource() ) );
         } else {
             result.setValue( Collections.emptyList() );
         }
@@ -120,12 +98,7 @@ public class MenuViewModel extends ViewModel {
     private LiveData<List<CalendarWeek>> getCalendarWeekList(final Resource<Document> resource) {
         final MutableLiveData<List<CalendarWeek>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
-            final Document menuPage = resource.getResource();
-            final List<CalendarWeek> calendarWeekItems = new ArrayList<>();
-            for( Element option : menuPage.select(CALENDAR_WEEK_SELECTOR) ) {
-                calendarWeekItems.add( new CalendarWeek( option ) );
-            }
-            result.setValue(calendarWeekItems);
+            result.setValue( DocumentParser.getCalendarWeekList( resource.getResource() ) );
         } else {
             result.setValue( Collections.emptyList() );
         }
@@ -135,12 +108,7 @@ public class MenuViewModel extends ViewModel {
     private LiveData<List<ChangedMenu>> getChangedMenuList( final Resource<Document> resource ) {
         final MutableLiveData<List<ChangedMenu>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
-            final Document menuConfirmationPage = resource.getResource();
-            final List<ChangedMenu> changedMenus = new ArrayList<>();
-            for( Element tableRow : menuConfirmationPage.select( CHANGED_MENUS_SELECTOR ) ) {
-                changedMenus.add( new ChangedMenu( tableRow ) );
-            }
-            result.setValue(changedMenus);
+            result.setValue( DocumentParser.getChangedMenuList( resource.getResource() ) );
         } else {
             result.setValue( Collections.emptyList() );
         }
@@ -150,12 +118,7 @@ public class MenuViewModel extends ViewModel {
     private LiveData<Event<Boolean>> getOrderStatusFromThankYouDocument( final Resource<Document> resource ) {
         final MutableLiveData<Event<Boolean>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
-            final Document thankYouPage = resource.getResource();
-            if( thankYouPage.select( ".bestellfortschritt.bestellfortschritt2" ).size() > 0 ) {
-                result.setValue( new Event<>( Boolean.TRUE ) );
-            } else {
-                result.setValue( new Event<>( Boolean.FALSE ) );
-            }
+            result.setValue( new Event<>( DocumentParser.isOrderSuccessful( resource.getResource() ) ) );
         } else {
             result.setValue( new Event<>( Boolean.FALSE ) );
         }

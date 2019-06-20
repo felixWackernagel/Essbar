@@ -8,13 +8,17 @@ import android.text.format.DateUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -24,7 +28,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
@@ -77,8 +83,31 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         }
     }
 
+    private void setSelectedCalendarWeek( @NonNull final android.view.Menu menu ) {
+        final MenuItem item = menu.findItem(R.id.action_calendar_week);
+        if( item != null ) {
+            final View actionView = item.getActionView();
+            actionView.setOnClickListener( v -> menu.performIdentifierAction( item.getItemId(), 0 ) );
+            final TextView day = actionView.findViewById( android.R.id.text1 );
+            day.setText( String.valueOf( viewModel.getSelectedCalendarWeek() ) );
+        }
+    }
+
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
+
+        binding.toolbar.inflateMenu( R.menu.menu_list );
+        setSelectedCalendarWeek( binding.toolbar.getMenu() );
+        binding.toolbar.setOnMenuItemClickListener(item -> {
+            switch( item.getItemId() ) {
+                case R.id.action_calendar_week:
+                    Toast.makeText( getContext(), "Open Calendar Week Selector", Toast.LENGTH_SHORT ).show();
+                    return true;
+
+                default:
+                    return false;
+            }
+        });
 
         final ActionBar actionBar = getSupportActionBar();
         Context themedContext = getContext();

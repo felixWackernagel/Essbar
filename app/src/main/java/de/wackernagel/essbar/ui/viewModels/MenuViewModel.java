@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.Nullable;
@@ -149,14 +150,31 @@ public class MenuViewModel extends ViewModel {
         return successfulOrder;
     }
 
+    public int getSelectedCalendarWeek() {
+        final String calendarWeekSeconds = calendarWeek.getValue();
+        Date calendarWeekDate;
+        if( calendarWeekSeconds == null ) {
+            calendarWeekDate = calculateCurrentCalendarWeek();
+        } else {
+            calendarWeekDate = new Date( Long.valueOf( calendarWeekSeconds ) * 1000L );
+        }
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime( calendarWeekDate );
+        return calendar.get( Calendar.WEEK_OF_YEAR );
+    }
+
     public void loadCurrentCalendarWeek() {
+        final String dateInSeconds = String.valueOf( calculateCurrentCalendarWeek().getTime() / 1000 );
+        loadCalendarWeek( dateInSeconds );
+    }
+
+    private Date calculateCurrentCalendarWeek() {
         final Calendar calendar = Calendar.getInstance();
         calendar.set( Calendar.DAY_OF_WEEK, Calendar.MONDAY );
         calendar.set( Calendar.HOUR_OF_DAY, 0 );
         calendar.set( Calendar.MINUTE, 0 );
         calendar.set( Calendar.SECOND, 0 );
-        final String dateInSeconds = String.valueOf( calendar.getTimeInMillis() / 1000 );
-        loadCalendarWeek( dateInSeconds );
+        return calendar.getTime();
     }
 
     public void loadCalendarWeek( @Nullable final String startDateOfCalendarWeekInSeconds ) {

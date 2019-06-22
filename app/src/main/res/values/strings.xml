@@ -31,6 +31,7 @@
     <string name="roboto_thin">sans-serif-thin</string>
     <string name="roboto_medium">sans-serif-medium</string>
     <string name="action_calendar_week">Kalenderwoche wechseln</string>
+    <string name="calendar_week_section">Kalenderwoche</string>
 
     <array name="weekdays">
         <item>Montag</item>

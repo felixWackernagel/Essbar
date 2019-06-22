@@ -22,7 +22,7 @@
         android:paddingTop="2dp"
         android:textColor="@android:color/black"
         android:textSize="10sp"
-        android:fontFamily="@string/roboto_light"
+        android:fontFamily="@string/roboto_regular"
         tools:ignore="SmallSp"
         tools:text="31"/>
 

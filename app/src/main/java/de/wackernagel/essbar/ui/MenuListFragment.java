@@ -15,10 +15,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -28,9 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuItemCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
@@ -60,6 +56,14 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
     private ActionMode actionMode;
     private int statusBarColor;
 
+    private TextView calendarWeekNumberView;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -73,6 +77,10 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel.getCalendarWeek().observe( getViewLifecycleOwner(), calendarWeek -> {
+            if( calendarWeekNumberView != null )
+                calendarWeekNumberView.setText( String.valueOf( viewModel.calculateCalendarWeek( calendarWeek ) ) );
+        } );
 
         setupToolbar();
         setupRecyclerView();
@@ -83,31 +91,42 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         }
     }
 
-    private void setSelectedCalendarWeek( @NonNull final android.view.Menu menu ) {
+    @Override
+    public void onCreateOptionsMenu(@NonNull android.view.Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate( R.menu.menu_list, menu );
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull android.view.Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        setSelectedCalendarWeek( menu );
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch( item.getItemId() ) {
+            case R.id.action_calendar_week:
+                CalendarWeekSelectorFragment.newInstance().show( requireFragmentManager(), "calendar_week_selector" );
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void setSelectedCalendarWeek(@NonNull final android.view.Menu menu ) {
         final MenuItem item = menu.findItem(R.id.action_calendar_week);
         if( item != null ) {
             final View actionView = item.getActionView();
             actionView.setOnClickListener( v -> menu.performIdentifierAction( item.getItemId(), 0 ) );
-            final TextView day = actionView.findViewById( android.R.id.text1 );
-            day.setText( String.valueOf( viewModel.getSelectedCalendarWeek() ) );
+            calendarWeekNumberView = actionView.findViewById( android.R.id.text1 );
+            calendarWeekNumberView.setText( String.valueOf( viewModel.getSelectedCalendarWeek() ) );
         }
     }
 
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
-
-        binding.toolbar.inflateMenu( R.menu.menu_list );
-        setSelectedCalendarWeek( binding.toolbar.getMenu() );
-        binding.toolbar.setOnMenuItemClickListener(item -> {
-            switch( item.getItemId() ) {
-                case R.id.action_calendar_week:
-                    Toast.makeText( getContext(), "Open Calendar Week Selector", Toast.LENGTH_SHORT ).show();
-                    return true;
-
-                default:
-                    return false;
-            }
-        });
 
         final ActionBar actionBar = getSupportActionBar();
         Context themedContext = getContext();

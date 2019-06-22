@@ -2,6 +2,7 @@ package de.wackernagel.essbar.dagger;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
+import de.wackernagel.essbar.ui.CalendarWeekSelectorFragment;
 import de.wackernagel.essbar.ui.CustomerFormFragment;
 import de.wackernagel.essbar.ui.CustomersListFragment;
 import de.wackernagel.essbar.ui.MenuConfirmationFragment;
@@ -21,5 +22,8 @@ public abstract class FragmentBuildersModule {
 
     @ContributesAndroidInjector
     abstract MenuConfirmationFragment contributeFullscreenFragment();
+
+    @ContributesAndroidInjector
+    abstract CalendarWeekSelectorFragment contributeCalendarWeekSelectorFragment();
 
 }

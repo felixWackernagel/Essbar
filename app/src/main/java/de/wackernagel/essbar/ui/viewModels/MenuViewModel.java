@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -150,8 +151,12 @@ public class MenuViewModel extends ViewModel {
         return successfulOrder;
     }
 
-    public int getSelectedCalendarWeek() {
-        final String calendarWeekSeconds = calendarWeek.getValue();
+    @NonNull
+    public LiveData<String> getCalendarWeek() {
+        return calendarWeek;
+    }
+
+    public int calculateCalendarWeek( final String calendarWeekSeconds ) {
         Date calendarWeekDate;
         if( calendarWeekSeconds == null ) {
             calendarWeekDate = calculateCurrentCalendarWeek();
@@ -161,6 +166,10 @@ public class MenuViewModel extends ViewModel {
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime( calendarWeekDate );
         return calendar.get( Calendar.WEEK_OF_YEAR );
+    }
+
+    public int getSelectedCalendarWeek() {
+        return calculateCalendarWeek( calendarWeek.getValue() );
     }
 
     public void loadCurrentCalendarWeek() {

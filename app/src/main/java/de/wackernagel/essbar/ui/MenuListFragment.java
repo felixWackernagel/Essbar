@@ -1,26 +1,13 @@
 package de.wackernagel.essbar.ui;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.format.DateUtils;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.TextView;
-
-import java.util.Calendar;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,17 +16,18 @@ import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
-import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.Menu;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 
-import static de.wackernagel.essbar.utils.ViewUtils.spToPx;
-
-public class MenuListFragment extends ToolbarFragment implements AdapterView.OnItemSelectedListener, ActionMode.Callback {
+public class MenuListFragment extends ToolbarFragment implements ActionMode.Callback {
 
     static MenuListFragment newInstance() {
         final MenuListFragment fragment = new MenuListFragment();
@@ -52,7 +40,6 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
 
     private FragmentMenuListBinding binding;
     private MenuViewModel viewModel;
-    private ToolbarSpinnerAdapter<CalendarWeek> calendarWeeksAdapter;
     private ActionMode actionMode;
     private int statusBarColor;
 
@@ -105,14 +92,11 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.action_calendar_week:
-                CalendarWeekSelectorFragment.newInstance().show( requireFragmentManager(), "calendar_week_selector" );
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        if( item.getItemId() == R.id.action_calendar_week ) {
+            CalendarWeekSelectorFragment.newInstance().show( requireFragmentManager(), "calendar_week_selector" );
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setSelectedCalendarWeek(@NonNull final android.view.Menu menu ) {
@@ -129,56 +113,14 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
         setSupportActionBar(binding.toolbar);
 
         final ActionBar actionBar = getSupportActionBar();
-        Context themedContext = getContext();
         if( actionBar != null ) {
             actionBar.setDisplayShowTitleEnabled(false);
-            themedContext = actionBar.getThemedContext();
+            actionBar.setTitle( R.string.menu_fragment_title );
         }
-
-        calendarWeeksAdapter = new ToolbarSpinnerAdapter<CalendarWeek>( themedContext ) {
-            @Override
-            CharSequence getTitle( final int position, boolean forDropDown ) {
-                final CalendarWeek item = getItem( position );
-                if( forDropDown ) {
-                    return item.getDateRange();
-                }
-
-                // style like Title and Subtitle
-                final String selectedTitle = getString( R.string.menu_fragment_title, item.getDateRange() );
-                final int spanStart = selectedTitle.length() - item.getDateRange().length();
-                final int spanEnd = selectedTitle.length();
-                final SpannableStringBuilder ssb = new SpannableStringBuilder( selectedTitle );
-                ssb.setSpan( new AbsoluteSizeSpan( spToPx( 16f, requireContext() ) ), spanStart, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ssb.setSpan( new TypefaceSpan( "sans-serif" /* roboto regular */ ), spanStart, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                return ssb;
-            }
-        };
-        binding.toolbarSpinner.setAdapter(calendarWeeksAdapter);
-        binding.toolbarSpinner.setOnItemSelectedListener(this );
-
-        viewModel.getCalendarWeeks().observe( getViewLifecycleOwner(), calendarWeeks -> {
-            binding.toolbarSpinner.setOnItemSelectedListener( null );
-            calendarWeeksAdapter.setItems( calendarWeeks );
-            binding.toolbarSpinner.setSelection( findIndexOfSelectedItem( calendarWeeks ), false );
-            binding.toolbarSpinner.setOnItemSelectedListener( MenuListFragment.this );
-        });
-    }
-
-    private int findIndexOfSelectedItem( final List<CalendarWeek> calendarWeeks) {
-        if( calendarWeeks != null ) {
-            final int size = calendarWeeks.size();
-            for( int index = 0; index < size; index++ ) {
-                if( calendarWeeks.get( index ).isSelected() ) {
-                    return index;
-                }
-            }
-        }
-        return 0;
     }
 
     private void setupRecyclerView() {
         final String[] localizedWeekdays = getResources().getStringArray( R.array.weekdays );
-        final String todayAsWord = getString( R.string.today );
 
         final MenuListAdapter adapter = new MenuListAdapter();
         adapter.setOnMenuStatusChangedListener( this::updateNumberOfChangedMenus );
@@ -200,17 +142,7 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
             @Override
             public CharSequence getSectionHeader( int position ) {
                 final Menu item = adapter.getListItem( position );
-                final CalendarWeek calendarWeek = calendarWeeksAdapter.getItem( binding.toolbarSpinner.getSelectedItemPosition() );
-                final Calendar calendar = Calendar.getInstance();
-                // calendarWeek start date is monday
-                calendar.setTime( calendarWeek.getStartDate() );
-                // weekday is a integer i.e. monday is 0
-                calendar.add( Calendar.DAY_OF_WEEK, item.getWeekday().getNumber() );
-                final String weekdayAsWord = localizedWeekdays[ item.getWeekday().getNumber() ];
-                if( DateUtils.isToday( calendar.getTimeInMillis() ) ) {
-                    return weekdayAsWord.concat( todayAsWord );
-                }
-                return weekdayAsWord;
+                return localizedWeekdays[ item.getWeekday().getNumber() ];
             }
         }) );
 
@@ -240,15 +172,6 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        viewModel.loadCalendarWeek( calendarWeeksAdapter.getItem( position ).getValue() );
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-    }
-
-    @Override
     public boolean onCreateActionMode(ActionMode mode, android.view.Menu menu) {
         mode.getMenuInflater().inflate( R.menu.menu_list_cab_menu, menu );
         final Integer quantity = viewModel.getNumberOfChangedOrders().getValue();
@@ -269,14 +192,11 @@ public class MenuListFragment extends ToolbarFragment implements AdapterView.OnI
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch( item.getItemId() ) {
-            case R.id.action_change_menus_order_status:
-                MenuConfirmationFragment.newInstance().show( requireFragmentManager().beginTransaction(), MenuConfirmationFragment.TAG );
-                return true;
-
-            default:
-                return false;
+        if( item.getItemId() == R.id.action_change_menus_order_status ) {
+            MenuConfirmationFragment.newInstance().show(requireFragmentManager().beginTransaction(), MenuConfirmationFragment.TAG);
+            return true;
         }
+        return false;
     }
 
     @Override

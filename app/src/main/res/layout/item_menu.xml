@@ -16,7 +16,7 @@
     </data>
 
     <de.wackernagel.essbar.utils.CheckableFrameLayout
-        android:background="@drawable/spinner_item_dropdown_selector"
+        android:background="@drawable/checkable_selector"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         app:edit="@{holder.isChanged()}">

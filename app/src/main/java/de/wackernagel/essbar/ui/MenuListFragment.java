@@ -114,7 +114,6 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
 
         final ActionBar actionBar = getSupportActionBar();
         if( actionBar != null ) {
-            actionBar.setDisplayShowTitleEnabled(false);
             actionBar.setTitle( R.string.menu_fragment_title );
         }
     }

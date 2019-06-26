@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -37,7 +38,8 @@
                     android:inputType="number"
                     android:drawableStart="@drawable/ic_person_black_24dp"
                     android:drawablePadding="16dp"
-                    android:drawableTint="@color/colorAccent"/>
+                    android:drawableTint="@color/colorAccent"
+                    tools:ignore="UnusedAttribute"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -62,7 +64,8 @@
                     android:inputType="textPassword|textNoSuggestions"
                     android:drawableStart="@drawable/ic_lock_black_24dp"
                     android:drawablePadding="16dp"
-                    android:drawableTint="@color/colorAccent"/>
+                    android:drawableTint="@color/colorAccent"
+                    tools:ignore="UnusedAttribute"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 

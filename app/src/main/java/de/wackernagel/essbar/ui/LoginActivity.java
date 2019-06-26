@@ -61,9 +61,7 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
 
 
         final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
-        viewModel.getCustomersCount().observe( this, (count) -> {
-            binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 );
-        });
+        viewModel.getCustomersCount().observe( this, (count) -> binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 ));
 
         EssbarPreferences.setCookie( this, null );
 

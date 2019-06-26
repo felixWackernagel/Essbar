@@ -5,7 +5,6 @@
     <string name="login">Anmelden</string>
     <string name="today">\u00A0(Heute)</string>
     <string name="lunch">Mittag</string>
-    <string name="customer_name_number">%1$s (%2$s)</string>
     <string name="menu_fragment_title">Speiseplan</string>
     <string name="menu_confirmation_fragment_title">Änderungen</string>
     <string name="username_password_error">Ihre Anmeldung ist fehlgeschlagen. Prüfen Sie Kundennummer und Passwort?</string>

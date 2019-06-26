@@ -77,13 +77,11 @@ public class MenuConfirmationFragment extends DialogFragment {
         binding.toolbar.setTitle( R.string.menu_confirmation_fragment_title );
         binding.toolbar.inflateMenu( R.menu.menu_confirmation_menu );
         binding.toolbar.setOnMenuItemClickListener(item -> {
-            switch( item.getItemId() ) {
-                case R.id.action_buy:
-                    viewModel.postChangedAndConfirmedMenus();
-                    return true;
-                default:
-                    return false;
+            if( item.getItemId() == R.id.action_buy ) {
+                viewModel.postChangedAndConfirmedMenus();
+                return true;
             }
+            return false;
         });
     }
 

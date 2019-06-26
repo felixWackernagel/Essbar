@@ -104,6 +104,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
 
             @Override
             public void onEncryptionError(Exception e) {
+                Log.e("CustomerFormFragment", "encryption failed", e );
                 Toast.makeText( requireContext(), R.string.unknown_error, Toast.LENGTH_LONG ).show();
             }
         });

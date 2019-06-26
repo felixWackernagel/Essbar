@@ -137,9 +137,9 @@ public class MenuListAdapter extends ListAdapter<Menu, MenuListAdapter.MenuViewH
 
         @Override
         public boolean areContentsTheSame(@NonNull Menu oldItem, @NonNull Menu newItem) {
-            return oldItem.getWeekday() == newItem.getWeekday() &&
+            return oldItem.getWeekday().equals( newItem.getWeekday() ) &&
                     TextUtils.equals( oldItem.getMenuName(), newItem.getMenuName() ) &&
-                    oldItem.getTyp() == newItem.getTyp() &&
+                    oldItem.getTyp().equals( newItem.getTyp() ) &&
                     oldItem.isOrdered() == newItem.isOrdered() &&
                     oldItem.isEditable() == newItem.isEditable();
         }

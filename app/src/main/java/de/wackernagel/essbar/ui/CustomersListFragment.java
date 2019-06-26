@@ -91,6 +91,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
 
             @Override
             public void onDecryptionError(Exception e) {
+                Log.e("CustomerListFragment", "decryption failed", e );
                 showError( getString( R.string.unknown_error ) );
             }
         });

@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
+import de.wackernagel.essbar.ui.pojos.Weekday;
 import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.Resource;
@@ -78,11 +80,28 @@ public class MenuViewModel extends ViewModel {
     private LiveData<List<Menu>> getMenusList( final Resource<Document> resource) {
         final MutableLiveData<List<Menu>> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
-            result.setValue( DocumentParser.getMenuList( resource.getResource() ) );
+            final List<Menu> menuList = DocumentParser.getMenuList( resource.getResource() );
+            filterEqualPausedMenus( menuList );
+            result.setValue( menuList );
         } else {
             result.setValue( Collections.emptyList() );
         }
         return result;
+    }
+
+    private void filterEqualPausedMenus(final List<Menu> menuList ) {
+        if( !menuList.isEmpty() ) {
+            final Iterator<Menu> iterator = menuList.iterator();
+            Weekday toExclude = null;
+            while( iterator.hasNext() ) {
+                final Menu menu = iterator.next();
+                if( menu.getWeekday().equals( toExclude )  ) {
+                    iterator.remove();
+                } else if( menu.isPaused() ) {
+                    toExclude = menu.getWeekday();
+                }
+            }
+        }
     }
 
     private LiveData<SparseBooleanArray> getCheckedMenus( final List<Menu> menus ) {

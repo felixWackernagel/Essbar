@@ -30,13 +30,13 @@ public class RetrofitModule {
     @Singleton
     WebService provideWebservice() {
         final OkHttpClient.Builder client = new OkHttpClient.Builder();
-        client.cookieJar( new PreferencesCookieJar( application ) );
-        client.addInterceptor( new NetworkConnectionInterceptor( application ) );
+        client.cookieJar( PreferencesCookieJar.get() );
+        client.addNetworkInterceptor( new NetworkConnectionInterceptor( application ) );
 
         addRequestLogging(client);
 
         final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl( "https://www.bestellung-pipapo-catering.de" )
+                .baseUrl( "https://bestellung-pipapo-catering.mms-rcs.de" )
                 .addCallAdapterFactory( new LiveDataResourceCallAdapterFactory() )
                 .addConverterFactory( JSoupConverter.FACTORY )
                 .client( client.build() )

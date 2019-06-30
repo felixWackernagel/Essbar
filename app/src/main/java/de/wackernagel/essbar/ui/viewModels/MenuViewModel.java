@@ -3,6 +3,13 @@ package de.wackernagel.essbar.ui.viewModels;
 import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
@@ -12,12 +19,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;

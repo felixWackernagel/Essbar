@@ -83,4 +83,16 @@ public class DocumentParser {
             return Boolean.FALSE;
         }
     }
+
+    @Nullable
+    public static String getCSRFToken( @Nullable final Document document ) {
+        if( document != null ) {
+            final Elements csrfElements = document.select( "form > input[name=csrfmiddlewaretoken]" );
+            if( csrfElements.size() == 1 ) {
+                return csrfElements.get( 0 ).attr( "value" );
+            }
+            return null;
+        }
+        return null;
+    }
 }

@@ -13,9 +13,13 @@ import retrofit2.http.POST;
 
 public interface WebService {
 
+    @GET( "/content" )
+    LiveData<Resource<Document>> getHome();
+
+    @Headers("Referer: https://bestellung-pipapo-catering.mms-rcs.de/content/")
     @FormUrlEncoded
-    @POST( "/index.php?ear_a=akt_login" )
-    LiveData<Resource<Document>> postLoginData(@Field("Login_Name") String username, @Field("Login_Passwort") String password );
+    @POST( "/accounts/login/" )
+    LiveData<Resource<Document>> postLoginData(@Field("csrfmiddlewaretoken") String csrfToken, @Field("login") String username, @Field("password") String password );
 
     @GET( "/index.php?m=2;0" )
     LiveData<Resource<Document>> getMenus();

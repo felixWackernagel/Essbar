@@ -36,8 +36,8 @@ public class EssbarRepository {
         return webService.postMenusStartDate( date );
     }
 
-    public LiveData<Resource<Document>> getLoginDocument( final String username, final String password ) {
-        return webService.postLoginData( username, password );
+    public LiveData<Resource<Document>> getLoginDocument( final String csrfToken, final String username, final String password ) {
+        return webService.postLoginData( csrfToken, username, password );
     }
 
     public LiveData<Resource<Document>> getMenuConfirmationDocument(final String formPayload ) {
@@ -54,5 +54,9 @@ public class EssbarRepository {
 
     public LiveData<Integer> getCustomersCount() {
         return customerDao.customersCount();
+    }
+
+    public LiveData<Resource<Document>> getHomeDocument() {
+        return webService.getHome();
     }
 }

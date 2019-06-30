@@ -3,6 +3,7 @@ package de.wackernagel.essbar.ui;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -14,7 +15,12 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
@@ -25,6 +31,7 @@ import de.wackernagel.essbar.databinding.ActivityLoginBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
 import de.wackernagel.essbar.utils.ViewUtils;
+import de.wackernagel.essbar.web.Resource;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -62,6 +69,9 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
 
         final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
         viewModel.getCustomersCount().observe( this, (count) -> binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 ));
+        viewModel.getHome().observe(this, ready -> {
+            Log.e("LoginActivity", "login ready? " + ready );
+        });
 
         EssbarPreferences.setCookie( this, null );
 

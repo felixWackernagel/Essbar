@@ -19,17 +19,19 @@ public class DocumentParser {
     }
 
     public static boolean isLoginSuccessful( @Nullable final Document document ) {
-        return document != null && document.select( "#login-info .fehler" ).size() == 0;
+        if( document != null ) {
+            final Element headline = document.selectFirst("h1");
+            return headline != null && "speiseplan".equalsIgnoreCase( headline.text() );
+        }
+        return false;
     }
 
     @Nullable
     public static String getLoginUsername( @Nullable final Document document ) {
         if( document != null ) {
-            final Element loginElement = document.selectFirst( "#form-login" );
-            if( loginElement != null ) {
-                loginElement.select( "b" ).remove();
-                loginElement.select( "a" ).remove();
-                return loginElement.text();
+            final Element userNameElement = document.selectFirst( "site > header > session > user > a" );
+            if( userNameElement != null ) {
+                return userNameElement.text();
             }
         }
         return null;

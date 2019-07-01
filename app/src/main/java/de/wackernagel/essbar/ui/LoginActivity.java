@@ -2,12 +2,10 @@ package de.wackernagel.essbar.ui;
 
 import android.app.KeyguardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,23 +13,21 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import com.google.android.material.snackbar.Snackbar;
+
+import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
 import dagger.android.AndroidInjector;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
-import de.wackernagel.essbar.EssbarPreferences;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.ActivityLoginBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
 import de.wackernagel.essbar.utils.ViewUtils;
-import de.wackernagel.essbar.web.Resource;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -56,8 +52,10 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
         binding = DataBindingUtil.setContentView( this, R.layout.activity_login );
 
         final KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
-        if( !keyguardManager.isKeyguardSecure() ) {
-            Snackbar.make( binding.coordinatorLayout, R.string.no_secure_lock_error, Snackbar.LENGTH_LONG ).show();
+        if( !keyguardManager.isDeviceSecure() ) {
+            Snackbar.make( binding.coordinatorLayout, R.string.no_secure_lock_error, Snackbar.LENGTH_INDEFINITE ).setAction("Einstellungen", (view) -> {
+                startActivity( new Intent(Settings.ACTION_SECURITY_SETTINGS) );
+            }).show();
         }
 
         final int spaceInPixel = ViewUtils.dpToPx( 16, this );
@@ -66,14 +64,11 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
         binding.viewPager.setPadding( spaceInPixel, 0 , spaceInPixel, 0 );
         binding.viewPager.setClipToPadding( false );
 
-
         final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
         viewModel.getCustomersCount().observe( this, (count) -> binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 ));
         viewModel.getHome().observe(this, ready -> {
             Log.e("LoginActivity", "login ready? " + ready );
         });
-
-        EssbarPreferences.setCookie( this, null );
 
         getLifecycle().addObserver( connectivityLifecycleObserver );
         connectivityLifecycleObserver.getConnectedStatus().observe( this, this::showOfflineState );

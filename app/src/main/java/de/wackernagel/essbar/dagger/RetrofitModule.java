@@ -11,7 +11,7 @@ import de.wackernagel.essbar.BuildConfig;
 import de.wackernagel.essbar.web.JSoupConverter;
 import de.wackernagel.essbar.web.LiveDataResourceCallAdapterFactory;
 import de.wackernagel.essbar.web.NetworkConnectionInterceptor;
-import de.wackernagel.essbar.web.PreferencesCookieJar;
+import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.WebService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -19,6 +19,8 @@ import retrofit2.Retrofit;
 
 @Module
 public class RetrofitModule {
+
+    private static final String TAG = "RetrofitModule";
 
     private final Application application;
 
@@ -30,8 +32,8 @@ public class RetrofitModule {
     @Singleton
     WebService provideWebservice() {
         final OkHttpClient.Builder client = new OkHttpClient.Builder();
-        client.cookieJar( PreferencesCookieJar.get() );
-        client.addNetworkInterceptor( new NetworkConnectionInterceptor( application ) );
+        client.cookieJar( InMemoryCookieJar.get() );
+        client.addInterceptor( new NetworkConnectionInterceptor( application ) );
 
         addRequestLogging(client);
 
@@ -47,9 +49,9 @@ public class RetrofitModule {
 
     private void addRequestLogging(OkHttpClient.Builder client) {
         if (BuildConfig.DEBUG) {
-            final HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(message -> Log.i("Essbar", message));
+            final HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(message -> Log.i(TAG, message));
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-            client.addInterceptor(interceptor);
+            client.addNetworkInterceptor(interceptor);
         }
     }
 }

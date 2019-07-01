@@ -9,11 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+
+import javax.inject.Inject;
+
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentCustomerFormBinding;
@@ -70,8 +71,8 @@ public class CustomerFormFragment extends AbstractLoginFragment {
         viewModel.getLoginDocument().observe(this, resource -> {
             if( resource.isSuccess() ) {
                 if( DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
-                    if( binding.saveCredentials.isChecked() ) {
-                        viewModel.findCustomerName( resource.getResource() );
+                    if (binding.saveCredentials.isChecked()) {
+                        viewModel.findCustomerName(resource.getResource());
                         doEncryption();
                     } else {
                         startMainActivity();
@@ -81,7 +82,6 @@ public class CustomerFormFragment extends AbstractLoginFragment {
                 }
             } else {
                 final String message = ( resource.getError() != null ? resource.getError().getMessage() : getString( R.string.unknown_error ) );
-                Log.e( "Essbar", message );
                 showError( message );
             }
 

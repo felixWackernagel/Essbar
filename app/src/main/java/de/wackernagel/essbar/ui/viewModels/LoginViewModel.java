@@ -1,7 +1,6 @@
 package de.wackernagel.essbar.ui.viewModels;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -89,7 +88,6 @@ public class LoginViewModel extends ViewModel {
     }
 
     private LiveData<Boolean> getFormData(final Resource<Document> resource ) {
-        Log.e( "LoginViewModel", "transform Document to Login Ready" );
         final MutableLiveData<Boolean> result = new MutableLiveData<>();
         if( resource != null && resource.isSuccess() ) {
             csrfToken = DocumentParser.getCSRFToken( resource.getResource() );

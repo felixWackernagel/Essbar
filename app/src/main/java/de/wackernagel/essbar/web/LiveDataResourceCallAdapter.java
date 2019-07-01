@@ -1,5 +1,7 @@
 package de.wackernagel.essbar.web;
 
+import android.util.Log;
+
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,6 +40,9 @@ public class LiveDataResourceCallAdapter<R> implements CallAdapter<R, LiveData<R
                         public void onResponse(Call<R> call, Response<R> response) {
                             if( call.isCanceled() )
                                 return;
+
+                            Log.d("Response", "Status-Code = " + response.code() + ", " + response.raw().request().url() );
+
                             postValue( Resource.success( response.body() ) );
                         }
 

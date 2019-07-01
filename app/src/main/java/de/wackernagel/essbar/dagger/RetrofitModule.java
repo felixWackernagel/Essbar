@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import de.wackernagel.essbar.BuildConfig;
+import de.wackernagel.essbar.EssbarConstants;
 import de.wackernagel.essbar.web.JSoupConverter;
 import de.wackernagel.essbar.web.LiveDataResourceCallAdapterFactory;
 import de.wackernagel.essbar.web.NetworkConnectionInterceptor;
@@ -38,7 +39,7 @@ public class RetrofitModule {
         addRequestLogging(client);
 
         final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl( "https://bestellung-pipapo-catering.mms-rcs.de" )
+                .baseUrl( EssbarConstants.Urls.BASE )
                 .addCallAdapterFactory( new LiveDataResourceCallAdapterFactory() )
                 .addConverterFactory( JSoupConverter.FACTORY )
                 .client( client.build() )

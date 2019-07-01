@@ -1,10 +1,11 @@
 package de.wackernagel.essbar.repository;
 
+import androidx.lifecycle.LiveData;
+
 import org.jsoup.nodes.Document;
 
 import java.util.List;
 
-import androidx.lifecycle.LiveData;
 import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.room.CustomerDao;
 import de.wackernagel.essbar.web.Resource;
@@ -28,12 +29,8 @@ public class EssbarRepository {
         return customerDao.queryAllCustomers();
     }
 
-    public LiveData<Resource<Document>> getMenusDocument() {
-        return webService.getMenus();
-    }
-
-    public LiveData<Resource<Document>> getMenusDocumentByDate( final String date ) {
-        return webService.postMenusStartDate( date );
+    public LiveData<Resource<Document>> getMenusDocumentByDate( final String startDate, final String endDate, final String csrfToken, final String calendarWeekWithYear ) {
+        return webService.postMenusStartDate( startDate, endDate, csrfToken, calendarWeekWithYear );
     }
 
     public LiveData<Resource<Document>> getLoginDocument( final String csrfToken, final String username, final String password ) {

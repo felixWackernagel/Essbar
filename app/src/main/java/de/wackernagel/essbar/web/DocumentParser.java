@@ -61,7 +61,7 @@ public class DocumentParser {
     public static List<CalendarWeek> getCalendarWeekList( @Nullable final Document document ) {
         final List<CalendarWeek> calendarWeeks = new ArrayList<>();
         if( document != null ) {
-            for( Element option : document.select( "#select_woche > select > option" ) ) {
+            for( Element option : document.select( "site > content > form > label > select > option" ) ) {
                 calendarWeeks.add( new CalendarWeek( option ) );
             }
         }

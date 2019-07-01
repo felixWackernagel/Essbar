@@ -68,7 +68,7 @@ public class CalendarWeekListAdapter extends ListAdapter<CalendarWeek, CalendarW
         }
     }
 
-    public static class CalendarWeekViewHolder extends RecyclerView.ViewHolder {
+    static class CalendarWeekViewHolder extends RecyclerView.ViewHolder {
         @NonNull
         final ViewDataBinding binding;
 

@@ -2,9 +2,7 @@ package de.wackernagel.essbar.ui;
 
 import android.app.KeyguardManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,8 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
@@ -52,23 +48,16 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
         binding = DataBindingUtil.setContentView( this, R.layout.activity_login );
 
         final KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
-        if( !keyguardManager.isDeviceSecure() ) {
-            Snackbar.make( binding.coordinatorLayout, R.string.no_secure_lock_error, Snackbar.LENGTH_INDEFINITE ).setAction("Einstellungen", (view) -> {
-                startActivity( new Intent(Settings.ACTION_SECURITY_SETTINGS) );
-            }).show();
-        }
 
         final int spaceInPixel = ViewUtils.dpToPx( 16, this );
-        binding.viewPager.setAdapter( new LoginPagerAdapter( getSupportFragmentManager() ) );
+        binding.viewPager.setAdapter( new LoginPagerAdapter( getSupportFragmentManager(), keyguardManager.isDeviceSecure() ? 2 : 1 ) );
         binding.viewPager.setPageMargin( spaceInPixel );
         binding.viewPager.setPadding( spaceInPixel, 0 , spaceInPixel, 0 );
         binding.viewPager.setClipToPadding( false );
 
         final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
         viewModel.getCustomersCount().observe( this, (count) -> binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 ));
-        viewModel.getHome().observe(this, ready -> {
-            Log.e("LoginActivity", "login ready? " + ready );
-        });
+        viewModel.getHome().observe(this, ready -> Log.e("LoginActivity", "login ready? " + ready ));
 
         getLifecycle().addObserver( connectivityLifecycleObserver );
         connectivityLifecycleObserver.getConnectedStatus().observe( this, this::showOfflineState );
@@ -85,9 +74,11 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
     }
 
     static class LoginPagerAdapter extends FragmentPagerAdapter {
+        private final int count;
 
-        LoginPagerAdapter(@NonNull FragmentManager fm) {
+        LoginPagerAdapter(@NonNull FragmentManager fm, final int count ) {
             super(fm);
+            this.count = count;
         }
 
         @NonNull
@@ -101,7 +92,7 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
 
         @Override
         public int getCount() {
-            return 2;
+            return count;
         }
     }
 }

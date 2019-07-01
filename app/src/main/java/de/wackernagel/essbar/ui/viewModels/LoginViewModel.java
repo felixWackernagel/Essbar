@@ -14,6 +14,7 @@ import java.util.List;
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.web.DocumentParser;
+import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.Resource;
 
 public class LoginViewModel extends ViewModel {
@@ -22,7 +23,6 @@ public class LoginViewModel extends ViewModel {
 
     private LiveData<Boolean> loginFormReady;
 
-    private String csrfToken = null;
     private String username = "";
     private String password = "";
     private String customerName = null;
@@ -34,7 +34,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     public LiveData<Resource<Document>> getLoginDocument() {
-        return repository.getLoginDocument( csrfToken, username, password );
+        return repository.getLoginDocument( InMemoryCookieJar.get().getCSRFToken(), username, password );
     }
 
     public String getUsername() {
@@ -89,9 +89,8 @@ public class LoginViewModel extends ViewModel {
 
     private LiveData<Boolean> getFormData(final Resource<Document> resource ) {
         final MutableLiveData<Boolean> result = new MutableLiveData<>();
-        if( resource != null && resource.isSuccess() ) {
-            csrfToken = DocumentParser.getCSRFToken( resource.getResource() );
-            result.setValue( !TextUtils.isEmpty(csrfToken) );
+        if( resource != null && resource.isStatusOk() && resource.isAvailable() ) {
+            result.setValue( !TextUtils.isEmpty( InMemoryCookieJar.get().getCSRFToken() ) );
         } else {
             result.setValue( Boolean.FALSE );
         }

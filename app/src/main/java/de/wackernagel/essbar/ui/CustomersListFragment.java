@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
+import de.wackernagel.essbar.EssbarConstants;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentCustomerListBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
@@ -24,6 +25,7 @@ import de.wackernagel.essbar.web.DocumentParser;
 
 public class CustomersListFragment extends AbstractLoginFragment {
 
+    private static final String TAG = "CustomersListFragment";
     private static final int REQUEST_CODE_FOR_CREDENTIAL_DECRYPTION = 2;
 
     private FragmentCustomerListBinding binding;
@@ -111,15 +113,16 @@ public class CustomersListFragment extends AbstractLoginFragment {
 
     private void loginAtWebsite() {
         viewModel.getLoginDocument().observe(this, resource -> {
-            if( resource.isSuccess() ) {
-                if( DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
+            Log.i(TAG, resource.toString() );
+            if( resource.isStatusOk() && resource.isAvailable() ) {
+                if( !EssbarConstants.Urls.LOGIN.equals( resource.getUrl() ) && DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
                     startMainActivity();
                 } else {
                     showError( getString( R.string.username_password_error) );
                 }
             } else {
                 final String message = ( resource.getError() != null ? resource.getError().getMessage() : getString( R.string.unknown_error ) );
-                Log.e( "Essbar", message );
+                Log.e( TAG, message );
                 showError( message );
             }
         } );

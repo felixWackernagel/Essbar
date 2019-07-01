@@ -1,6 +1,8 @@
 package de.wackernagel.essbar.ui;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
+import de.wackernagel.essbar.EssbarConstants;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentCustomerFormBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
@@ -24,6 +27,8 @@ import de.wackernagel.essbar.utils.ViewUtils;
 import de.wackernagel.essbar.web.DocumentParser;
 
 public class CustomerFormFragment extends AbstractLoginFragment {
+
+    private static final String TAG = "CustomerFormFragment";
 
     private static final int REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION = 1;
 
@@ -53,6 +58,11 @@ public class CustomerFormFragment extends AbstractLoginFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
+        final KeyguardManager keyguardManager = (KeyguardManager) requireContext().getSystemService(Context.KEYGUARD_SERVICE );
+        if( !keyguardManager.isDeviceSecure() ) {
+            binding.saveCredentials.setVisibility( View.GONE );
+        }
+
         binding.usernameField.setText( viewModel.getUsername() );
         binding.passwordField.setText( viewModel.getPassword() );
         ViewUtils.addRequiredValidationOnBlur( binding.usernameContainer, viewModel::getUsername, viewModel::setUsername, R.string.username_required_error );
@@ -69,8 +79,9 @@ public class CustomerFormFragment extends AbstractLoginFragment {
         setFormEnabled( false );
 
         viewModel.getLoginDocument().observe(this, resource -> {
-            if( resource.isSuccess() ) {
-                if( DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
+            Log.i(TAG, resource.toString() );
+            if( resource.isStatusOk() && resource.isAvailable() ) {
+                if( !EssbarConstants.Urls.HOME.equals( resource.getUrl() ) && DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
                     if (binding.saveCredentials.isChecked()) {
                         viewModel.findCustomerName(resource.getResource());
                         doEncryption();

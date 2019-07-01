@@ -1,11 +1,10 @@
 package de.wackernagel.essbar.web;
 
-import android.util.Log;
+import androidx.lifecycle.LiveData;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import androidx.lifecycle.LiveData;
 import retrofit2.Call;
 import retrofit2.CallAdapter;
 import retrofit2.Callback;
@@ -40,17 +39,14 @@ public class LiveDataResourceCallAdapter<R> implements CallAdapter<R, LiveData<R
                         public void onResponse(Call<R> call, Response<R> response) {
                             if( call.isCanceled() )
                                 return;
-
-                            Log.d("Response", "Status-Code = " + response.code() + ", " + response.raw().request().url() );
-
-                            postValue( Resource.success( response.body() ) );
+                            postValue( Resource.success( response.code(), response.raw().request().url().toString(), response.body() ) );
                         }
 
                         @Override
                         public void onFailure(Call<R> call, Throwable throwable) {
                             if( call.isCanceled() )
                                 return;
-                            postValue( Resource.error( throwable ) );
+                            postValue( Resource.error( call.request().url().toString(), throwable ) );
                         }
                     });
                 }

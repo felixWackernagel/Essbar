@@ -1,6 +1,5 @@
 package de.wackernagel.essbar.ui.viewModels;
 
-import android.text.TextUtils;
 import android.util.SparseBooleanArray;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import org.jsoup.nodes.Element;
 
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,6 +24,7 @@ import de.wackernagel.essbar.ui.pojos.Menu;
 import de.wackernagel.essbar.ui.pojos.Weekday;
 import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.DocumentParser;
+import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.Resource;
 
 public class MenuViewModel extends ViewModel {
@@ -70,17 +69,44 @@ public class MenuViewModel extends ViewModel {
         successfulOrder = Transformations.switchMap( thankYouDocument, this::getOrderStatusFromThankYouDocument );
     }
 
-    private LiveData<Resource<Document>> getMenuDocument( final String calendarWeek ) {
-        if(TextUtils.isEmpty( calendarWeek ) ) {
-            return repository.getMenusDocument();
-        } else {
-            return repository.getMenusDocumentByDate( calendarWeek );
+    /**
+     * @param calendarWeekWithYear (yyyy,cw)
+     */
+    private LiveData<Resource<Document>> getMenuDocument( final String calendarWeekWithYear ) {
+        final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
+        int year = Integer.valueOf( dateParts[0] );
+        int weekOfYear = Integer.valueOf( dateParts[1] );
+        return repository.getMenusDocumentByDate( getDay( Calendar.MONDAY, weekOfYear, year ), getDay( Calendar.SUNDAY, weekOfYear, year ) ,InMemoryCookieJar.get().getCSRFToken(), calendarWeekWithYear );
+    }
+
+    /**
+     *
+     * @param dayOfWeek like MONDAY
+     * @param weekOfYear like 26
+     * @param year like 2019
+     * @return 2019-07-14
+     */
+    private String getDay( int dayOfWeek, int weekOfYear, int year ) {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.YEAR, year );
+        calendar.set( Calendar.WEEK_OF_YEAR, weekOfYear );
+        calendar.set( Calendar.DAY_OF_WEEK, dayOfWeek );
+        calendar.set( Calendar.HOUR_OF_DAY, 0 );
+        calendar.set( Calendar.MINUTE, 0 );
+        calendar.set( Calendar.SECOND, 0 );
+        return calendar.get(Calendar.YEAR) + "-" + twoDigitFormat( calendar.get( Calendar.MONTH ) ) + "-" + twoDigitFormat( calendar.get( Calendar.DATE ) );
+    }
+
+    private String twoDigitFormat( int digit ) {
+        if( digit <= 9 ) {
+            return "0" + digit;
         }
+        return String.valueOf( digit );
     }
 
     private LiveData<List<Menu>> getMenusList( final Resource<Document> resource) {
         final MutableLiveData<List<Menu>> result = new MutableLiveData<>();
-        if( resource != null && resource.isSuccess() ) {
+        if( resource != null && resource.isAvailable() ) {
             final List<Menu> menuList = DocumentParser.getMenuList( resource.getResource() );
             filterEqualPausedMenus( menuList );
             result.setValue( menuList );
@@ -119,7 +145,7 @@ public class MenuViewModel extends ViewModel {
 
     private LiveData<List<CalendarWeek>> getCalendarWeekList(final Resource<Document> resource) {
         final MutableLiveData<List<CalendarWeek>> result = new MutableLiveData<>();
-        if( resource != null && resource.isSuccess() ) {
+        if( resource != null && resource.isStatusOk() && resource.isAvailable() ) {
             result.setValue( DocumentParser.getCalendarWeekList( resource.getResource() ) );
         } else {
             result.setValue( Collections.emptyList() );
@@ -129,7 +155,7 @@ public class MenuViewModel extends ViewModel {
 
     private LiveData<List<ChangedMenu>> getChangedMenuList( final Resource<Document> resource ) {
         final MutableLiveData<List<ChangedMenu>> result = new MutableLiveData<>();
-        if( resource != null && resource.isSuccess() ) {
+        if( resource != null && resource.isAvailable() ) {
             result.setValue( DocumentParser.getChangedMenuList( resource.getResource() ) );
         } else {
             result.setValue( Collections.emptyList() );
@@ -139,7 +165,7 @@ public class MenuViewModel extends ViewModel {
 
     private LiveData<Event<Boolean>> getOrderStatusFromThankYouDocument( final Resource<Document> resource ) {
         final MutableLiveData<Event<Boolean>> result = new MutableLiveData<>();
-        if( resource != null && resource.isSuccess() ) {
+        if( resource != null && resource.isAvailable() ) {
             result.setValue( new Event<>( DocumentParser.isOrderSuccessful( resource.getResource() ) ) );
         } else {
             result.setValue( new Event<>( Boolean.FALSE ) );
@@ -171,21 +197,22 @@ public class MenuViewModel extends ViewModel {
         return successfulOrder;
     }
 
+    /**
+     * @return (yyyy,cw) like (2019,26)
+     */
     @NonNull
     public LiveData<String> getCalendarWeek() {
         return calendarWeek;
     }
 
-    public int calculateCalendarWeek( final String calendarWeekSeconds ) {
-        Date calendarWeekDate;
-        if( calendarWeekSeconds == null ) {
-            calendarWeekDate = calculateCurrentCalendarWeek();
+    public int calculateCalendarWeek( @Nullable final String calendarWeekWithYear ) {
+        if( calendarWeekWithYear == null ) {
+            return calculateCurrentCalendarWeek();
         } else {
-            calendarWeekDate = new Date( Long.valueOf( calendarWeekSeconds ) * 1000L );
+            // (2019,27) = length 9
+            final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
+            return Integer.valueOf( dateParts[0] );
         }
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime( calendarWeekDate );
-        return calendar.get( Calendar.WEEK_OF_YEAR );
     }
 
     public int getSelectedCalendarWeek() {
@@ -193,21 +220,26 @@ public class MenuViewModel extends ViewModel {
     }
 
     public void loadCurrentCalendarWeek() {
-        final String dateInSeconds = String.valueOf( calculateCurrentCalendarWeek().getTime() / 1000 );
-        loadCalendarWeek( dateInSeconds );
+        loadCalendarWeek( "(" + Calendar.getInstance().get( Calendar.YEAR ) + "," + calculateCurrentCalendarWeek() + ")" );
     }
 
-    private Date calculateCurrentCalendarWeek() {
+    /**
+     * @return calendar week like 26
+     */
+    private int calculateCurrentCalendarWeek() {
         final Calendar calendar = Calendar.getInstance();
         calendar.set( Calendar.DAY_OF_WEEK, Calendar.MONDAY );
         calendar.set( Calendar.HOUR_OF_DAY, 0 );
         calendar.set( Calendar.MINUTE, 0 );
         calendar.set( Calendar.SECOND, 0 );
-        return calendar.getTime();
+        return calendar.get( Calendar.WEEK_OF_YEAR );
     }
 
-    public void loadCalendarWeek( @Nullable final String startDateOfCalendarWeekInSeconds ) {
-        calendarWeek.setValue( startDateOfCalendarWeekInSeconds );
+    /**
+     * @param calendarWeekWithYear (yyyy,cw) like (2019,26)
+     */
+    public void loadCalendarWeek( @Nullable final String calendarWeekWithYear ) {
+        calendarWeek.setValue( calendarWeekWithYear );
     }
 
     public void incrementNumberOfChangedOrders() {
@@ -249,7 +281,7 @@ public class MenuViewModel extends ViewModel {
 
     public void postChangedAndConfirmedMenus() {
         final Resource<Document> menuConfirmationDocument = this.menuConfirmationDocument.getValue();
-        if( menuConfirmationDocument != null && menuConfirmationDocument.isSuccess() ) {
+        if( menuConfirmationDocument != null && menuConfirmationDocument.isAvailable() ) {
             final Document page = menuConfirmationDocument.getResource();
             final StringBuilder sb = new StringBuilder();
             for( Element input : page.select( "form .block input" ) ) {

@@ -211,7 +211,7 @@ public class MenuViewModel extends ViewModel {
         } else {
             // (2019,27) = length 9
             final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
-            return Integer.valueOf( dateParts[0] );
+            return Integer.valueOf( dateParts[1] );
         }
     }
 

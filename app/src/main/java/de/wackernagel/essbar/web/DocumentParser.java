@@ -40,18 +40,12 @@ public class DocumentParser {
     public static List<Menu> getMenuList( @Nullable final Document document ) {
         final List<Menu> menus = new ArrayList<>();
         if( document != null ) {
-            final String[] menuTypeSelectors = new String[] {
-                    "tr.menue-line-Fruehstueck > td.menue-Fruehstueck",
-                    "tr.menue-line-Obstfruehstueck > td.menue-Obstfruehstueck",
-                    "tr.menue-line-Mittag > td.menue-Mittag",
-                    "tr.menue-line-Vesper > td.menue-Vesper"
-            };
-
-            for( int menuTypeIndex = 0; menuTypeIndex < menuTypeSelectors.length; menuTypeIndex++ ) {
-                final Elements menuTypeElements = document.select( menuTypeSelectors[ menuTypeIndex ] );
-                for( int menuIndex = 0; menuIndex < menuTypeElements.size(); menuIndex++ ) {
-                    final int menuItemIndex = menuTypeIndex + ( ( menuTypeIndex + 1 ) * menuIndex );
-                    menus.add( menuItemIndex, new Menu( menuTypeElements.get( menuIndex ) ) );
+            final Elements rows = document.select("site > content > form > table > tbody > tr" );
+            for( int row = 1; row < rows.size(); row++ ) {
+                final Elements columns = rows.get( row ).select( "td" );
+                for( int column = 0; column < columns.size(); column ++ ) {
+                    final int menuItemIndex = (row-1) + ( row * column );
+                    menus.add( menuItemIndex, new Menu( columns.get( column ) ) );
                 }
             }
         }

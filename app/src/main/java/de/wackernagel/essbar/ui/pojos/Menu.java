@@ -1,12 +1,15 @@
 package de.wackernagel.essbar.ui.pojos;
 
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.util.Objects;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import org.jsoup.nodes.Element;
+
+import java.util.Calendar;
+import java.util.Objects;
+import java.util.Set;
 
 public class Menu {
     private int id;
@@ -20,35 +23,71 @@ public class Menu {
     private String price;
 
     public Menu(final Element element ) {
-        weekday = Weekday.from( element.classNames() );
-        typ = Type.from( element.classNames() );
-        id = typ.getNumber() + ( weekday.getNumber() * 4 );
-        editable = element.classNames().contains( "pointer" );
-        ordered = element.classNames().contains( "gruen" );
+        menuName = element.select("meal > mealtxt").text();
+        editable = element.select( "input" ).size() == 1;
+        ordered = element.select( ".ordered-label" ).size() == 1 || element.select( "input[checked]" ).size() == 1;
         if( editable ) {
-            final Elements hiddenFields = element.select( "input[type='hidden']" );
-            if( hiddenFields != null && hiddenFields.size() == 1 ) {
-                inputName = hiddenFields.get( 0 ).attr( "name" );
-            }
+            inputName = element.select( "input" ).get( 0 ).attr( "name" );
         }
+        price = element.siblingElements().select( ".mealtitel > price" ).text();
+        weekday = calculateWeekday( element.attr( "day" ) );
+        typ = calculateType( element.classNames(), menuName );
+        id = typ.getNumber() + ( weekday.getNumber() * 4 );
 
-        final Element priceCell = element.siblingElements().get( 0 );
-        priceCell.select( "span" ).remove();
-        priceCell.select( "br" ).remove();
-        price = priceCell.text();
-
-        final Elements deliveryPause = element.select(".zustellpause");
-        paused = !deliveryPause.isEmpty();
+        // TODO
+        paused = false;
         if( paused ) {
-            menuName = deliveryPause.get( 0 ).text().replaceAll("\\(.*?\\) ?", "");
-        } else {
-            // remove all meta data
-            element.select("div").remove();
+            menuName = "<Grund>";
+        }
+    }
 
-            // remove braces
-            menuName = element.text().replaceAll("\\(.*?\\) ?", "");
+    private Type calculateType( final Set<String> cssClasses, final String menuName ) {
+        if( cssClasses.contains( "menuGroup_1" ) ) {
+            return Type.LUNCH;
         }
 
+        if( TextUtils.isEmpty( menuName ) ) {
+            return Type.UNKNOWN;
+        }
+
+        final String firstLetter = String.valueOf( menuName.charAt( 0 ) );
+        if( "F".equalsIgnoreCase( firstLetter ) ) {
+            return Type.BREAKFAST;
+        } else if( "O".equalsIgnoreCase( firstLetter ) ) {
+            return Type.FRUIT_BREAKFAST;
+        } else if( "V".equalsIgnoreCase( firstLetter ) ) {
+            return Type.SNACK;
+        }
+        return typ = Type.UNKNOWN;
+    }
+
+    /**
+     * @param day 2019-07-05
+     */
+    private Weekday calculateWeekday( final String day ) {
+        if( TextUtils.isEmpty( day ) ) {
+            return Weekday.UNKNOWN;
+        }
+        final String[] dayParts = day.split("-");
+        if( dayParts.length != 3 ) {
+            return Weekday.UNKNOWN;
+        }
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.YEAR, Integer.valueOf( dayParts[0] ) );
+        calendar.set( Calendar.MONTH, Integer.valueOf( dayParts[1] ) - 1 );
+        calendar.set( Calendar.DATE, Integer.valueOf( dayParts[2] ) );
+        final int dayOfWeek = calendar.get( Calendar.DAY_OF_WEEK );
+        switch ( dayOfWeek ) {
+            case Calendar.SUNDAY: return Weekday.UNKNOWN;
+            case Calendar.MONDAY: return Weekday.MONDAY;
+            case Calendar.TUESDAY: return Weekday.TUESDAY;
+            case Calendar.WEDNESDAY: return Weekday.WEDNESDAY;
+            case Calendar.THURSDAY: return Weekday.THURSDAY;
+            case Calendar.FRIDAY: return Weekday.FRIDAY;
+            case Calendar.SATURDAY: return Weekday.UNKNOWN;
+        }
+        return Weekday.UNKNOWN;
     }
 
     public String getMenuName() {

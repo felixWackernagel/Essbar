@@ -80,7 +80,6 @@ public class MenuViewModel extends ViewModel {
     }
 
     /**
-     *
      * @param dayOfWeek like MONDAY
      * @param weekOfYear like 26
      * @param year like 2019

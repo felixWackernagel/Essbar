@@ -23,9 +23,9 @@ public class Menu {
     private String price;
 
     public Menu(final Element element ) {
-        menuName = element.select("meal > mealtxt").text();
+        menuName = element.select("meal > mealtxt").text().replaceAll("\\(.*?\\) ?", ""); // remove braces
         editable = element.select( "input" ).size() == 1;
-        ordered = element.select( ".ordered-label" ).size() == 1 || element.select( "input[checked]" ).size() == 1;
+        ordered = element.select( ".ordered-label" ).size() == 1 || element.select( "input[checked]" ).size() == 1 || element.classNames().contains("in-order");
         if( editable ) {
             inputName = element.select( "input" ).get( 0 ).attr( "name" );
         }

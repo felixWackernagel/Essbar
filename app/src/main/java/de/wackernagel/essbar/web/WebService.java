@@ -4,10 +4,13 @@ import org.jsoup.nodes.Document;
 
 import androidx.lifecycle.LiveData;
 
+import java.util.Map;
+
 import de.wackernagel.essbar.EssbarConstants;
 import okhttp3.RequestBody;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -29,9 +32,10 @@ public interface WebService {
     @POST( "/menu/0/{start}/{end}/" )
     LiveData<Resource<Document>> postMenusStartDate(@Path("start") String start, @Path("end") String end, @Field("csrfmiddlewaretoken") String csrfToken, @Field("week_id") String calendarWeekWithYear );
 
-    @Headers("Content-Type: application/x-www-form-urlencoded")
-    @POST( "/index.php?m=2;0" )
-    LiveData<Resource<Document>> postChangedMenus(@Body RequestBody formData );
+    @Headers("Referer: https://bestellung-pipapo-catering.mms-rcs.de/menu/0/2019-07-01/2019-07-07/" )
+    @FormUrlEncoded
+    @POST( "/menu/0/{start}/{end}/" )
+    LiveData<Resource<Document>> postChangedMenus( @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
 
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @POST( "/index.php?m=2;0" )

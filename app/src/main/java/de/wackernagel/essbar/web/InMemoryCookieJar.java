@@ -16,6 +16,8 @@ import okhttp3.HttpUrl;
 
 public class InMemoryCookieJar implements CookieJar {
 
+    private static String TAG = "InMemoryCookieJar";
+
     private static InMemoryCookieJar instance = new InMemoryCookieJar();
 
     private HashMap<String, List<Cookie>> cookieStore;
@@ -30,8 +32,18 @@ public class InMemoryCookieJar implements CookieJar {
 
     @Override
     public void saveFromResponse( @NonNull final HttpUrl url, @NonNull final List<Cookie> cookies ) {
-        Log.e("CookieJar", "url=" + url.toString());
         cookieStore.put( url.host(), cookies );
+        log();
+    }
+
+    private void log() {
+        Log.e(TAG, "CookieJar start ...");
+        for( Map.Entry<String, List<Cookie>> entry : cookieStore.entrySet() ) {
+            for( Cookie cookie : entry.getValue() ) {
+                Log.e( TAG, entry.getKey() + " = " + cookie.toString() );
+            }
+        }
+        Log.e(TAG, "... end CookieJar");
     }
 
     @Override

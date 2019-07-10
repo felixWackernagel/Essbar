@@ -65,7 +65,7 @@ public class DocumentParser {
     public static List<ChangedMenu> getChangedMenuList( @Nullable final Document document) {
         final List<ChangedMenu> changedMenus = new ArrayList<>();
         if( document != null ) {
-            for( Element tableRow : document.select( "form .best_table_top tr[class^=auflistung]" ) ) {
+            for( Element tableRow : document.selectFirst( "site > content > table.orders-list" ).select( "tr[class^=color]") ) {
                 changedMenus.add( new ChangedMenu( tableRow ) );
             }
         }
@@ -78,17 +78,5 @@ public class DocumentParser {
         } else {
             return Boolean.FALSE;
         }
-    }
-
-    @Nullable
-    public static String getCSRFToken( @Nullable final Document document ) {
-        if( document != null ) {
-            final Elements csrfElements = document.select( "form > input[name=csrfmiddlewaretoken]" );
-            if( csrfElements.size() == 1 ) {
-                return csrfElements.get( 0 ).attr( "value" );
-            }
-            return null;
-        }
-        return null;
     }
 }

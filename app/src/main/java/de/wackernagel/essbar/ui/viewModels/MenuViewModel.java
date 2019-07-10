@@ -1,5 +1,7 @@
 package de.wackernagel.essbar.ui.viewModels;
 
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 
 import androidx.annotation.NonNull;
@@ -12,8 +14,10 @@ import androidx.lifecycle.ViewModel;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,6 +30,7 @@ import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.Resource;
+import de.wackernagel.essbar.web.forms.ChangedMenusForm;
 
 public class MenuViewModel extends ViewModel {
 
@@ -39,7 +44,7 @@ public class MenuViewModel extends ViewModel {
     private final LiveData<List<CalendarWeek>> calendarWeeks;
     private final MutableLiveData<Integer> numberOfChangedOrders;
 
-    private final MutableLiveData<String> menusToChange;
+    private final MutableLiveData<ChangedMenusForm> menusToChange;
     private final LiveData<Resource<Document>> menuConfirmationDocument;
     private final LiveData<List<ChangedMenu>> changedMenusToConfirm;
 
@@ -55,7 +60,7 @@ public class MenuViewModel extends ViewModel {
         numberOfChangedOrders.setValue( 0 );
         menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
         menus = Transformations.switchMap(menusDocument, this::getMenusList );
-        menusOrderStatus = Transformations.switchMap(menus, this::getCheckedMenus );
+        menusOrderStatus = Transformations.switchMap(menus, this::transformMenusToOrderStatus);
         calendarWeeks = Transformations.switchMap(menusDocument, this::getCalendarWeekList);
 
         // menus > order confirmation
@@ -88,12 +93,14 @@ public class MenuViewModel extends ViewModel {
     private String getDay( int dayOfWeek, int weekOfYear, int year ) {
         final Calendar calendar = Calendar.getInstance();
         calendar.set( Calendar.YEAR, year );
-        calendar.set( Calendar.WEEK_OF_YEAR, weekOfYear );
+        // FIXME sunday is first day of week but we need monday so on sunday we increment the week of day by 1 but this creates a error on new year
+        calendar.set( Calendar.WEEK_OF_YEAR, (dayOfWeek == Calendar.SUNDAY) ? (weekOfYear + 1) : weekOfYear );
         calendar.set( Calendar.DAY_OF_WEEK, dayOfWeek );
         calendar.set( Calendar.HOUR_OF_DAY, 0 );
         calendar.set( Calendar.MINUTE, 0 );
         calendar.set( Calendar.SECOND, 0 );
-        return calendar.get(Calendar.YEAR) + "-" + twoDigitFormat( calendar.get( Calendar.MONTH ) ) + "-" + twoDigitFormat( calendar.get( Calendar.DATE ) );
+        Log.e( "MenuViewModel", "Get Day from [" + dayOfWeek + ", " + weekOfYear + ", " + year + "] to " + new SimpleDateFormat( "dd.MM.yyyy" ).format( calendar.getTime() ) );
+        return calendar.get(Calendar.YEAR) + "-" + twoDigitFormat( calendar.get( Calendar.MONTH ) + 1 ) + "-" + twoDigitFormat( calendar.get( Calendar.DATE ) );
     }
 
     private String twoDigitFormat( int digit ) {
@@ -130,15 +137,15 @@ public class MenuViewModel extends ViewModel {
         }
     }
 
-    private LiveData<SparseBooleanArray> getCheckedMenus( final List<Menu> menus ) {
+    private LiveData<SparseBooleanArray> transformMenusToOrderStatus( final List<Menu> menus ) {
         final MutableLiveData<SparseBooleanArray> result = new MutableLiveData<>();
-        final SparseBooleanArray checkedMenus = new SparseBooleanArray();
+        final SparseBooleanArray menuOrderStatus = new SparseBooleanArray();
         if( menus != null && !menus.isEmpty() ) {
             for( Menu menu : menus ) {
-                checkedMenus.put( menu.getId(), menu.isOrdered() );
+                menuOrderStatus.put( menu.getId(), menu.isOrdered() );
             }
         }
-        result.setValue( checkedMenus );
+        result.setValue( menuOrderStatus );
         return result;
     }
 
@@ -154,7 +161,7 @@ public class MenuViewModel extends ViewModel {
 
     private LiveData<List<ChangedMenu>> getChangedMenuList( final Resource<Document> resource ) {
         final MutableLiveData<List<ChangedMenu>> result = new MutableLiveData<>();
-        if( resource != null && resource.isAvailable() ) {
+        if( resource != null && resource.isStatusOk() && resource.isAvailable() ) {
             result.setValue( DocumentParser.getChangedMenuList( resource.getResource() ) );
         } else {
             result.setValue( Collections.emptyList() );
@@ -176,6 +183,9 @@ public class MenuViewModel extends ViewModel {
         return menus;
     }
 
+    /**
+     * @return A map with menu id -> menu order status (true or false)
+     */
     public LiveData<SparseBooleanArray> getMenusOrderStatus() {
         return menusOrderStatus;
     }
@@ -257,25 +267,31 @@ public class MenuViewModel extends ViewModel {
     }
 
     public void loadChangedMenusToConfirm() {
-        final StringBuilder formPayloadBuilder = new StringBuilder();
+        final HashMap<String, String> formFields = new HashMap<>();
+        formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
+
         final List<Menu> allMenus = menus.getValue();
         if( allMenus != null && !allMenus.isEmpty() ) {
-            formPayloadBuilder.append("m_alt=");
-            formPayloadBuilder.append("&starttag=").append( menusDocument.getValue().getResource().selectFirst("input[name=starttag]").attr("value"));
-            formPayloadBuilder.append("&endtag=").append( menusDocument.getValue().getResource().selectFirst("input[name=endtag]").attr("value"));
             for( Menu menu : allMenus ) {
-                if( menu.getInputName() == null ) {
+                if( TextUtils.isEmpty( menu.getInputName() ) || TextUtils.isEmpty( menu.getInputValue() ) ) {
+                    Log.e("MenuViewModel", "(1) Skip menu for changed menu request. " + menu.toString() );
                     continue;
                 }
-                formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 0 );
-                // add second input only if menu is ordered or was already ordered
                 if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) ) {
-                    formPayloadBuilder.append("&").append( menu.getInputName() ).append("=").append( 1 );
+                    formFields.put( menu.getInputName(), menu.getInputValue() );
+                } else {
+                    Log.e("MenuViewModel", "(2) Skip menu for changed menu request. " + menu.toString() );
                 }
             }
-            formPayloadBuilder.append("&btn_bestellen=Weiter");
         }
-        menusToChange.setValue( formPayloadBuilder.toString() );
+
+        formFields.put( "change_order", "Weiter" );
+
+        final String calendarWeekWithYear = calendarWeek.getValue();
+        final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
+        int year = Integer.valueOf( dateParts[0] );
+        int weekOfYear = Integer.valueOf( dateParts[1] );
+        menusToChange.setValue( new ChangedMenusForm( getDay( Calendar.MONDAY, weekOfYear, year), getDay( Calendar.SUNDAY, weekOfYear, year), formFields ) );
     }
 
     public void postChangedAndConfirmedMenus() {

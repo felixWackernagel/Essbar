@@ -10,6 +10,7 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.room.CustomerDao;
 import de.wackernagel.essbar.web.Resource;
 import de.wackernagel.essbar.web.WebService;
+import de.wackernagel.essbar.web.forms.ChangedMenusForm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
@@ -37,8 +38,8 @@ public class EssbarRepository {
         return webService.postLoginData( csrfToken, username, password );
     }
 
-    public LiveData<Resource<Document>> getMenuConfirmationDocument(final String formPayload ) {
-        return webService.postChangedMenus( RequestBody.create( MediaType.parse( "text/plain" ), formPayload ) );
+    public LiveData<Resource<Document>> getMenuConfirmationDocument(final ChangedMenusForm changedMenusForm ) {
+        return webService.postChangedMenus( changedMenusForm.getStartDate(), changedMenusForm.getEndDate(), changedMenusForm.getFields() );
     }
 
     public LiveData<Resource<Document>> postConfirmedMenus( final String formPayload ) {

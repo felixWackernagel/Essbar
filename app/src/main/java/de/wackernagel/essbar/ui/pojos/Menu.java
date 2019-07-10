@@ -20,6 +20,7 @@ public class Menu {
     private Type typ;
     private boolean paused;
     private String inputName;
+    private String inputValue;
     private String price;
 
     public Menu(final Element element ) {
@@ -28,6 +29,7 @@ public class Menu {
         ordered = element.select( ".ordered-label" ).size() == 1 || element.select( "input[checked]" ).size() == 1 || element.classNames().contains("in-order");
         if( editable ) {
             inputName = element.select( "input" ).get( 0 ).attr( "name" );
+            inputValue = element.select( "input" ).get( 0 ).attr( "value" );
         }
         price = element.siblingElements().select( ".mealtitel > price" ).text();
         weekday = calculateWeekday( element.attr( "day" ) );
@@ -58,7 +60,7 @@ public class Menu {
         } else if( "V".equalsIgnoreCase( firstLetter ) ) {
             return Type.SNACK;
         }
-        return typ = Type.UNKNOWN;
+        return Type.UNKNOWN;
     }
 
     /**
@@ -123,6 +125,11 @@ public class Menu {
         return inputName;
     }
 
+    @Nullable
+    public String getInputValue() {
+        return inputValue;
+    }
+
     public String getPrice() {
         return price;
     }
@@ -139,6 +146,7 @@ public class Menu {
                 ", typ=" + typ +
                 ", paused=" + paused +
                 ", inputName='" + inputName + '\'' +
+                ", inputValue='" + inputValue + '\'' +
                 ", price='" + price + '\'' +
                 '}';
     }
@@ -156,11 +164,12 @@ public class Menu {
                 weekday == menu.weekday &&
                 typ == menu.typ &&
                 Objects.equals(inputName, menu.inputName) &&
+                Objects.equals(inputValue, menu.inputValue) &&
                 Objects.equals(price, menu.price);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuName, editable, ordered, weekday, typ, paused, inputName, price);
+        return Objects.hash(id, menuName, editable, ordered, weekday, typ, paused, inputName, inputValue, price);
     }
 }

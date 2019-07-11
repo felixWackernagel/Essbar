@@ -104,9 +104,9 @@ public class MenuViewModel extends ViewModel {
      */
     private String getDay( int dayOfWeek, int weekOfYear, int year ) {
         final Calendar calendar = Calendar.getInstance();
+        calendar.setFirstDayOfWeek( Calendar.MONDAY );
         calendar.set( Calendar.YEAR, year );
-        // FIXME sunday is first day of week but we need monday so on sunday we increment the week of day by 1 but this creates a error on new year
-        calendar.set( Calendar.WEEK_OF_YEAR, (dayOfWeek == Calendar.SUNDAY) ? (weekOfYear + 1) : weekOfYear );
+        calendar.set( Calendar.WEEK_OF_YEAR, weekOfYear );
         calendar.set( Calendar.DAY_OF_WEEK, dayOfWeek );
         calendar.set( Calendar.HOUR_OF_DAY, 0 );
         calendar.set( Calendar.MINUTE, 0 );

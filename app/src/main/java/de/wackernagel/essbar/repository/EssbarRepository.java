@@ -10,9 +10,10 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.room.CustomerDao;
 import de.wackernagel.essbar.web.Resource;
 import de.wackernagel.essbar.web.WebService;
+import de.wackernagel.essbar.web.forms.ChangeCalendarWeekForm;
 import de.wackernagel.essbar.web.forms.ChangedMenusForm;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
+import de.wackernagel.essbar.web.forms.ConfirmedMenusForm;
+import de.wackernagel.essbar.web.forms.LoginForm;
 
 public class EssbarRepository {
 
@@ -30,20 +31,24 @@ public class EssbarRepository {
         return customerDao.queryAllCustomers();
     }
 
-    public LiveData<Resource<Document>> getMenusDocumentByDate( final String startDate, final String endDate, final String csrfToken, final String calendarWeekWithYear ) {
-        return webService.postMenusStartDate( startDate, endDate, csrfToken, calendarWeekWithYear );
+    public LiveData<Resource<Document>> getCurrentMenusDocument( final ChangeCalendarWeekForm changeCalendarWeekForm ) {
+        return webService.getCurrentMenus( changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate() );
     }
 
-    public LiveData<Resource<Document>> getLoginDocument( final String csrfToken, final String username, final String password ) {
-        return webService.postLoginData( csrfToken, username, password );
+    public LiveData<Resource<Document>> getMenusDocumentByDate( final ChangeCalendarWeekForm changeCalendarWeekForm ) {
+        return webService.postMenusStartDate( changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate(), changeCalendarWeekForm.getFields() );
+    }
+
+    public LiveData<Resource<Document>> getLoginDocument( final LoginForm loginForm ) {
+        return webService.postLoginData( loginForm.getFields() );
     }
 
     public LiveData<Resource<Document>> getMenuConfirmationDocument(final ChangedMenusForm changedMenusForm ) {
-        return webService.postChangedMenus( changedMenusForm.getStartDate(), changedMenusForm.getEndDate(), changedMenusForm.getFields() );
+        return webService.postChangedMenus( changedMenusForm.getReferer(), changedMenusForm.getStartDate(), changedMenusForm.getEndDate(), changedMenusForm.getFields() );
     }
 
-    public LiveData<Resource<Document>> postConfirmedMenus( final String formPayload ) {
-        return webService.postConfirmedMenus( RequestBody.create( MediaType.parse( "text/plain" ), formPayload ) );
+    public LiveData<Resource<Document>> postConfirmedMenus( final ConfirmedMenusForm confirmedMenusForm ) {
+        return webService.postConfirmedMenus( confirmedMenusForm.getFields() );
     }
 
     public void insertCustomer( final Customer customer ) {

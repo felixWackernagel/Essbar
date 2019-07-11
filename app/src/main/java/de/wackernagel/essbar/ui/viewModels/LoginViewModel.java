@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 
 import org.jsoup.nodes.Document;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.wackernagel.essbar.repository.EssbarRepository;
@@ -16,6 +17,7 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.Resource;
+import de.wackernagel.essbar.web.forms.LoginForm;
 
 public class LoginViewModel extends ViewModel {
 
@@ -34,7 +36,11 @@ public class LoginViewModel extends ViewModel {
     }
 
     public LiveData<Resource<Document>> getLoginDocument() {
-        return repository.getLoginDocument( InMemoryCookieJar.get().getCSRFToken(), username, password );
+        final HashMap<String, String> formFields = new HashMap<>(3 );
+        formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
+        formFields.put( "login", username );
+        formFields.put( "password", password );
+        return repository.getLoginDocument( new LoginForm( formFields ) );
     }
 
     public String getUsername() {

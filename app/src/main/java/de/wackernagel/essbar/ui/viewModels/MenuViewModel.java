@@ -12,7 +12,6 @@ import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,7 +29,9 @@ import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.Resource;
+import de.wackernagel.essbar.web.forms.ChangeCalendarWeekForm;
 import de.wackernagel.essbar.web.forms.ChangedMenusForm;
+import de.wackernagel.essbar.web.forms.ConfirmedMenusForm;
 
 public class MenuViewModel extends ViewModel {
 
@@ -48,7 +49,7 @@ public class MenuViewModel extends ViewModel {
     private final LiveData<Resource<Document>> menuConfirmationDocument;
     private final LiveData<List<ChangedMenu>> changedMenusToConfirm;
 
-    private final MutableLiveData<String> confirmedMenus;
+    private final MutableLiveData<ConfirmedMenusForm> confirmedMenus;
     private final LiveData<Event<Boolean>> successfulOrder;
 
     MenuViewModel( final EssbarRepository repository ) {
@@ -81,7 +82,18 @@ public class MenuViewModel extends ViewModel {
         final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
         int year = Integer.valueOf( dateParts[0] );
         int weekOfYear = Integer.valueOf( dateParts[1] );
-        return repository.getMenusDocumentByDate( getDay( Calendar.MONDAY, weekOfYear, year ), getDay( Calendar.SUNDAY, weekOfYear, year ) ,InMemoryCookieJar.get().getCSRFToken(), calendarWeekWithYear );
+
+        final HashMap<String, String> formFields = new HashMap<>( 2 );
+
+        if( weekOfYear == calculateCurrentCalendarWeek() || InMemoryCookieJar.get().getCSRFToken() == null ) {
+            Log.e("MenuViewModel", "Get Menus from CW " + weekOfYear);
+            return repository.getCurrentMenusDocument( new ChangeCalendarWeekForm( getDay( Calendar.MONDAY, weekOfYear, year ), getDay( Calendar.SUNDAY, weekOfYear, year ), formFields ) );
+        }
+
+        Log.e("MenuViewModel", "Set CW " + weekOfYear);
+        formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
+        formFields.put( "week_id", calendarWeekWithYear );
+        return repository.getMenusDocumentByDate( new ChangeCalendarWeekForm( getDay( Calendar.MONDAY, weekOfYear, year ), getDay( Calendar.SUNDAY, weekOfYear, year ), formFields ) );
     }
 
     /**
@@ -171,7 +183,7 @@ public class MenuViewModel extends ViewModel {
 
     private LiveData<Event<Boolean>> getOrderStatusFromThankYouDocument( final Resource<Document> resource ) {
         final MutableLiveData<Event<Boolean>> result = new MutableLiveData<>();
-        if( resource != null && resource.isAvailable() ) {
+        if( resource != null && resource.isStatusOk() && resource.isAvailable() ) {
             result.setValue( new Event<>( DocumentParser.isOrderSuccessful( resource.getResource() ) ) );
         } else {
             result.setValue( new Event<>( Boolean.FALSE ) );
@@ -274,13 +286,10 @@ public class MenuViewModel extends ViewModel {
         if( allMenus != null && !allMenus.isEmpty() ) {
             for( Menu menu : allMenus ) {
                 if( TextUtils.isEmpty( menu.getInputName() ) || TextUtils.isEmpty( menu.getInputValue() ) ) {
-                    Log.e("MenuViewModel", "(1) Skip menu for changed menu request. " + menu.toString() );
                     continue;
                 }
                 if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) ) {
                     formFields.put( menu.getInputName(), menu.getInputValue() );
-                } else {
-                    Log.e("MenuViewModel", "(2) Skip menu for changed menu request. " + menu.toString() );
                 }
             }
         }
@@ -295,20 +304,9 @@ public class MenuViewModel extends ViewModel {
     }
 
     public void postChangedAndConfirmedMenus() {
-        final Resource<Document> menuConfirmationDocument = this.menuConfirmationDocument.getValue();
-        if( menuConfirmationDocument != null && menuConfirmationDocument.isAvailable() ) {
-            final Document page = menuConfirmationDocument.getResource();
-            final StringBuilder sb = new StringBuilder();
-            for( Element input : page.select( "form .block input" ) ) {
-                // add each input name and value
-                if( sb.length() > 0 ) {
-                    sb.append( "&" );
-                }
-                sb.append( input.attr("name") );
-                sb.append( "=" );
-                sb.append( input.attr("value") );
-            }
-            confirmedMenus.setValue( sb.toString() );
-        }
+        final HashMap<String, String> formFields = new HashMap<>( 2 );
+        formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
+        formFields.put( "order", "zum genannten Preis bestellen" );
+        confirmedMenus.setValue( new ConfirmedMenusForm( formFields ) );
     }
 }

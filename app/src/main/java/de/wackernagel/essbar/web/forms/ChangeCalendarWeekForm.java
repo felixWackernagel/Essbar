@@ -4,23 +4,15 @@ import androidx.annotation.NonNull;
 
 import java.util.Map;
 
-import de.wackernagel.essbar.EssbarConstants;
-
-public class ChangedMenusForm {
-    private final String referer;
+public class ChangeCalendarWeekForm {
     private final String startDate;
     private final String endDate;
     private final Map<String, String> fields;
 
-    public ChangedMenusForm( @NonNull final String startDate, @NonNull final String endDate, @NonNull final Map<String, String> fields ) {
-        this.referer = String.format( EssbarConstants.Urls.MENUS, startDate, endDate );
+    public ChangeCalendarWeekForm( @NonNull final String startDate, @NonNull final String endDate, @NonNull final Map<String, String> fields) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.fields = fields;
-    }
-
-    public String getReferer() {
-        return referer;
     }
 
     public String getStartDate() {

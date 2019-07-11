@@ -140,6 +140,9 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
 
             @Override
             public CharSequence getSectionHeader( int position ) {
+                if( position < 0 ) {
+                    return "";
+                }
                 final Menu item = adapter.getListItem( position );
                 return localizedWeekdays[ item.getWeekday().getNumber() ];
             }

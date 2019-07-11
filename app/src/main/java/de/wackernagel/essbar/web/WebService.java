@@ -1,44 +1,45 @@
 package de.wackernagel.essbar.web;
 
-import org.jsoup.nodes.Document;
-
 import androidx.lifecycle.LiveData;
+
+import org.jsoup.nodes.Document;
 
 import java.util.Map;
 
 import de.wackernagel.essbar.EssbarConstants;
-import okhttp3.RequestBody;
-import retrofit2.http.Body;
-import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface WebService {
 
-    @GET( "/content" )
+    @GET( "/content/" )
     LiveData<Resource<Document>> getHome();
 
     @Headers("Referer: " + EssbarConstants.Urls.HOME )
     @FormUrlEncoded
     @POST( "/accounts/login/" )
-    LiveData<Resource<Document>> postLoginData(@Field("csrfmiddlewaretoken") String csrfToken, @Field("login") String username, @Field("password") String password );
+    LiveData<Resource<Document>> postLoginData( @FieldMap Map<String, String> fields );
 
-    @Headers("Referer: https://bestellung-pipapo-catering.mms-rcs.de/menu/0/2019-07-01/2019-07-07/" )
+    @Headers("Referer: https://bestellung-pipapo-catering.mms-rcs.de/menu/0/2019-07-08/2019-07-14/" )
     @FormUrlEncoded
     @POST( "/menu/0/{start}/{end}/" )
-    LiveData<Resource<Document>> postMenusStartDate(@Path("start") String start, @Path("end") String end, @Field("csrfmiddlewaretoken") String csrfToken, @Field("week_id") String calendarWeekWithYear );
+    LiveData<Resource<Document>> postMenusStartDate( @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
 
-    @Headers("Referer: https://bestellung-pipapo-catering.mms-rcs.de/menu/0/2019-07-01/2019-07-07/" )
+    @GET( "/menu/0/{start}/{end}/" )
+    LiveData<Resource<Document>> getCurrentMenus( @Path("start") String start, @Path("end") String end );
+
     @FormUrlEncoded
     @POST( "/menu/0/{start}/{end}/" )
-    LiveData<Resource<Document>> postChangedMenus( @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
+    LiveData<Resource<Document>> postChangedMenus( @Header( "Referer" ) String referer, @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
 
-    @Headers("Content-Type: application/x-www-form-urlencoded")
-    @POST( "/index.php?m=2;0" )
-    LiveData<Resource<Document>> postConfirmedMenus( @Body RequestBody formData );
+    @Headers("Referer: " + EssbarConstants.Urls.ORDER_CONFIRMATION )
+    @FormUrlEncoded
+    @POST( "/orders/confirmation/" )
+    LiveData<Resource<Document>> postConfirmedMenus( @FieldMap Map<String, String> fields );
 
 }

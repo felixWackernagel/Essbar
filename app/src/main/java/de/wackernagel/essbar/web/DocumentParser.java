@@ -73,7 +73,7 @@ public class DocumentParser {
     }
 
     public static Boolean isOrderSuccessful( @Nullable final Document document ) {
-        if( document != null && document.select( ".bestellfortschritt.bestellfortschritt2" ).size() > 0 ) {
+        if( document != null && document.select( "site > content > progressbar > yoursave.active" ).size() > 0 ) {
             return Boolean.TRUE;
         } else {
             return Boolean.FALSE;

@@ -18,28 +18,23 @@ import retrofit2.http.Path;
 public interface WebService {
 
     @GET( "/content/" )
-    LiveData<Resource<Document>> getHome();
+    LiveData<Resource<Document>> getHomePage();
 
     @Headers("Referer: " + EssbarConstants.Urls.HOME )
     @FormUrlEncoded
     @POST( "/accounts/login/" )
     LiveData<Resource<Document>> postLoginData( @FieldMap Map<String, String> fields );
 
-    @Headers("Referer: https://bestellung-pipapo-catering.mms-rcs.de/menu/0/2019-07-08/2019-07-14/" )
-    @FormUrlEncoded
-    @POST( "/menu/0/{start}/{end}/" )
-    LiveData<Resource<Document>> postMenusStartDate( @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
-
     @GET( "/menu/0/{start}/{end}/" )
-    LiveData<Resource<Document>> getCurrentMenus( @Path("start") String start, @Path("end") String end );
+    LiveData<Resource<Document>> getCalendarWeekMenusPage(@Path("start") String start, @Path("end") String end );
 
     @FormUrlEncoded
     @POST( "/menu/0/{start}/{end}/" )
-    LiveData<Resource<Document>> postChangedMenus( @Header( "Referer" ) String referer, @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
+    LiveData<Resource<Document>> postChangedMenusData(@Header( "Referer" ) String referer, @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
 
     @Headers("Referer: " + EssbarConstants.Urls.ORDER_CONFIRMATION )
     @FormUrlEncoded
     @POST( "/orders/confirmation/" )
-    LiveData<Resource<Document>> postConfirmedMenus( @FieldMap Map<String, String> fields );
+    LiveData<Resource<Document>> postChangedAndConfirmedMenusData( @FieldMap Map<String, String> fields );
 
 }

@@ -10,7 +10,7 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.room.CustomerDao;
 import de.wackernagel.essbar.web.Resource;
 import de.wackernagel.essbar.web.WebService;
-import de.wackernagel.essbar.web.forms.ChangeCalendarWeekForm;
+import de.wackernagel.essbar.web.forms.CalendarWeekForm;
 import de.wackernagel.essbar.web.forms.ChangedMenusForm;
 import de.wackernagel.essbar.web.forms.ConfirmedMenusForm;
 import de.wackernagel.essbar.web.forms.LoginForm;
@@ -31,12 +31,8 @@ public class EssbarRepository {
         return customerDao.queryAllCustomers();
     }
 
-    public LiveData<Resource<Document>> getCurrentMenusDocument( final ChangeCalendarWeekForm changeCalendarWeekForm ) {
-        return webService.getCurrentMenus( changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate() );
-    }
-
-    public LiveData<Resource<Document>> getMenusDocumentByDate( final ChangeCalendarWeekForm changeCalendarWeekForm ) {
-        return webService.postMenusStartDate( changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate(), changeCalendarWeekForm.getFields() );
+    public LiveData<Resource<Document>> getMenusDocumentByCalendarWeek(final CalendarWeekForm changeCalendarWeekForm ) {
+        return webService.getCalendarWeekMenusPage( changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate() );
     }
 
     public LiveData<Resource<Document>> getLoginDocument( final LoginForm loginForm ) {
@@ -44,11 +40,11 @@ public class EssbarRepository {
     }
 
     public LiveData<Resource<Document>> getMenuConfirmationDocument(final ChangedMenusForm changedMenusForm ) {
-        return webService.postChangedMenus( changedMenusForm.getReferer(), changedMenusForm.getStartDate(), changedMenusForm.getEndDate(), changedMenusForm.getFields() );
+        return webService.postChangedMenusData( changedMenusForm.getReferer(), changedMenusForm.getStartDate(), changedMenusForm.getEndDate(), changedMenusForm.getFields() );
     }
 
     public LiveData<Resource<Document>> postConfirmedMenus( final ConfirmedMenusForm confirmedMenusForm ) {
-        return webService.postConfirmedMenus( confirmedMenusForm.getFields() );
+        return webService.postChangedAndConfirmedMenusData( confirmedMenusForm.getFields() );
     }
 
     public void insertCustomer( final Customer customer ) {
@@ -60,6 +56,6 @@ public class EssbarRepository {
     }
 
     public LiveData<Resource<Document>> getHomeDocument() {
-        return webService.getHome();
+        return webService.getHomePage();
     }
 }

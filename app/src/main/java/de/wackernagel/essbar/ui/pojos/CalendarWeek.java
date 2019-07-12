@@ -16,16 +16,16 @@ public class CalendarWeek {
     }
 
 
-    // KW 26 || 24.06. - 30.06.2019
+    // KW 26 || 24.06. - 30.06.2019 or KW 6 || 24.06. - 30.06.2019
     // 24.06. - 30.06.2019
     private String sliceOutDateRange( String name ) {
-        return name.substring(9);
+        return name.substring( name.lastIndexOf("|" ) + 2 );
     }
 
-    // KW 26 || 24.06. - 30.06.2019
+    // KW 26 || 24.06. - 30.06.2019 or KW 6 || 24.06. - 30.06.2019
     // 26
     private String sliceOutNumber( String name ) {
-        return name.substring(3, 5);
+        return name.substring(3, name.indexOf( "|" ) - 1 );
     }
 
     public String getValue() {

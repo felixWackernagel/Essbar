@@ -2,17 +2,13 @@ package de.wackernagel.essbar.web.forms;
 
 import androidx.annotation.NonNull;
 
-import java.util.Map;
-
-public class ChangeCalendarWeekForm {
+public class CalendarWeekForm {
     private final String startDate;
     private final String endDate;
-    private final Map<String, String> fields;
 
-    public ChangeCalendarWeekForm( @NonNull final String startDate, @NonNull final String endDate, @NonNull final Map<String, String> fields) {
+    public CalendarWeekForm( @NonNull final String startDate, @NonNull final String endDate ) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.fields = fields;
     }
 
     public String getStartDate() {
@@ -21,9 +17,5 @@ public class ChangeCalendarWeekForm {
 
     public String getEndDate() {
         return endDate;
-    }
-
-    public Map<String, String> getFields() {
-        return fields;
     }
 }

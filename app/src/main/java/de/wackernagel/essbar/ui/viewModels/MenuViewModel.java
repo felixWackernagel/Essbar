@@ -1,7 +1,6 @@
 package de.wackernagel.essbar.ui.viewModels;
 
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 
 import androidx.annotation.NonNull;
@@ -13,7 +12,6 @@ import androidx.lifecycle.ViewModel;
 
 import org.jsoup.nodes.Document;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +27,7 @@ import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.InMemoryCookieJar;
 import de.wackernagel.essbar.web.Resource;
-import de.wackernagel.essbar.web.forms.ChangeCalendarWeekForm;
+import de.wackernagel.essbar.web.forms.CalendarWeekForm;
 import de.wackernagel.essbar.web.forms.ChangedMenusForm;
 import de.wackernagel.essbar.web.forms.ConfirmedMenusForm;
 
@@ -79,21 +77,22 @@ public class MenuViewModel extends ViewModel {
      * @param calendarWeekWithYear (yyyy,cw)
      */
     private LiveData<Resource<Document>> getMenuDocument( final String calendarWeekWithYear ) {
+        final int[] yearAndWeekOfYear = splitCalendarWeekWithYear( calendarWeekWithYear );
+        return repository.getMenusDocumentByCalendarWeek( new CalendarWeekForm(
+                getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ),
+                getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ) ) );
+    }
+
+    /**
+     * @param calendarWeekWithYear (yyyy,cw)
+     * @return int array with year at [0] and week of year at [1]
+     */
+    private int[] splitCalendarWeekWithYear( final String calendarWeekWithYear )
+    {
         final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
         int year = Integer.valueOf( dateParts[0] );
         int weekOfYear = Integer.valueOf( dateParts[1] );
-
-        final HashMap<String, String> formFields = new HashMap<>( 2 );
-
-        if( weekOfYear == calculateCurrentCalendarWeek() || InMemoryCookieJar.get().getCSRFToken() == null ) {
-            Log.e("MenuViewModel", "Get Menus from CW " + weekOfYear);
-            return repository.getCurrentMenusDocument( new ChangeCalendarWeekForm( getDay( Calendar.MONDAY, weekOfYear, year ), getDay( Calendar.SUNDAY, weekOfYear, year ), formFields ) );
-        }
-
-        Log.e("MenuViewModel", "Set CW " + weekOfYear);
-        formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
-        formFields.put( "week_id", calendarWeekWithYear );
-        return repository.getMenusDocumentByDate( new ChangeCalendarWeekForm( getDay( Calendar.MONDAY, weekOfYear, year ), getDay( Calendar.SUNDAY, weekOfYear, year ), formFields ) );
+        return new int[]{ year, weekOfYear };
     }
 
     /**
@@ -111,7 +110,6 @@ public class MenuViewModel extends ViewModel {
         calendar.set( Calendar.HOUR_OF_DAY, 0 );
         calendar.set( Calendar.MINUTE, 0 );
         calendar.set( Calendar.SECOND, 0 );
-        Log.e( "MenuViewModel", "Get Day from [" + dayOfWeek + ", " + weekOfYear + ", " + year + "] to " + new SimpleDateFormat( "dd.MM.yyyy" ).format( calendar.getTime() ) );
         return calendar.get(Calendar.YEAR) + "-" + twoDigitFormat( calendar.get( Calendar.MONTH ) + 1 ) + "-" + twoDigitFormat( calendar.get( Calendar.DATE ) );
     }
 
@@ -226,13 +224,16 @@ public class MenuViewModel extends ViewModel {
         return calendarWeek;
     }
 
+    /**
+     *
+     * @param calendarWeekWithYear (yyyy,cw) like (2019,26)
+     * @return current week of year if calendarWeekWithYear is null or week of year from given string
+     */
     public int calculateCalendarWeek( @Nullable final String calendarWeekWithYear ) {
         if( calendarWeekWithYear == null ) {
             return calculateCurrentCalendarWeek();
         } else {
-            // (2019,27) = length 9
-            final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
-            return Integer.valueOf( dateParts[1] );
+            return splitCalendarWeekWithYear( calendarWeekWithYear )[1];
         }
     }
 
@@ -283,12 +284,13 @@ public class MenuViewModel extends ViewModel {
         formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
 
         final List<Menu> allMenus = menus.getValue();
-        if( allMenus != null && !allMenus.isEmpty() ) {
+        final SparseBooleanArray allOrderStates = menusOrderStatus.getValue();
+        if( allMenus != null && !allMenus.isEmpty() && allOrderStates != null ) {
             for( Menu menu : allMenus ) {
                 if( TextUtils.isEmpty( menu.getInputName() ) || TextUtils.isEmpty( menu.getInputValue() ) ) {
                     continue;
                 }
-                if( menusOrderStatus.getValue().get( menu.getId(), menu.isOrdered() ) ) {
+                if( allOrderStates.get( menu.getId(), menu.isOrdered() ) ) {
                     formFields.put( menu.getInputName(), menu.getInputValue() );
                 }
             }
@@ -296,11 +298,10 @@ public class MenuViewModel extends ViewModel {
 
         formFields.put( "change_order", "Weiter" );
 
-        final String calendarWeekWithYear = calendarWeek.getValue();
-        final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
-        int year = Integer.valueOf( dateParts[0] );
-        int weekOfYear = Integer.valueOf( dateParts[1] );
-        menusToChange.setValue( new ChangedMenusForm( getDay( Calendar.MONDAY, weekOfYear, year), getDay( Calendar.SUNDAY, weekOfYear, year), formFields ) );
+        final int[] yearAndWeekOfYear = splitCalendarWeekWithYear( calendarWeek.getValue() );
+        menusToChange.setValue( new ChangedMenusForm(
+                getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0]),
+                getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0]), formFields ) );
     }
 
     public void postChangedAndConfirmedMenus() {

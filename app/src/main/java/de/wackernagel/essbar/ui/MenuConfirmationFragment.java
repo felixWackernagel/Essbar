@@ -6,16 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuConfirmationBinding;
+import de.wackernagel.essbar.ui.lists.DataBindingListAdapter;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
@@ -86,7 +88,7 @@ public class MenuConfirmationFragment extends DialogFragment {
     }
 
     private void setupRecyclerView() {
-        final ChangedMenuListAdapter adapter = new ChangedMenuListAdapter();
+        final DataBindingListAdapter<ChangedMenu> adapter = new DataBindingListAdapter<>();
         binding.recyclerView.setLayoutManager( new LinearLayoutManager( null ) );
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );

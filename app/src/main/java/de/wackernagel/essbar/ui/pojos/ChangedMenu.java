@@ -7,7 +7,9 @@ import org.jsoup.nodes.Element;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class ChangedMenu {
+import de.wackernagel.essbar.ui.lists.Listable;
+
+public class ChangedMenu implements Listable {
 
     private final long id;
     private final String date;
@@ -86,6 +88,7 @@ public class ChangedMenu {
         return Type.UNKNOWN;
     }
 
+    @Override
     public long getId() {
         return id;
     }

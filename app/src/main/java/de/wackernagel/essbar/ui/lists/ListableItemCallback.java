@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 
+import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 
@@ -23,7 +24,10 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
         if( newItem instanceof CalendarWeek && oldItem instanceof CalendarWeek ) {
             return calendarWeeksSame( (CalendarWeek) oldItem, (CalendarWeek) newItem );
         }
-        return false;
+        if( newItem instanceof Customer && oldItem instanceof Customer ) {
+            return customersSame( (Customer) oldItem, (Customer) newItem );
+        }
+        throw new IllegalStateException( "Incomplete implementation to compare old with new item of class '" + oldItem + "', '" + newItem + "'!" );
     }
 
     private boolean changedMenusSame(ChangedMenu oldItem, ChangedMenu newItem) {
@@ -36,6 +40,13 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
     private boolean calendarWeeksSame(CalendarWeek oldItem, CalendarWeek newItem) {
         return TextUtils.equals( oldItem.getDateRange(), newItem.getDateRange() ) &&
                 oldItem.isSelected() == newItem.isSelected();
+    }
+
+    private boolean customersSame(Customer oldItem, Customer newItem) {
+        return TextUtils.equals( oldItem.getNumber(), newItem.getNumber() ) &&
+                TextUtils.equals( oldItem.getEncryptedPassword(), newItem.getEncryptedPassword() ) &&
+                TextUtils.equals( oldItem.getEncryptionIv(), newItem.getEncryptionIv() ) &&
+                TextUtils.equals( oldItem.getName(), newItem.getName() );
     }
 
 }

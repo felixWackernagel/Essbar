@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import de.wackernagel.essbar.R;
+import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 
@@ -56,7 +57,10 @@ public class DataBindingListAdapter<T extends Listable> extends ListAdapter<T, D
         if( item instanceof CalendarWeek ) {
             return R.layout.item_calendar_week;
         }
-        throw new IllegalStateException( "Can't resolve viewType for class '" + item.getClass().getSimpleName() + "'!" );
+        if( item instanceof Customer ) {
+            return R.layout.item_customer;
+        }
+        throw new IllegalStateException( "Incomplete implementation to resolve viewType for class '" + item.getClass().getSimpleName() + "'!" );
     }
 
     @NonNull

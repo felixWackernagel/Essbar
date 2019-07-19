@@ -11,9 +11,11 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import de.wackernagel.essbar.ui.lists.Listable;
+
 @Entity( tableName = "customers",
          indices = { @Index( value = "number", unique = true ) } )
-public class Customer {
+public class Customer implements Listable {
     @PrimaryKey( autoGenerate = true)
     private long id;
 
@@ -47,6 +49,7 @@ public class Customer {
         this.name = name;
     }
 
+    @Override
     public long getId() {
         return id;
     }

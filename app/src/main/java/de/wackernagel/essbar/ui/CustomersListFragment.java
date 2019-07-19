@@ -18,6 +18,8 @@ import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.EssbarConstants;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentCustomerListBinding;
+import de.wackernagel.essbar.room.Customer;
+import de.wackernagel.essbar.ui.lists.DataBindingListAdapter;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.EncryptionUtils;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
@@ -54,8 +56,8 @@ public class CustomersListFragment extends AbstractLoginFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
-        final CustomerListAdapter adapter = new CustomerListAdapter();
-        adapter.setOnCustomerClickListener(customer -> {
+        final DataBindingListAdapter<Customer> adapter = new DataBindingListAdapter<>();
+        adapter.setClickListener(customer -> {
             viewModel.setCustomer( customer );
             doDecryption();
         });
@@ -93,7 +95,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
 
             @Override
             public void onDecryptionError(Exception e) {
-                Log.e("CustomerListFragment", "decryption failed", e );
+                Log.e(TAG, "decryption failed", e );
                 showError( getString( R.string.unknown_error ) );
             }
         });

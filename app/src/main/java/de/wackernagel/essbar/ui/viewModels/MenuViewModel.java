@@ -23,6 +23,7 @@ import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
 import de.wackernagel.essbar.ui.pojos.Weekday;
+import de.wackernagel.essbar.utils.DateUtils;
 import de.wackernagel.essbar.utils.Event;
 import de.wackernagel.essbar.web.DocumentParser;
 import de.wackernagel.essbar.web.InMemoryCookieJar;
@@ -77,47 +78,10 @@ public class MenuViewModel extends ViewModel {
      * @param calendarWeekWithYear (yyyy,cw)
      */
     private LiveData<Resource<Document>> getMenuDocument( final String calendarWeekWithYear ) {
-        final int[] yearAndWeekOfYear = splitCalendarWeekWithYear( calendarWeekWithYear );
+        final int[] yearAndWeekOfYear = DateUtils.splitCalendarWeekWithYear( calendarWeekWithYear );
         return repository.getMenusDocumentByCalendarWeek( new CalendarWeekForm(
-                getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ),
-                getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ) ) );
-    }
-
-    /**
-     * @param calendarWeekWithYear (yyyy,cw)
-     * @return int array with year at [0] and week of year at [1]
-     */
-    private int[] splitCalendarWeekWithYear( final String calendarWeekWithYear )
-    {
-        final String[] dateParts = calendarWeekWithYear.substring( 1, calendarWeekWithYear.length() - 1 ).split(",");
-        int year = Integer.valueOf( dateParts[0] );
-        int weekOfYear = Integer.valueOf( dateParts[1] );
-        return new int[]{ year, weekOfYear };
-    }
-
-    /**
-     * @param dayOfWeek like MONDAY
-     * @param weekOfYear like 26
-     * @param year like 2019
-     * @return 2019-07-14
-     */
-    private String getDay( int dayOfWeek, int weekOfYear, int year ) {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setFirstDayOfWeek( Calendar.MONDAY );
-        calendar.set( Calendar.YEAR, year );
-        calendar.set( Calendar.WEEK_OF_YEAR, weekOfYear );
-        calendar.set( Calendar.DAY_OF_WEEK, dayOfWeek );
-        calendar.set( Calendar.HOUR_OF_DAY, 0 );
-        calendar.set( Calendar.MINUTE, 0 );
-        calendar.set( Calendar.SECOND, 0 );
-        return calendar.get(Calendar.YEAR) + "-" + twoDigitFormat( calendar.get( Calendar.MONTH ) + 1 ) + "-" + twoDigitFormat( calendar.get( Calendar.DATE ) );
-    }
-
-    private String twoDigitFormat( int digit ) {
-        if( digit <= 9 ) {
-            return "0" + digit;
-        }
-        return String.valueOf( digit );
+                DateUtils.getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ),
+                DateUtils.getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ) ) );
     }
 
     private LiveData<List<Menu>> getMenusList( final Resource<Document> resource) {
@@ -224,37 +188,12 @@ public class MenuViewModel extends ViewModel {
         return calendarWeek;
     }
 
-    /**
-     *
-     * @param calendarWeekWithYear (yyyy,cw) like (2019,26)
-     * @return current week of year if calendarWeekWithYear is null or week of year from given string
-     */
-    public int calculateCalendarWeek( @Nullable final String calendarWeekWithYear ) {
-        if( calendarWeekWithYear == null ) {
-            return calculateCurrentCalendarWeek();
-        } else {
-            return splitCalendarWeekWithYear( calendarWeekWithYear )[1];
-        }
-    }
-
     public int getSelectedCalendarWeek() {
-        return calculateCalendarWeek( calendarWeek.getValue() );
+        return DateUtils.calculateCalendarWeek( calendarWeek.getValue() );
     }
 
     public void loadCurrentCalendarWeek() {
-        loadCalendarWeek( "(" + Calendar.getInstance().get( Calendar.YEAR ) + "," + calculateCurrentCalendarWeek() + ")" );
-    }
-
-    /**
-     * @return calendar week like 26
-     */
-    private int calculateCurrentCalendarWeek() {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.set( Calendar.DAY_OF_WEEK, Calendar.MONDAY );
-        calendar.set( Calendar.HOUR_OF_DAY, 0 );
-        calendar.set( Calendar.MINUTE, 0 );
-        calendar.set( Calendar.SECOND, 0 );
-        return calendar.get( Calendar.WEEK_OF_YEAR );
+        loadCalendarWeek( "(" + Calendar.getInstance().get( Calendar.YEAR ) + "," + DateUtils.calculateCurrentCalendarWeek() + ")" );
     }
 
     /**
@@ -298,10 +237,10 @@ public class MenuViewModel extends ViewModel {
 
         formFields.put( "change_order", "Weiter" );
 
-        final int[] yearAndWeekOfYear = splitCalendarWeekWithYear( calendarWeek.getValue() );
+        final int[] yearAndWeekOfYear = DateUtils.splitCalendarWeekWithYear( calendarWeek.getValue() );
         menusToChange.setValue( new ChangedMenusForm(
-                getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0]),
-                getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0]), formFields ) );
+                DateUtils.getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0]),
+                DateUtils.getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0]), formFields ) );
     }
 
     public void postChangedAndConfirmedMenus() {

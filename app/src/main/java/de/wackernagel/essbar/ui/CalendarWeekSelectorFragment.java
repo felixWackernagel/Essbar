@@ -15,10 +15,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.databinding.FragmentCalendarWeekSelectorBinding;
+import de.wackernagel.essbar.ui.lists.DataBindingClickListener;
+import de.wackernagel.essbar.ui.lists.DataBindingListAdapter;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 
-public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment implements CalendarWeekListAdapter.OnCalendarWeekClickListener {
+public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment implements DataBindingClickListener<CalendarWeek> {
 
     static CalendarWeekSelectorFragment newInstance() {
         final Bundle args = new Bundle();
@@ -46,7 +48,8 @@ public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment impl
         AndroidSupportInjection.inject(this );
         super.onActivityCreated(savedInstanceState);
 
-        final CalendarWeekListAdapter adapter = new CalendarWeekListAdapter( this );
+        final DataBindingListAdapter<CalendarWeek> adapter = new DataBindingListAdapter<>();
+        adapter.setClickListener( this );
         binding.recyclerView.setLayoutManager( new LinearLayoutManager( null ) );
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
@@ -56,8 +59,8 @@ public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment impl
     }
 
     @Override
-    public void onCalendarWeekClick( @NonNull final CalendarWeek calendarWeek ) {
-        viewModel.loadCalendarWeek( calendarWeek.getValue() );
+    public void onBindingClicked( final CalendarWeek item ) {
+        viewModel.loadCalendarWeek( item.getValue() );
         dismiss();
     }
 }

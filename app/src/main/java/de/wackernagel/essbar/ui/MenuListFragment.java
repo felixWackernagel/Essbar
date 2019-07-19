@@ -25,6 +25,7 @@ import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
 import de.wackernagel.essbar.ui.pojos.Menu;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
+import de.wackernagel.essbar.utils.DateUtils;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 
 public class MenuListFragment extends ToolbarFragment implements ActionMode.Callback {
@@ -66,7 +67,7 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
         viewModel.getCalendarWeek().observe( getViewLifecycleOwner(), calendarWeek -> {
             if( calendarWeekNumberView != null )
-                calendarWeekNumberView.setText( String.valueOf( viewModel.calculateCalendarWeek( calendarWeek ) ) );
+                calendarWeekNumberView.setText( String.valueOf( DateUtils.calculateCalendarWeek( calendarWeek ) ) );
         } );
 
         setupToolbar();

@@ -2,17 +2,24 @@ package de.wackernagel.essbar.ui.pojos;
 
 import org.jsoup.nodes.Element;
 
-public class CalendarWeek {
+import java.util.Calendar;
+
+import de.wackernagel.essbar.ui.lists.Listable;
+import de.wackernagel.essbar.utils.DateUtils;
+
+public class CalendarWeek implements Listable {
     private final String value;
     private final boolean selected;
     private final String dateRange;
     private final String number;
+    private final long id;
 
     public CalendarWeek( final Element element ) {
         this.value = element.attr("value" ); // (yyyy,cw) like (2019,26)
         this.selected = "selected".equals( element.attr("selected") );
         this.dateRange = sliceOutDateRange( element.text() );
         this.number = sliceOutNumber( element.text() );
+        this.id = DateUtils.getDayAsDate( Calendar.MONDAY, value ).getTime();
     }
 
 
@@ -42,5 +49,10 @@ public class CalendarWeek {
 
     public String getNumber() {
         return number;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 }

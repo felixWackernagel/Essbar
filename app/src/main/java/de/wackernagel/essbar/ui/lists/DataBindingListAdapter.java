@@ -5,15 +5,21 @@ import android.view.ViewGroup;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import de.wackernagel.essbar.R;
+import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 
+import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
+
 public class DataBindingListAdapter<T extends Listable> extends ListAdapter<T, DataBindingViewHolder<T>> {
+
+    private DataBindingClickListener<T> clickListener;
 
     public DataBindingListAdapter() {
         this( new ListableItemCallback<>() );
@@ -22,6 +28,10 @@ public class DataBindingListAdapter<T extends Listable> extends ListAdapter<T, D
     private DataBindingListAdapter( @NonNull final DiffUtil.ItemCallback<T> diffCallback ) {
         super(diffCallback);
         setHasStableIds( true );
+    }
+
+    public void setClickListener( @Nullable final DataBindingClickListener<T> clickListener) {
+        this.clickListener = clickListener;
     }
 
     @Override
@@ -43,7 +53,10 @@ public class DataBindingListAdapter<T extends Listable> extends ListAdapter<T, D
         if( item instanceof ChangedMenu ) {
             return R.layout.item_changed_menu;
         }
-        throw new IllegalStateException( "Can resolve viewType for class '" + item.getClass().getSimpleName() + "'!" );
+        if( item instanceof CalendarWeek ) {
+            return R.layout.item_calendar_week;
+        }
+        throw new IllegalStateException( "Can't resolve viewType for class '" + item.getClass().getSimpleName() + "'!" );
     }
 
     @NonNull
@@ -58,6 +71,12 @@ public class DataBindingListAdapter<T extends Listable> extends ListAdapter<T, D
     public void onBindViewHolder(@NonNull DataBindingViewHolder<T> holder, int position) {
         final T data = getItem( position );
         holder.bind( data );
+        holder.itemView.setOnClickListener( v -> {
+            final int adapterPosition = holder.getAdapterPosition();
+            if( adapterPosition != NO_POSITION ) {
+                clickListener.onBindingClicked( getItem( adapterPosition ) );
+            }
+        } );
     }
 
 }

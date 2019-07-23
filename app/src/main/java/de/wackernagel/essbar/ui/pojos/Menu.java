@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ObservableBoolean;
 
 import org.jsoup.nodes.Element;
 
@@ -11,8 +12,10 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.Set;
 
-public class Menu {
-    private int id;
+import de.wackernagel.essbar.ui.lists.Listable;
+
+public class Menu implements Listable {
+    private long id;
     private String menuName;
     private boolean editable;
     private boolean ordered;
@@ -22,6 +25,9 @@ public class Menu {
     private String inputName;
     private String inputValue;
     private String price;
+
+    private boolean actualOrdered;
+    private ObservableBoolean changed;
 
     public Menu(final Element element ) {
         menuName = element.select("meal > mealtxt").text().replaceAll("\\(.*?\\) ?", ""); // remove braces
@@ -41,6 +47,9 @@ public class Menu {
         if( paused ) {
             menuName = "<Grund>";
         }
+
+        actualOrdered = ordered;
+        changed = new ObservableBoolean( false );
     }
 
     private Type calculateType( final Set<String> cssClasses, final String menuName ) {
@@ -96,7 +105,8 @@ public class Menu {
         return menuName;
     }
 
-    public int getId() {
+    @Override
+    public long getId() {
         return id;
     }
 
@@ -134,6 +144,19 @@ public class Menu {
         return price;
     }
 
+    public boolean isActualOrdered() {
+        return actualOrdered;
+    }
+
+    public void setActualOrdered( final boolean actualOrdered ) {
+        this.actualOrdered = actualOrdered;
+        changed.set( actualOrdered != ordered );
+    }
+
+    public ObservableBoolean getChanged() {
+        return changed;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -142,6 +165,7 @@ public class Menu {
                 ", menuName='" + menuName + '\'' +
                 ", editable=" + editable +
                 ", ordered=" + ordered +
+                ", actuelOrdered=" + actualOrdered +
                 ", weekday=" + weekday +
                 ", typ=" + typ +
                 ", paused=" + paused +
@@ -159,6 +183,7 @@ public class Menu {
         return id == menu.id &&
                 editable == menu.editable &&
                 ordered == menu.ordered &&
+                actualOrdered == menu.actualOrdered &&
                 paused == menu.paused &&
                 Objects.equals(menuName, menu.menuName) &&
                 weekday == menu.weekday &&
@@ -170,6 +195,6 @@ public class Menu {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuName, editable, ordered, weekday, typ, paused, inputName, inputValue, price);
+        return Objects.hash(id, menuName, editable, ordered, actualOrdered, weekday, typ, paused, inputName, inputValue, price);
     }
 }

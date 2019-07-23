@@ -17,16 +17,15 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
-import de.wackernagel.essbar.ui.pojos.Menu;
+import de.wackernagel.essbar.ui.lists.DataBindingListAdapter;
+import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.DateUtils;
-import de.wackernagel.essbar.utils.SectionItemDecoration;
 
 public class MenuListFragment extends ToolbarFragment implements ActionMode.Callback {
 
@@ -120,44 +119,11 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
     }
 
     private void setupRecyclerView() {
-        final String[] localizedWeekdays = getResources().getStringArray( R.array.weekdays );
-
-        final MenuListAdapter adapter = new MenuListAdapter();
-        adapter.setOnMenuStatusChangedListener( this::updateNumberOfChangedMenus );
-        viewModel.getMenusOrderStatus().observe( getViewLifecycleOwner(), adapter::setCheckedItems );
-
+        final DataBindingListAdapter<Listable> adapter = new DataBindingListAdapter<>( viewModel );
         binding.recyclerView.setLayoutManager( new LinearLayoutManager( null ) );
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
-        binding.recyclerView.addItemDecoration( new SectionItemDecoration( requireContext(), false, new SectionItemDecoration.SectionCallback() {
-            @Override
-            public boolean isSection( int position ) {
-                if( position < 0 ) {
-                    return false;
-                }
-                // first item or when current and previous position have different weekdays
-                return position == 0 || adapter.getListItem( position - 1 ).getWeekday() != adapter.getListItem( position ).getWeekday();
-            }
-
-            @Override
-            public CharSequence getSectionHeader( int position ) {
-                if( position < 0 ) {
-                    return "";
-                }
-                final Menu item = adapter.getListItem( position );
-                return localizedWeekdays[ item.getWeekday().getNumber() ];
-            }
-        }) );
-
         viewModel.getMenus().observe( getViewLifecycleOwner(), adapter::submitList);
-    }
-
-    private void updateNumberOfChangedMenus(@Nonnull final Menu menu, final boolean isOrdered ) {
-        if( menu.isOrdered() != isOrdered ) {
-            viewModel.incrementNumberOfChangedOrders();
-        } else {
-            viewModel.decrementNumberOfChangedOrders();
-        }
     }
 
     private void setupContextualActionBar() {

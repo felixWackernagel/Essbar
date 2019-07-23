@@ -6,6 +6,7 @@ import android.widget.Checkable;
 import android.widget.FrameLayout;
 
 public class CheckableFrameLayout extends FrameLayout implements Checkable {
+
     private static final int[] CHECKED_STATE_SET = {
             android.R.attr.state_activated,
             android.R.attr.state_checked,
@@ -38,7 +39,7 @@ public class CheckableFrameLayout extends FrameLayout implements Checkable {
 
     @Override
     public void setChecked(boolean checked) {
-        if (mChecked != checked) {
+        if( mChecked != checked ) {
             mChecked = checked;
             invalidate();
             refreshDrawableState();

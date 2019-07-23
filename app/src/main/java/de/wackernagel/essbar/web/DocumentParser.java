@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.Nullable;
+
+import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
@@ -37,8 +39,8 @@ public class DocumentParser {
         return null;
     }
 
-    public static List<Menu> getMenuList( @Nullable final Document document ) {
-        final List<Menu> menus = new ArrayList<>();
+    public static List<Listable> getMenuList(@Nullable final Document document ) {
+        final List<Listable> menus = new ArrayList<>();
         if( document != null ) {
             final Elements rows = document.select("site > content > form > table > tbody > tr" );
             for( int row = 1; row < rows.size(); row++ ) {

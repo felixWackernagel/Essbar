@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
+import de.wackernagel.essbar.ui.pojos.Menu;
 
 public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallback<T> {
 
@@ -26,6 +27,9 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
         }
         if( newItem instanceof Customer && oldItem instanceof Customer ) {
             return customersSame( (Customer) oldItem, (Customer) newItem );
+        }
+        if( newItem instanceof Menu && oldItem instanceof Menu ) {
+            return menusSame( (Menu) oldItem, (Menu) newItem );
         }
         throw new IllegalStateException( "Incomplete implementation to compare old with new item of class '" + oldItem + "', '" + newItem + "'!" );
     }
@@ -47,6 +51,15 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
                 TextUtils.equals( oldItem.getEncryptedPassword(), newItem.getEncryptedPassword() ) &&
                 TextUtils.equals( oldItem.getEncryptionIv(), newItem.getEncryptionIv() ) &&
                 TextUtils.equals( oldItem.getName(), newItem.getName() );
+    }
+
+    private boolean menusSame( Menu oldItem, Menu newItem ) {
+        return oldItem.getWeekday().equals( newItem.getWeekday() ) &&
+                TextUtils.equals( oldItem.getMenuName(), newItem.getMenuName() ) &&
+                oldItem.getTyp().equals( newItem.getTyp() ) &&
+                oldItem.isOrdered() == newItem.isOrdered() &&
+                oldItem.isActualOrdered() == newItem.isActualOrdered() &&
+                oldItem.isEditable() == newItem.isEditable();
     }
 
 }

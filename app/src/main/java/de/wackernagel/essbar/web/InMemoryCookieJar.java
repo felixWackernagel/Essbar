@@ -1,7 +1,5 @@
 package de.wackernagel.essbar.web;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -15,8 +13,6 @@ import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 
 public class InMemoryCookieJar implements CookieJar {
-
-    private static String TAG = "InMemoryCookieJar";
 
     private static InMemoryCookieJar instance = new InMemoryCookieJar();
 
@@ -33,17 +29,6 @@ public class InMemoryCookieJar implements CookieJar {
     @Override
     public void saveFromResponse( @NonNull final HttpUrl url, @NonNull final List<Cookie> cookies ) {
         cookieStore.put( url.host(), cookies );
-        log();
-    }
-
-    private void log() {
-        Log.e(TAG, "CookieJar start ...");
-        for( Map.Entry<String, List<Cookie>> entry : cookieStore.entrySet() ) {
-            for( Cookie cookie : entry.getValue() ) {
-                Log.e( TAG, entry.getKey() + " = " + cookie.toString() );
-            }
-        }
-        Log.e(TAG, "... end CookieJar");
     }
 
     @Override

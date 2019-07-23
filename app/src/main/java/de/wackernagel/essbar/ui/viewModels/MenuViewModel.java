@@ -1,7 +1,7 @@
 package de.wackernagel.essbar.ui.viewModels;
 
 import android.text.TextUtils;
-import android.util.SparseBooleanArray;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,13 +12,17 @@ import androidx.lifecycle.ViewModel;
 
 import org.jsoup.nodes.Document;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import de.wackernagel.essbar.repository.EssbarRepository;
+import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
@@ -39,8 +43,7 @@ public class MenuViewModel extends ViewModel {
     private final MutableLiveData<String> calendarWeek;
 
     private final LiveData<Resource<Document>> menusDocument;
-    private final LiveData<List<Menu>> menus;
-    private final LiveData<SparseBooleanArray> menusOrderStatus;
+    private final LiveData<List<Listable>> menus;
     private final LiveData<List<CalendarWeek>> calendarWeeks;
     private final MutableLiveData<Integer> numberOfChangedOrders;
 
@@ -60,7 +63,6 @@ public class MenuViewModel extends ViewModel {
         numberOfChangedOrders.setValue( 0 );
         menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
         menus = Transformations.switchMap(menusDocument, this::getMenusList );
-        menusOrderStatus = Transformations.switchMap(menus, this::transformMenusToOrderStatus);
         calendarWeeks = Transformations.switchMap(menusDocument, this::getCalendarWeekList);
 
         // menus > order confirmation
@@ -84,10 +86,10 @@ public class MenuViewModel extends ViewModel {
                 DateUtils.getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ) ) );
     }
 
-    private LiveData<List<Menu>> getMenusList( final Resource<Document> resource) {
-        final MutableLiveData<List<Menu>> result = new MutableLiveData<>();
+    private LiveData<List<Listable>> getMenusList( final Resource<Document> resource) {
+        final MutableLiveData<List<Listable>> result = new MutableLiveData<>();
         if( resource != null && resource.isAvailable() ) {
-            final List<Menu> menuList = DocumentParser.getMenuList( resource.getResource() );
+            final List<Listable> menuList = DocumentParser.getMenuList( resource.getResource() );
             filterEqualPausedMenus( menuList );
             result.setValue( menuList );
         } else {
@@ -96,31 +98,22 @@ public class MenuViewModel extends ViewModel {
         return result;
     }
 
-    private void filterEqualPausedMenus(final List<Menu> menuList ) {
+    private void filterEqualPausedMenus(final List<Listable> menuList ) {
         if( !menuList.isEmpty() ) {
-            final Iterator<Menu> iterator = menuList.iterator();
+            final Iterator<Listable> iterator = menuList.iterator();
             Weekday toExclude = null;
             while( iterator.hasNext() ) {
-                final Menu menu = iterator.next();
-                if( menu.getWeekday().equals( toExclude )  ) {
-                    iterator.remove();
-                } else if( menu.isPaused() ) {
-                    toExclude = menu.getWeekday();
+                final Listable item = iterator.next();
+                if( item instanceof Menu ) {
+                    final Menu menu = (Menu) item;
+                    if( menu.getWeekday().equals( toExclude )  ) {
+                        iterator.remove();
+                    } else if( menu.isPaused() ) {
+                        toExclude = menu.getWeekday();
+                    }
                 }
             }
         }
-    }
-
-    private LiveData<SparseBooleanArray> transformMenusToOrderStatus( final List<Menu> menus ) {
-        final MutableLiveData<SparseBooleanArray> result = new MutableLiveData<>();
-        final SparseBooleanArray menuOrderStatus = new SparseBooleanArray();
-        if( menus != null && !menus.isEmpty() ) {
-            for( Menu menu : menus ) {
-                menuOrderStatus.put( menu.getId(), menu.isOrdered() );
-            }
-        }
-        result.setValue( menuOrderStatus );
-        return result;
     }
 
     private LiveData<List<CalendarWeek>> getCalendarWeekList(final Resource<Document> resource) {
@@ -153,15 +146,8 @@ public class MenuViewModel extends ViewModel {
         return result;
     }
 
-    public LiveData<List<Menu>> getMenus() {
+    public LiveData<List<Listable>> getMenus() {
         return menus;
-    }
-
-    /**
-     * @return A map with menu id -> menu order status (true or false)
-     */
-    public LiveData<SparseBooleanArray> getMenusOrderStatus() {
-        return menusOrderStatus;
     }
 
     public LiveData<List<CalendarWeek>> getCalendarWeeks() {
@@ -203,11 +189,11 @@ public class MenuViewModel extends ViewModel {
         calendarWeek.setValue( calendarWeekWithYear );
     }
 
-    public void incrementNumberOfChangedOrders() {
+    private void incrementNumberOfChangedOrders() {
         numberOfChangedOrders.setValue( numberOfChangedOrders.getValue() + 1 );
     }
 
-    public void decrementNumberOfChangedOrders() {
+    private void decrementNumberOfChangedOrders() {
         numberOfChangedOrders.setValue( numberOfChangedOrders.getValue() - 1 );
     }
 
@@ -218,18 +204,28 @@ public class MenuViewModel extends ViewModel {
         }
     }
 
+    private List<Menu> getMenusList() {
+        final List<Listable> allMenus = menus.getValue();
+        final ArrayList<Menu> result = new ArrayList<>();
+        for( Listable listable : allMenus ) {
+            if( listable instanceof Menu ) {
+                result.add( (Menu) listable);
+            }
+        }
+        return result;
+    }
+
     public void loadChangedMenusToConfirm() {
         final HashMap<String, String> formFields = new HashMap<>();
         formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
 
-        final List<Menu> allMenus = menus.getValue();
-        final SparseBooleanArray allOrderStates = menusOrderStatus.getValue();
-        if( allMenus != null && !allMenus.isEmpty() && allOrderStates != null ) {
+        final List<Menu> allMenus = getMenusList();
+        if( allMenus != null && !allMenus.isEmpty() ) {
             for( Menu menu : allMenus ) {
                 if( TextUtils.isEmpty( menu.getInputName() ) || TextUtils.isEmpty( menu.getInputValue() ) ) {
                     continue;
                 }
-                if( allOrderStates.get( menu.getId(), menu.isOrdered() ) ) {
+                if( menu.isActualOrdered() ) {
                     formFields.put( menu.getInputName(), menu.getInputValue() );
                 }
             }
@@ -248,5 +244,24 @@ public class MenuViewModel extends ViewModel {
         formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
         formFields.put( "order", "zum genannten Preis bestellen" );
         confirmedMenus.setValue( new ConfirmedMenusForm( formFields ) );
+    }
+
+    /* ***************************************** */
+
+    public void changeOrder(CompoundButton buttonView, boolean isOrdered) {
+        // Check if change was by button press or setter based.
+        if( buttonView.isPressed() ) {
+            final Menu menu = (Menu) buttonView.getTag();
+            menu.setActualOrdered( isOrdered );
+            updateNumberOfChangedMenus( menu, isOrdered );
+        }
+    }
+
+    private void updateNumberOfChangedMenus(@Nonnull final Menu menu, final boolean isOrdered ) {
+        if( menu.isOrdered() != isOrdered ) {
+            incrementNumberOfChangedOrders();
+        } else {
+            decrementNumberOfChangedOrders();
+        }
     }
 }

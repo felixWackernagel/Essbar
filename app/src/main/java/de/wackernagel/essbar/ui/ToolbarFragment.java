@@ -10,7 +10,7 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-public class ToolbarFragment extends Fragment {
+class ToolbarFragment extends Fragment {
 
     @Override
     public void onAttach( @NonNull Context context) {

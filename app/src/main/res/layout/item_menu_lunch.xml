@@ -5,14 +5,11 @@
 
     <data>
         <variable
-            name="obj"
+            name="item"
             type="de.wackernagel.essbar.ui.pojos.Menu"/>
         <variable
-            name="holder"
-            type="de.wackernagel.essbar.ui.MenuListAdapter.MenuViewHolder"/>
-        <variable
-            name="adapter"
-            type="de.wackernagel.essbar.ui.MenuListAdapter"/>
+            name="viewModel"
+            type="de.wackernagel.essbar.ui.viewModels.MenuViewModel"/>
     </data>
 
     <de.wackernagel.essbar.utils.CheckableFrameLayout
@@ -20,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="88dp"
         android:paddingTop="16dp"
-        app:edit="@{holder.isChanged()}">
+        app:check="@{item.changed}">
 
         <TextView
             android:layout_width="match_parent"
@@ -40,7 +37,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="56dp"
             android:lineSpacingMultiplier="1.2"
-            android:text="@{@string/menu_name_and_price(obj.menuName, obj.price)}"
+            android:text="@{@string/menu_name_and_price(item.menuName, item.price)}"
             tools:text="Hartweizen Nudeln mit Tomatenpesto auf Hackfleisch"
             style="@style/ListItemSecondary"/>
 
@@ -50,9 +47,10 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_gravity="end|top"
-            android:visibility="@{obj.editable}"
-            android:checked="@{adapter.isMenuChecked( obj.id )}"
-            android:onCheckedChanged="@{holder::onCheckedChanged}"
+            android:visibility="@{item.editable}"
+            android:checked="@{item.actualOrdered}"
+            android:onCheckedChanged="@{viewModel::changeOrder}"
+            app:singleTag="@{item}"
             tools:checked="true" />
 
         <ImageView
@@ -64,7 +62,7 @@
             android:src="@drawable/ic_shopping_cart_black_24dp"
             android:tint="@color/colorAccent"
             android:contentDescription="@null"
-            android:visibility="@{!obj.editable &amp;&amp; obj.ordered}"
+            android:visibility="@{!item.editable &amp;&amp; item.ordered}"
             tools:visibility="gone"/>
 
     </de.wackernagel.essbar.utils.CheckableFrameLayout>

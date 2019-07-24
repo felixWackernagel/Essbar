@@ -32,6 +32,8 @@
     <string name="action_calendar_week">Kalenderwoche wechseln</string>
     <string name="calendar_week_section">Kalenderwoche</string>
 
+    <string name="date_today">Heute</string>
+    <string name="date_yesterday">Gestern</string>
     <array name="weekdays">
         <item>Montag</item>
         <item>Dienstag</item>
@@ -39,4 +41,7 @@
         <item>Donnerstag</item>
         <item>Freitag</item>
     </array>
+    <string name="date_day_of_week">EEEE</string>
+    <string name="date_past">E, dd. MMMM</string>
+    <string name="date_past_year">E, dd. MMMM yyyy</string>
 </resources>

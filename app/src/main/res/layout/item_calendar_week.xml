@@ -7,6 +7,9 @@
         <variable
             name="item"
             type="de.wackernagel.essbar.ui.pojos.CalendarWeek"/>
+        <variable
+            name="viewModel"
+            type="de.wackernagel.essbar.ui.viewModels.MenuViewModel"/>
     </data>
 
     <de.wackernagel.essbar.utils.CheckableFrameLayout

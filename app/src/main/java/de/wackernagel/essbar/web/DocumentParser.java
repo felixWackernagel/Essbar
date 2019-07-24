@@ -39,8 +39,8 @@ public class DocumentParser {
         return null;
     }
 
-    public static List<Listable> getMenuList(@Nullable final Document document ) {
-        final List<Listable> menus = new ArrayList<>();
+    public static List<Menu> getMenuList(@Nullable final Document document ) {
+        final List<Menu> menus = new ArrayList<>();
         if( document != null ) {
             final Elements rows = document.select("site > content > form > table > tbody > tr" );
             for( int row = 1; row < rows.size(); row++ ) {

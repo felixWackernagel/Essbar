@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
 
         final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
         viewModel.getCustomersCount().observe( this, (count) -> binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 ));
-        viewModel.getHome().observe(this, ready -> Log.e("LoginActivity", "login ready? " + ready ));
+        viewModel.isWebsiteReady().observe(this, ready -> Log.e("LoginActivity", "login ready? " + ready ));
 
         getLifecycle().addObserver( connectivityLifecycleObserver );
         connectivityLifecycleObserver.getConnectedStatus().observe( this, this::showOfflineState );

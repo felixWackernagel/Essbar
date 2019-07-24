@@ -89,7 +89,7 @@ public class LoginViewModel extends ViewModel {
         return repository.getCustomersCount();
     }
 
-    public LiveData<Boolean> getHome() {
+    public LiveData<Boolean> isWebsiteReady() {
         return loginFormReady;
     }
 

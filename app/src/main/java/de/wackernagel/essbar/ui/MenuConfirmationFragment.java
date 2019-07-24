@@ -104,7 +104,7 @@ public class MenuConfirmationFragment extends DialogFragment {
             public CharSequence getSectionHeader( int position ) {
                 final int itemPosition = Math.max( 0, position );
                 final ChangedMenu item = adapter.getListItem( itemPosition );
-                return item.getWeekday().name();
+                return getResources().getStringArray( R.array.weekdays )[ item.getWeekday().getNumber() ];
             }
         }) );
         viewModel.getChangedMenusToConfirm().observe( getViewLifecycleOwner(), adapter::submitList );

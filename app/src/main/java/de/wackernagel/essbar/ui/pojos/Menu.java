@@ -9,10 +9,12 @@ import androidx.databinding.ObservableBoolean;
 import org.jsoup.nodes.Element;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
 import de.wackernagel.essbar.ui.lists.Listable;
+import de.wackernagel.essbar.utils.DateUtils;
 
 public class Menu implements Listable {
     private long id;
@@ -25,6 +27,7 @@ public class Menu implements Listable {
     private String inputName;
     private String inputValue;
     private String price;
+    private Date day;
 
     private boolean actualOrdered;
     private ObservableBoolean changed;
@@ -38,9 +41,10 @@ public class Menu implements Listable {
             inputValue = element.select( "input" ).get( 0 ).attr( "value" );
         }
         price = element.siblingElements().select( ".mealtitel > price" ).text();
+        day = DateUtils.parseDate( element.attr( "day" ) );
         weekday = calculateWeekday( element.attr( "day" ) );
         typ = calculateType( element.classNames(), menuName );
-        id = typ.getNumber() + ( weekday.getNumber() * 4 );
+        id = typ.getNumber() + ( 5 * weekday.getNumber() );
 
         // TODO
         paused = false;
@@ -58,7 +62,7 @@ public class Menu implements Listable {
         }
 
         if( TextUtils.isEmpty( menuName ) ) {
-            return Type.UNKNOWN;
+            return Type.SECTION;
         }
 
         final String firstLetter = String.valueOf( menuName.charAt( 0 ) );
@@ -69,7 +73,7 @@ public class Menu implements Listable {
         } else if( "V".equalsIgnoreCase( firstLetter ) ) {
             return Type.SNACK;
         }
-        return Type.UNKNOWN;
+        return Type.SECTION;
     }
 
     /**
@@ -130,6 +134,10 @@ public class Menu implements Listable {
         return typ;
     }
 
+    public Date getDay() {
+        return day;
+    }
+
     @Nullable
     public String getInputName() {
         return inputName;
@@ -168,6 +176,7 @@ public class Menu implements Listable {
                 ", actuelOrdered=" + actualOrdered +
                 ", weekday=" + weekday +
                 ", typ=" + typ +
+                ", day=" + day +
                 ", paused=" + paused +
                 ", inputName='" + inputName + '\'' +
                 ", inputValue='" + inputValue + '\'' +
@@ -188,6 +197,7 @@ public class Menu implements Listable {
                 Objects.equals(menuName, menu.menuName) &&
                 weekday == menu.weekday &&
                 typ == menu.typ &&
+                Objects.equals(day, menu.day) &&
                 Objects.equals(inputName, menu.inputName) &&
                 Objects.equals(inputValue, menu.inputValue) &&
                 Objects.equals(price, menu.price);
@@ -195,6 +205,6 @@ public class Menu implements Listable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuName, editable, ordered, actualOrdered, weekday, typ, paused, inputName, inputValue, price);
+        return Objects.hash(id, menuName, editable, ordered, actualOrdered, weekday, typ, day, paused, inputName, inputValue, price);
     }
 }

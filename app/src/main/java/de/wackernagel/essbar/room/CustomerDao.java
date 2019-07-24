@@ -17,7 +17,7 @@ public interface CustomerDao {
     @Query( "SELECT * FROM customers ORDER BY name" )
     LiveData<List<Customer>> queryAllCustomers();
 
-    @Query( "SELECT COUNT(id) FROM customers" )
+    @Query( "SELECT COUNT(id) FROM customers LIMIT 1" )
     LiveData<Integer> customersCount();
 
 }

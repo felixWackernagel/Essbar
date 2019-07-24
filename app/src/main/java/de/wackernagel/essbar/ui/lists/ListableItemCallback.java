@@ -9,6 +9,7 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
+import de.wackernagel.essbar.ui.pojos.Section;
 
 public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallback<T> {
 
@@ -30,6 +31,9 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
         }
         if( newItem instanceof Menu && oldItem instanceof Menu ) {
             return menusSame( (Menu) oldItem, (Menu) newItem );
+        }
+        if( newItem instanceof Section && oldItem instanceof Section ) {
+            return sectionsSame( (Section) oldItem, (Section) newItem );
         }
         throw new IllegalStateException( "Incomplete implementation to compare old with new item of class '" + oldItem + "', '" + newItem + "'!" );
     }
@@ -60,6 +64,11 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
                 oldItem.isOrdered() == newItem.isOrdered() &&
                 oldItem.isActualOrdered() == newItem.isActualOrdered() &&
                 oldItem.isEditable() == newItem.isEditable();
+    }
+
+    private boolean sectionsSame( Section oldItem, Section newItem ) {
+        return oldItem.getWeekday().equals( newItem.getWeekday() ) &&
+                oldItem.getDate().equals( newItem.getDate() );
     }
 
 }

@@ -17,6 +17,7 @@ import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
+import de.wackernagel.essbar.ui.pojos.Section;
 import de.wackernagel.essbar.ui.pojos.Type;
 
 import static androidx.recyclerview.widget.RecyclerView.NO_POSITION;
@@ -70,9 +71,12 @@ public class DataBindingListAdapter<ITEM extends Listable> extends ListAdapter<I
         if( item instanceof Customer ) {
             return R.layout.item_customer;
         }
-        if( item instanceof Menu) {
+        if( item instanceof Menu ) {
             final Menu menu = (Menu) item;
             return ( menu.getTyp() == Type.LUNCH && !menu.isPaused() ) ? R.layout.item_menu_lunch : R.layout.item_menu;
+        }
+        if( item instanceof Section ) {
+            return R.layout.item_section;
         }
         throw new IllegalStateException( "Incomplete implementation to resolve viewType for class '" + item.getClass().getSimpleName() + "'!" );
     }

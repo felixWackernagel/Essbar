@@ -26,6 +26,8 @@ import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
+import de.wackernagel.essbar.ui.pojos.Section;
+import de.wackernagel.essbar.ui.pojos.Type;
 import de.wackernagel.essbar.ui.pojos.Weekday;
 import de.wackernagel.essbar.utils.DateUtils;
 import de.wackernagel.essbar.utils.Event;
@@ -89,28 +91,39 @@ public class MenuViewModel extends ViewModel {
     private LiveData<List<Listable>> getMenusList( final Resource<Document> resource) {
         final MutableLiveData<List<Listable>> result = new MutableLiveData<>();
         if( resource != null && resource.isAvailable() ) {
-            final List<Listable> menuList = DocumentParser.getMenuList( resource.getResource() );
+            final List<Menu> menuList = DocumentParser.getMenuList( resource.getResource() );
             filterEqualPausedMenus( menuList );
-            result.setValue( menuList );
+            final List<Listable> listItems = addSections( menuList );
+            result.setValue( listItems );
         } else {
             result.setValue( Collections.emptyList() );
         }
         return result;
     }
 
-    private void filterEqualPausedMenus(final List<Listable> menuList ) {
+    private List<Listable> addSections( final List<Menu> menus ) {
+        final ArrayList<Listable> result = new ArrayList<>();
+        Weekday currentWeekday = null;
+        for( Menu menu : menus ) {
+            if( menu.getWeekday() != currentWeekday ) {
+                currentWeekday = menu.getWeekday();
+                result.add( new Section( currentWeekday, Type.SECTION, menu.getDay() ) );
+            }
+            result.add( menu );
+        }
+        return result;
+    }
+
+    private void filterEqualPausedMenus(final List<Menu> menuList ) {
         if( !menuList.isEmpty() ) {
-            final Iterator<Listable> iterator = menuList.iterator();
+            final Iterator<Menu> iterator = menuList.iterator();
             Weekday toExclude = null;
             while( iterator.hasNext() ) {
-                final Listable item = iterator.next();
-                if( item instanceof Menu ) {
-                    final Menu menu = (Menu) item;
-                    if( menu.getWeekday().equals( toExclude )  ) {
-                        iterator.remove();
-                    } else if( menu.isPaused() ) {
-                        toExclude = menu.getWeekday();
-                    }
+                final Menu menu = iterator.next();
+                if( menu.getWeekday().equals( toExclude )  ) {
+                    iterator.remove();
+                } else if( menu.isPaused() ) {
+                    toExclude = menu.getWeekday();
                 }
             }
         }
@@ -207,11 +220,14 @@ public class MenuViewModel extends ViewModel {
     private List<Menu> getMenusList() {
         final List<Listable> allMenus = menus.getValue();
         final ArrayList<Menu> result = new ArrayList<>();
-        for( Listable listable : allMenus ) {
-            if( listable instanceof Menu ) {
-                result.add( (Menu) listable);
+        if( allMenus != null ) {
+            for( Listable listable : allMenus ) {
+                if( listable instanceof Menu ) {
+                    result.add( (Menu) listable);
+                }
             }
         }
+
         return result;
     }
 

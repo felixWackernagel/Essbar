@@ -72,7 +72,7 @@ public class ChangedMenu implements Listable {
 
     private Type calculateType( final String menuTitle ) {
         if( TextUtils.isEmpty( menuTitle ) ) {
-            return Type.UNKNOWN;
+            return Type.SECTION;
         }
 
         final String firstLetter = String.valueOf( menuTitle.charAt( 0 ) );
@@ -85,7 +85,7 @@ public class ChangedMenu implements Listable {
         } else if( "V".equalsIgnoreCase( firstLetter ) ) {
             return Type.SNACK;
         }
-        return Type.UNKNOWN;
+        return Type.SECTION;
     }
 
     @Override

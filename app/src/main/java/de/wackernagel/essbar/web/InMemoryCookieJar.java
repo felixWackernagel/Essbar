@@ -22,6 +22,10 @@ public class InMemoryCookieJar implements CookieJar {
         return instance;
     }
 
+    public void clear() {
+        cookieStore.clear();
+    }
+
     private InMemoryCookieJar() {
         cookieStore = new HashMap<>();
     }

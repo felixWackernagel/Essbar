@@ -76,7 +76,7 @@ public class DataBindingListAdapter<ITEM extends Listable> extends ListAdapter<I
             return ( menu.getTyp() == Type.LUNCH && !menu.isPaused() ) ? R.layout.item_menu_lunch : R.layout.item_menu;
         }
         if( item instanceof Section ) {
-            return R.layout.item_section;
+            return R.layout.item_menu_section;
         }
         throw new IllegalStateException( "Incomplete implementation to resolve viewType for class '" + item.getClass().getSimpleName() + "'!" );
     }
@@ -93,12 +93,14 @@ public class DataBindingListAdapter<ITEM extends Listable> extends ListAdapter<I
     public void onBindViewHolder(@NonNull DataBindingViewHolder<ITEM> holder, int position) {
         final ITEM data = getItem( position );
         holder.bind( data, viewModel );
-        holder.itemView.setOnClickListener( v -> {
-            final int adapterPosition = holder.getAdapterPosition();
-            if( clickListener != null && adapterPosition != NO_POSITION ) {
-                clickListener.onBindingClicked( getItem( adapterPosition ) );
-            }
-        } );
+        if( clickListener != null ) {
+            holder.itemView.setOnClickListener( v -> {
+                final int adapterPosition = holder.getAdapterPosition();
+                if( adapterPosition != NO_POSITION ) {
+                    clickListener.onBindingClicked( getItem( adapterPosition ) );
+                }
+            } );
+        }
     }
 
 }

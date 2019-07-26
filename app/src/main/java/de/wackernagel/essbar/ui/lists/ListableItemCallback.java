@@ -62,7 +62,7 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
                 TextUtils.equals( oldItem.getMenuName(), newItem.getMenuName() ) &&
                 oldItem.getTyp().equals( newItem.getTyp() ) &&
                 oldItem.isOrdered() == newItem.isOrdered() &&
-                oldItem.isActualOrdered() == newItem.isActualOrdered() &&
+                oldItem.isActualOrdered().get() == newItem.isActualOrdered().get() &&
                 oldItem.isEditable() == newItem.isEditable();
     }
 

@@ -23,8 +23,6 @@ public class LoginViewModel extends ViewModel {
 
     private final EssbarRepository repository;
 
-    private LiveData<Boolean> loginFormReady;
-
     private String username = "";
     private String password = "";
     private String customerName = null;
@@ -32,7 +30,6 @@ public class LoginViewModel extends ViewModel {
 
     LoginViewModel(EssbarRepository repository) {
         this.repository = repository;
-        this.loginFormReady = Transformations.switchMap( repository.getHomeDocument(), this::getFormData );
     }
 
     public LiveData<Resource<Document>> getLoginDocument() {
@@ -85,18 +82,20 @@ public class LoginViewModel extends ViewModel {
         return repository.getAllCustomers();
     }
 
-    public LiveData<Integer> getCustomersCount() {
+    public LiveData<Integer> getCustomerCount() {
         return repository.getCustomersCount();
     }
 
     public LiveData<Boolean> isWebsiteReady() {
-        return loginFormReady;
+        InMemoryCookieJar.get().clear();
+        return Transformations.switchMap( repository.getHomeDocument(), this::checkToken);
     }
 
-    private LiveData<Boolean> getFormData(final Resource<Document> resource ) {
+    private LiveData<Boolean> checkToken(final Resource<Document> resource ) {
         final MutableLiveData<Boolean> result = new MutableLiveData<>();
         if( resource != null && resource.isStatusOk() && resource.isAvailable() ) {
-            result.setValue( !TextUtils.isEmpty( InMemoryCookieJar.get().getCSRFToken() ) );
+            final String token = InMemoryCookieJar.get().getCSRFToken();
+            result.setValue( !TextUtils.isEmpty( token ) );
         } else {
             result.setValue( Boolean.FALSE );
         }

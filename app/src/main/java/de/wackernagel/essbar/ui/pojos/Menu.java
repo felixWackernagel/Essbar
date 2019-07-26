@@ -29,7 +29,7 @@ public class Menu implements Listable {
     private String price;
     private Date day;
 
-    private boolean actualOrdered;
+    private ObservableBoolean actualOrdered;
     private ObservableBoolean changed;
 
     public Menu(final Element element ) {
@@ -52,7 +52,7 @@ public class Menu implements Listable {
             menuName = "<Grund>";
         }
 
-        actualOrdered = ordered;
+        actualOrdered = new ObservableBoolean( ordered );
         changed = new ObservableBoolean( false );
     }
 
@@ -152,12 +152,12 @@ public class Menu implements Listable {
         return price;
     }
 
-    public boolean isActualOrdered() {
+    public ObservableBoolean isActualOrdered() {
         return actualOrdered;
     }
 
     public void setActualOrdered( final boolean actualOrdered ) {
-        this.actualOrdered = actualOrdered;
+        this.actualOrdered.set( actualOrdered );
         changed.set( actualOrdered != ordered );
     }
 
@@ -173,7 +173,7 @@ public class Menu implements Listable {
                 ", menuName='" + menuName + '\'' +
                 ", editable=" + editable +
                 ", ordered=" + ordered +
-                ", actuelOrdered=" + actualOrdered +
+                ", actuelOrdered=" + actualOrdered.get() +
                 ", weekday=" + weekday +
                 ", typ=" + typ +
                 ", day=" + day +
@@ -192,7 +192,7 @@ public class Menu implements Listable {
         return id == menu.id &&
                 editable == menu.editable &&
                 ordered == menu.ordered &&
-                actualOrdered == menu.actualOrdered &&
+                actualOrdered.get() == menu.actualOrdered.get() &&
                 paused == menu.paused &&
                 Objects.equals(menuName, menu.menuName) &&
                 weekday == menu.weekday &&
@@ -205,6 +205,6 @@ public class Menu implements Listable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, menuName, editable, ordered, actualOrdered, weekday, typ, day, paused, inputName, inputValue, price);
+        return Objects.hash(id, menuName, editable, ordered, actualOrdered.get(), weekday, typ, day, paused, inputName, inputValue, price);
     }
 }

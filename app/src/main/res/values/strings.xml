@@ -14,8 +14,9 @@
     <string name="no_secure_lock_error">Sie müssen Ihr Gerät mit einem PIN, Passwort oder Muster für diese Option sichern.</string>
     <string name="no_network_connection_error">Sie brauchen eine Internetverbindung.</string>
     <string name="decryption_canceled_error">Sie müssen sich authentifizieren damit wir Ihr Passwort entschlüsseln können.</string>
-    <string name="save_credentials">Kundendaten verschlüsselt speichern?</string>
-    <string name="profile_section">Gespeicherte Kundendaten</string>
+    <string name="save_credentials">Daten verschlüsselt speichern?</string>
+    <string name="profile_section">Kunden</string>
+    <string name="login_section">Login</string>
     <plurals name="changed_orders">
         <item quantity="one">%1$d Menü</item>
         <item quantity="other">%1$d Menüs</item>
@@ -44,4 +45,9 @@
     <string name="date_day_of_week">EEEE</string>
     <string name="date_past">E, dd. MMMM</string>
     <string name="date_past_year">E, dd. MMMM yyyy</string>
+
+    <string name="acra_dialog_title">Essbar Fehler</string>
+    <string name="acra_dialog_text">Leider ist ein Fehler aufgetreten. Möchten Sie einen Bericht zur Analyse per E-Mail verschicken?</string>
+    <string name="acra_dialog_positiv">senden</string>
+    <string name="acra_dialog_negativ">abbrechen</string>
 </resources>

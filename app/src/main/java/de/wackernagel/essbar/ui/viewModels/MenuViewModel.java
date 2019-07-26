@@ -241,7 +241,7 @@ public class MenuViewModel extends ViewModel {
                 if( TextUtils.isEmpty( menu.getInputName() ) || TextUtils.isEmpty( menu.getInputValue() ) ) {
                     continue;
                 }
-                if( menu.isActualOrdered() ) {
+                if( menu.isActualOrdered().get() ) {
                     formFields.put( menu.getInputName(), menu.getInputValue() );
                 }
             }
@@ -262,8 +262,6 @@ public class MenuViewModel extends ViewModel {
         confirmedMenus.setValue( new ConfirmedMenusForm( formFields ) );
     }
 
-    /* ***************************************** */
-
     public void changeOrder(CompoundButton buttonView, boolean isOrdered) {
         // Check if change was by button press or setter based.
         if( buttonView.isPressed() ) {
@@ -278,6 +276,15 @@ public class MenuViewModel extends ViewModel {
             incrementNumberOfChangedOrders();
         } else {
             decrementNumberOfChangedOrders();
+        }
+    }
+
+    public void onMenuSectionClicked( final Section section ) {
+        for( Menu menu : getMenusList() ) {
+            if( menu.getWeekday() == section.getWeekday() && menu.isEditable() ) {
+                menu.setActualOrdered( false );
+                updateNumberOfChangedMenus( menu, false );
+            }
         }
     }
 }

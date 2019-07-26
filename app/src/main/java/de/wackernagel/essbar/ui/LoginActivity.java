@@ -23,7 +23,6 @@ import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.ActivityLoginBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
 import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
-import de.wackernagel.essbar.utils.ViewUtils;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -40,6 +39,7 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
     ConnectivityLifecycleObserver connectivityLifecycleObserver;
 
     private ActivityLoginBinding binding;
+    private LoginViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,23 +49,32 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
 
         final KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
 
-        final int spaceInPixel = ViewUtils.dpToPx( 16, this );
         binding.viewPager.setAdapter( new LoginPagerAdapter( getSupportFragmentManager(), keyguardManager.isDeviceSecure() ? 2 : 1 ) );
-        binding.viewPager.setPageMargin( spaceInPixel );
-        binding.viewPager.setPadding( spaceInPixel, 0 , spaceInPixel, 0 );
-        binding.viewPager.setClipToPadding( false );
 
-        final LoginViewModel viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
-        viewModel.getCustomersCount().observe( this, (count) -> binding.viewPager.setCurrentItem( count > 0 ? 1 : 0 ));
-        viewModel.isWebsiteReady().observe(this, ready -> Log.e("LoginActivity", "login ready? " + ready ));
+        viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
+        viewModel.getCustomerCount().observe( this, (customerCount) -> binding.viewPager.setCurrentItem( customerCount > 0 ? 1 : 0 ));
 
         getLifecycle().addObserver( connectivityLifecycleObserver );
         connectivityLifecycleObserver.getConnectedStatus().observe( this, this::showOfflineState );
     }
 
     private void showOfflineState( boolean hasInternet ) {
-        binding.offlineContainer.setVisibility( hasInternet ? GONE : VISIBLE );
-        binding.onlineContainer.setVisibility( hasInternet ? VISIBLE : GONE );
+        if( hasInternet ) {
+            showLoadingState();
+        } else {
+            binding.offlineContainer.setVisibility( VISIBLE );
+            binding.onlineContainer.setVisibility( GONE );
+        }
+    }
+
+    private void showLoadingState() {
+        binding.loadingContainer.setVisibility( VISIBLE );
+        binding.onlineContainer.setVisibility( GONE );
+
+        viewModel.isWebsiteReady().observe(this, ready -> {
+            binding.loadingContainer.setVisibility( ready ? GONE : VISIBLE );
+            binding.onlineContainer.setVisibility( ready ? VISIBLE : GONE );
+        });
     }
 
     @Override

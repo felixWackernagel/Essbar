@@ -17,24 +17,24 @@ import retrofit2.http.Path;
 
 public interface WebService {
 
-    @GET( "/content/" )
+    @GET( EssbarConstants.Urls.HOME_PATH )
     LiveData<Resource<Document>> getHomePage();
 
     @Headers("Referer: " + EssbarConstants.Urls.HOME )
     @FormUrlEncoded
-    @POST( "/accounts/login/" )
+    @POST( EssbarConstants.Urls.LOGIN_PATH )
     LiveData<Resource<Document>> postLoginData( @FieldMap Map<String, String> fields );
 
-    @GET( "/menu/0/{start}/{end}/" )
+    @GET( "menu/0/{start}/{end}/" )
     LiveData<Resource<Document>> getCalendarWeekMenusPage(@Path("start") String start, @Path("end") String end );
 
     @FormUrlEncoded
-    @POST( "/menu/0/{start}/{end}/" )
+    @POST( "menu/0/{start}/{end}/" )
     LiveData<Resource<Document>> postChangedMenusData(@Header( "Referer" ) String referer, @Path("start") String start, @Path("end") String end, @FieldMap Map<String, String> fields );
 
     @Headers("Referer: " + EssbarConstants.Urls.ORDER_CONFIRMATION )
     @FormUrlEncoded
-    @POST( "/orders/confirmation/" )
+    @POST( EssbarConstants.Urls.ORDER_CONFIRMATION_PATH )
     LiveData<Resource<Document>> postChangedAndConfirmedMenusData( @FieldMap Map<String, String> fields );
 
 }

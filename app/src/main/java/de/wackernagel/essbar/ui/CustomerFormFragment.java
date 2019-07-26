@@ -60,7 +60,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
 
         final KeyguardManager keyguardManager = (KeyguardManager) requireContext().getSystemService(Context.KEYGUARD_SERVICE );
         if( !keyguardManager.isDeviceSecure() ) {
-            binding.saveCredentials.setVisibility( View.GONE );
+            binding.saveCredentialsContainer.setVisibility( View.GONE );
         }
 
         binding.usernameField.setText( viewModel.getUsername() );

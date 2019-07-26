@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="item"
+            type="de.wackernagel.essbar.ui.pojos.Section"/>
+        <variable
+            name="viewModel"
+            type="de.wackernagel.essbar.ui.viewModels.MenuViewModel"/>
+    </data>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/section_height"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:text="@{item.getTitle(context)}"
+        android:onClick="@{(view) -> viewModel.onMenuSectionClicked( item )}"
+        android:clickable="@{item.editable}"
+        android:foreground="?attr/selectableItemBackground"
+        tools:text="5 Items"
+        style="@style/ListItemSection"/>
+</layout>

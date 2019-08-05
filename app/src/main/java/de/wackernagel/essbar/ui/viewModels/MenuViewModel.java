@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
@@ -44,13 +42,11 @@ public class MenuViewModel extends ViewModel {
 
     private final MutableLiveData<String> calendarWeek;
 
-    private final LiveData<Resource<Document>> menusDocument;
     private final LiveData<List<Listable>> menus;
     private final LiveData<List<CalendarWeek>> calendarWeeks;
     private final MutableLiveData<Integer> numberOfChangedOrders;
 
     private final MutableLiveData<ChangedMenusForm> menusToChange;
-    private final LiveData<Resource<Document>> menuConfirmationDocument;
     private final LiveData<List<ChangedMenu>> changedMenusToConfirm;
 
     private final MutableLiveData<ConfirmedMenusForm> confirmedMenus;
@@ -63,13 +59,13 @@ public class MenuViewModel extends ViewModel {
         calendarWeek = new MutableLiveData<>();
         numberOfChangedOrders = new MutableLiveData<>();
         numberOfChangedOrders.setValue( 0 );
-        menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
+        final LiveData<Resource<Document>> menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
         menus = Transformations.switchMap(menusDocument, this::getMenusList );
         calendarWeeks = Transformations.switchMap(menusDocument, this::getCalendarWeekList);
 
         // menus > order confirmation
         menusToChange = new MutableLiveData<>();
-        menuConfirmationDocument = Transformations.switchMap( menusToChange, repository::getMenuConfirmationDocument );
+        final LiveData<Resource<Document>> menuConfirmationDocument = Transformations.switchMap( menusToChange, repository::getMenuConfirmationDocument );
         changedMenusToConfirm = Transformations.switchMap( menuConfirmationDocument, this::getChangedMenuList );
 
         // order confirmation > thank you
@@ -271,7 +267,7 @@ public class MenuViewModel extends ViewModel {
         }
     }
 
-    private void updateNumberOfChangedMenus(@Nonnull final Menu menu, final boolean isOrdered ) {
+    private void updateNumberOfChangedMenus(@NonNull final Menu menu, final boolean isOrdered ) {
         if( menu.isOrdered() != isOrdered ) {
             incrementNumberOfChangedOrders();
         } else {

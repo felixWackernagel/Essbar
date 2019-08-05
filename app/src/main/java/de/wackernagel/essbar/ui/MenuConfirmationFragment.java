@@ -1,17 +1,18 @@
 package de.wackernagel.essbar.ui;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
@@ -39,20 +40,25 @@ public class MenuConfirmationFragment extends DialogFragment {
     private MenuViewModel viewModel;
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        AndroidSupportInjection.inject(this );
+        super.onAttach(context);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
     }
 
     @Override
-    public View onCreateView( @Nonnull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         binding = FragmentMenuConfirmationBinding.inflate( inflater, container, false );
         return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this );
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );

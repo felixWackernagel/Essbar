@@ -1,15 +1,13 @@
 package de.wackernagel.essbar.room;
 
-import java.util.Objects;
-
-import javax.annotation.Nonnull;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+
+import java.util.Objects;
 
 import de.wackernagel.essbar.ui.lists.Listable;
 
@@ -93,7 +91,7 @@ public class Customer implements Listable {
     }
 
     @Override
-    @Nonnull
+    @NonNull
     public String toString() {
         return "Customer{" +
                 "id=" + id +

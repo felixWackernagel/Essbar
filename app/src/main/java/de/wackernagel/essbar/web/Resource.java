@@ -1,8 +1,7 @@
 package de.wackernagel.essbar.web;
 
-import javax.annotation.Nullable;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class Resource<T> {
     private int statusCode;

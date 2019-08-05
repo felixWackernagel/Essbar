@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.EssbarConstants;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentCustomerFormBinding;
@@ -54,7 +53,6 @@ public class CustomerFormFragment extends AbstractLoginFragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this );
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 

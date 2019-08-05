@@ -3,10 +3,8 @@ package de.wackernagel.essbar.ui;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -15,10 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
-import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.support.DaggerAppCompatActivity;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.ActivityLoginBinding;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
@@ -27,13 +22,10 @@ import de.wackernagel.essbar.utils.ConnectivityLifecycleObserver;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class LoginActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+public class LoginActivity extends DaggerAppCompatActivity {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-
-    @Inject
-    DispatchingAndroidInjector<Fragment> fragmentDispatchingAndroidInjector;
 
     @Inject
     ConnectivityLifecycleObserver connectivityLifecycleObserver;
@@ -43,7 +35,6 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView( this, R.layout.activity_login );
 
@@ -75,11 +66,6 @@ public class LoginActivity extends AppCompatActivity implements HasSupportFragme
             binding.loadingContainer.setVisibility( ready ? GONE : VISIBLE );
             binding.onlineContainer.setVisibility( ready ? VISIBLE : GONE );
         });
-    }
-
-    @Override
-    public AndroidInjector<Fragment> supportFragmentInjector() {
-        return fragmentDispatchingAndroidInjector;
     }
 
     static class LoginPagerAdapter extends FragmentPagerAdapter {

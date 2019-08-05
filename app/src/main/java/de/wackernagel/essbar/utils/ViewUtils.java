@@ -5,13 +5,12 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.widget.EditText;
 
-import com.google.android.material.textfield.TextInputLayout;
-
-import javax.annotation.Nonnull;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Consumer;
 import androidx.core.util.Supplier;
+
+import com.google.android.material.textfield.TextInputLayout;
 
 public final class ViewUtils {
 
@@ -59,11 +58,11 @@ public final class ViewUtils {
         return false;
     }
 
-    public static int spToPx( float sp, @Nonnull final Context context ) {
+    public static int spToPx( float sp, @NonNull final Context context ) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, context.getResources().getDisplayMetrics());
     }
 
-    public static int dpToPx( float dp, @Nonnull final Context context) {
+    public static int dpToPx( float dp, @NonNull final Context context) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 }

@@ -8,13 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import dagger.android.support.AndroidSupportInjection;
+
+import javax.inject.Inject;
+
 import de.wackernagel.essbar.EssbarConstants;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentCustomerListBinding;
@@ -52,7 +52,6 @@ public class CustomersListFragment extends AbstractLoginFragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this );
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 

@@ -9,12 +9,15 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.material.snackbar.Snackbar;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 
 public class AbstractLoginFragment extends Fragment {
@@ -22,6 +25,12 @@ public class AbstractLoginFragment extends Fragment {
     static final String KEYSTORE_ALIAS = "Essbar";
 
     private KeyguardManager keyguardManager;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        AndroidSupportInjection.inject(this );
+        super.onAttach(context);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

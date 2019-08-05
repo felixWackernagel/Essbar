@@ -45,7 +45,6 @@ class ToolbarFragment extends Fragment {
         if( activity != null )
             return activity.startSupportActionMode( callback );
         return null;
-
     }
 
 }

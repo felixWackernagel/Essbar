@@ -6,12 +6,12 @@ import de.wackernagel.essbar.ui.LoginActivity;
 import de.wackernagel.essbar.ui.MenuActivity;
 
 @Module
-public abstract class ActivityModule {
+abstract class ActivityModule {
 
-    @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
-    abstract MenuActivity contributeMainActivityInjector();
+    @ContributesAndroidInjector( modules = MenuFragmentModule.class )
+    abstract MenuActivity contributeMenuActivityInjector();
 
-    @ContributesAndroidInjector(modules = FragmentBuildersModule.class)
+    @ContributesAndroidInjector( modules = LoginFragmentModule.class )
     abstract LoginActivity contributeLoginActivityInjector();
 
 }

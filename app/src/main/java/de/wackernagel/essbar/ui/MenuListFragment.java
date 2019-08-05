@@ -1,5 +1,6 @@
 package de.wackernagel.essbar.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -46,6 +47,12 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
     private TextView calendarWeekNumberView;
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        AndroidSupportInjection.inject(this );
+        super.onAttach(context);
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -60,7 +67,6 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this );
         super.onActivityCreated(savedInstanceState);
 
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );

@@ -68,6 +68,10 @@ public class LoginViewModel extends ViewModel {
         repository.insertCustomer( new Customer( username, encryptionIV, encryptedPassword, customerName ) );
     }
 
+    public void deleteCustomer( final Customer customer ) {
+        repository.deleteCustomer( customer );
+    }
+
     /**
      * Searches the username inside the document and
      * save it inside the LoginViewModel.

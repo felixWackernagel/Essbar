@@ -44,6 +44,7 @@ public class MenuViewModel extends ViewModel {
 
     private final LiveData<List<Listable>> menus;
     private final LiveData<List<CalendarWeek>> calendarWeeks;
+    private int changedOrders;
     private final MutableLiveData<Integer> numberOfChangedOrders;
 
     private final MutableLiveData<ChangedMenusForm> menusToChange;
@@ -57,8 +58,9 @@ public class MenuViewModel extends ViewModel {
 
         // menus
         calendarWeek = new MutableLiveData<>();
+        changedOrders = 0;
         numberOfChangedOrders = new MutableLiveData<>();
-        numberOfChangedOrders.setValue( 0 );
+        numberOfChangedOrders.setValue( changedOrders );
         final LiveData<Resource<Document>> menusDocument = Transformations.switchMap(calendarWeek, this::getMenuDocument );
         menus = Transformations.switchMap(menusDocument, this::getMenusList );
         calendarWeeks = Transformations.switchMap(menusDocument, this::getCalendarWeekList);
@@ -199,16 +201,19 @@ public class MenuViewModel extends ViewModel {
     }
 
     private void incrementNumberOfChangedOrders() {
-        numberOfChangedOrders.setValue( numberOfChangedOrders.getValue() + 1 );
+        changedOrders++;
+        numberOfChangedOrders.setValue( changedOrders );
     }
 
     private void decrementNumberOfChangedOrders() {
-        numberOfChangedOrders.setValue( numberOfChangedOrders.getValue() - 1 );
+        changedOrders--;
+        numberOfChangedOrders.setValue( changedOrders );
     }
 
     public void resetChangedOrders() {
-        if( numberOfChangedOrders.getValue() > 0 ) {
-            numberOfChangedOrders.setValue( 0 );
+        if( changedOrders > 0 ) {
+            changedOrders = 0;
+            numberOfChangedOrders.setValue( changedOrders );
             loadCalendarWeek( calendarWeek.getValue() );
         }
     }

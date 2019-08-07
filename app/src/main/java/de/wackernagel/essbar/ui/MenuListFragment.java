@@ -1,6 +1,5 @@
 package de.wackernagel.essbar.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -20,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 import de.wackernagel.essbar.databinding.FragmentMenuListBinding;
 import de.wackernagel.essbar.ui.lists.DataBindingListAdapter;
@@ -28,7 +26,7 @@ import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.DateUtils;
 
-public class MenuListFragment extends ToolbarFragment implements ActionMode.Callback {
+public class MenuListFragment extends EssbarFragment implements ActionMode.Callback {
 
     static MenuListFragment newInstance() {
         final MenuListFragment fragment = new MenuListFragment();
@@ -45,12 +43,6 @@ public class MenuListFragment extends ToolbarFragment implements ActionMode.Call
     private int statusBarColor;
 
     private TextView calendarWeekNumberView;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        AndroidSupportInjection.inject(this );
-        super.onAttach(context);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

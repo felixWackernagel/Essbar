@@ -51,6 +51,10 @@ public class EssbarRepository {
         executors.diskIO().execute( () -> customerDao.insertCustomer( customer ) );
     }
 
+    public void deleteCustomer( final Customer customer ) {
+        executors.diskIO().execute( () -> customerDao.deleteCustomer( customer ) );
+    }
+
     public LiveData<Integer> getCustomersCount() {
         return customerDao.customersCount();
     }

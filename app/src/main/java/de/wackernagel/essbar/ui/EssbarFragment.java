@@ -10,13 +10,20 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
-class ToolbarFragment extends Fragment {
+import dagger.android.support.AndroidSupportInjection;
+
+class EssbarFragment extends Fragment {
 
     @Override
     public void onAttach( @NonNull Context context) {
+        // Host check
         if( !( context instanceof AppCompatActivity) ) {
-            throw new IllegalStateException( "A ToolbarFragment can only be attached to a AppCompatActivity." );
+            throw new IllegalStateException( "A EssbarFragment can only be attached to a AppCompatActivity." );
         }
+
+        // DI
+        AndroidSupportInjection.inject(this );
+
         super.onAttach(context);
     }
 

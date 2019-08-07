@@ -37,9 +37,8 @@ public class CustomersListFragment extends AbstractLoginFragment {
     ViewModelProvider.Factory viewModelFactory;
 
     static CustomersListFragment newInstance() {
-        final Bundle args = new Bundle();
         final CustomersListFragment fragment = new CustomersListFragment();
-        fragment.setArguments(args);
+        fragment.setArguments( Bundle.EMPTY );
         return fragment;
     }
 
@@ -55,12 +54,11 @@ public class CustomersListFragment extends AbstractLoginFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
-        final DataBindingListAdapter<Customer> adapter = new DataBindingListAdapter<>();
+        final DataBindingListAdapter<Customer> adapter = new DataBindingListAdapter<>( viewModel );
         adapter.setClickListener(customer -> {
             viewModel.setCustomer( customer );
             doDecryption();
         });
-
         binding.recyclerView.setLayoutManager( new LinearLayoutManager( requireContext() ));
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
@@ -117,7 +115,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
             Log.i(TAG, resource.toString() );
             if( resource.isStatusOk() && resource.isAvailable() ) {
                 if( !EssbarConstants.Urls.LOGIN.equals( resource.getUrl() ) && DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
-                    startMainActivity();
+                    startMenuActivity();
                 } else {
                     showError( getString( R.string.username_password_error) );
                 }

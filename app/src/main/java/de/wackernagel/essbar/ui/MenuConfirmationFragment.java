@@ -1,6 +1,5 @@
 package de.wackernagel.essbar.ui;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -23,7 +21,7 @@ import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 import de.wackernagel.essbar.utils.SectionItemDecoration;
 
-public class MenuConfirmationFragment extends DialogFragment {
+public class MenuConfirmationFragment extends FullscreenDialogFragment {
 
     static String TAG = "MenuConfirmationFragment";
 
@@ -43,12 +41,6 @@ public class MenuConfirmationFragment extends DialogFragment {
     public void onAttach(@NonNull Context context) {
         AndroidSupportInjection.inject(this );
         super.onAttach(context);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogTheme);
     }
 
     @Override
@@ -114,18 +106,5 @@ public class MenuConfirmationFragment extends DialogFragment {
             }
         }) );
         viewModel.getChangedMenusToConfirm().observe( getViewLifecycleOwner(), adapter::submitList );
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        applyFullscreenLayout();
-    }
-
-    private void applyFullscreenLayout() {
-        final Dialog dialog = getDialog();
-        if( dialog != null && dialog.getWindow() != null ) {
-            dialog.getWindow().setLayout( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT );
-        }
     }
 }

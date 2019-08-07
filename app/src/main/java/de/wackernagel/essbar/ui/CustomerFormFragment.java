@@ -38,9 +38,8 @@ public class CustomerFormFragment extends AbstractLoginFragment {
     ViewModelProvider.Factory viewModelFactory;
 
     static CustomerFormFragment newInstance() {
-        final Bundle args = new Bundle();
         final CustomerFormFragment fragment = new CustomerFormFragment();
-        fragment.setArguments(args);
+        fragment.setArguments( Bundle.EMPTY );
         return fragment;
     }
 
@@ -56,7 +55,6 @@ public class CustomerFormFragment extends AbstractLoginFragment {
         super.onActivityCreated(savedInstanceState);
         viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
-        final KeyguardManager keyguardManager = (KeyguardManager) requireContext().getSystemService(Context.KEYGUARD_SERVICE );
         if( !keyguardManager.isDeviceSecure() ) {
             binding.saveCredentialsContainer.setVisibility( View.GONE );
         }
@@ -84,7 +82,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
                         viewModel.findCustomerName(resource.getResource());
                         doEncryption();
                     } else {
-                        startMainActivity();
+                        startMenuActivity();
                     }
                 } else {
                     showError( getString( R.string.username_password_error) );
@@ -103,7 +101,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
             @Override
             public void onEncryptionSuccess(String encryptedPassword, String encryptionIV) {
                 viewModel.insertCustomer( encryptedPassword, encryptionIV );
-                startMainActivity();
+                startMenuActivity();
             }
 
             @Override
@@ -130,7 +128,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if( requestCode == REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION ) {
             if( resultCode == Activity.RESULT_CANCELED ) {
-                startMainActivity();
+                startMenuActivity();
             } else if( resultCode == Activity.RESULT_OK ) {
                 doEncryption();
             }

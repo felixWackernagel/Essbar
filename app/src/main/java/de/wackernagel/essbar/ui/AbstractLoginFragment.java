@@ -20,17 +20,11 @@ import com.google.android.material.snackbar.Snackbar;
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 
-public class AbstractLoginFragment extends Fragment {
+public class AbstractLoginFragment extends EssbarFragment {
 
     static final String KEYSTORE_ALIAS = "Essbar";
 
-    private KeyguardManager keyguardManager;
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        AndroidSupportInjection.inject(this );
-        super.onAttach(context);
-    }
+    KeyguardManager keyguardManager;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -45,7 +39,7 @@ public class AbstractLoginFragment extends Fragment {
         }
     }
 
-    void startMainActivity() {
+    void startMenuActivity() {
         final Intent intent = new Intent( requireContext(), MenuActivity.class );
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity( intent );

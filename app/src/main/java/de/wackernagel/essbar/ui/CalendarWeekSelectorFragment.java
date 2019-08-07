@@ -23,9 +23,8 @@ import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment implements DataBindingClickListener<CalendarWeek> {
 
     static CalendarWeekSelectorFragment newInstance() {
-        final Bundle args = new Bundle();
         final CalendarWeekSelectorFragment fragment = new CalendarWeekSelectorFragment();
-        fragment.setArguments(args);
+        fragment.setArguments( Bundle.EMPTY );
         return fragment;
     }
 

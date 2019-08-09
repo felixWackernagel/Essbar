@@ -19,7 +19,7 @@ public interface CustomerDao {
     LiveData<List<Customer>> queryAllCustomers();
 
     @Query( "SELECT COUNT(id) FROM customers LIMIT 1" )
-    LiveData<Integer> customersCount();
+    LiveData<Integer> hasCustomers();
 
     @Delete
     void deleteCustomer( Customer customer );

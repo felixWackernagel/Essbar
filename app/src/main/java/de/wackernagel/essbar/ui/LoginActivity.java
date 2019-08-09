@@ -37,13 +37,23 @@ public class LoginActivity extends DaggerAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView( this, R.layout.activity_login );
+        viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
+
+        final LoginPagerAdapter adapter = new LoginPagerAdapter( getSupportFragmentManager() );
+        binding.viewPager.setAdapter( adapter );
 
         final KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE );
-
-        binding.viewPager.setAdapter( new LoginPagerAdapter( getSupportFragmentManager(), keyguardManager.isDeviceSecure() ? 2 : 1 ) );
-
-        viewModel = new ViewModelProvider( this, viewModelFactory).get( LoginViewModel.class );
-        viewModel.getCustomerCount().observe( this, (customerCount) -> binding.viewPager.setCurrentItem( customerCount > 0 ? 1 : 0 ));
+        if( keyguardManager.isDeviceSecure() ) {
+            viewModel.hasCustomers().observe( this, (hasCustomers) -> {
+                if( hasCustomers ) {
+                    adapter.setCount( 2 );
+                    binding.viewPager.setCurrentItem( 1 );
+                } else {
+                    adapter.setCount( 1 );
+                    binding.viewPager.setCurrentItem( 0 );
+                }
+            });
+        }
 
         getLifecycle().addObserver( connectivityLifecycleObserver );
         connectivityLifecycleObserver.getConnectedStatus().observe( this, this::showOfflineState );
@@ -69,11 +79,10 @@ public class LoginActivity extends DaggerAppCompatActivity {
     }
 
     static class LoginPagerAdapter extends FragmentPagerAdapter {
-        private final int count;
+        private int count = 1;
 
-        LoginPagerAdapter(@NonNull FragmentManager fm, final int count ) {
+        LoginPagerAdapter(@NonNull FragmentManager fm ) {
             super(fm);
-            this.count = count;
         }
 
         @NonNull
@@ -88,6 +97,11 @@ public class LoginActivity extends DaggerAppCompatActivity {
         @Override
         public int getCount() {
             return count;
+        }
+
+        void setCount( final int count ) {
+            this.count = Math.max( count, 1 );
+            notifyDataSetChanged();
         }
     }
 }

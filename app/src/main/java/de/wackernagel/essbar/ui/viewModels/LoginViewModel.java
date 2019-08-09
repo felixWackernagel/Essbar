@@ -86,8 +86,8 @@ public class LoginViewModel extends ViewModel {
         return repository.getAllCustomers();
     }
 
-    public LiveData<Integer> getCustomerCount() {
-        return repository.getCustomersCount();
+    public LiveData<Boolean> hasCustomers() {
+        return Transformations.map( repository.hasCustomers(), (hasCustomers) -> hasCustomers > 0 ? Boolean.TRUE : Boolean.FALSE);
     }
 
     public LiveData<Boolean> isWebsiteReady() {

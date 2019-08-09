@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -16,6 +17,19 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:foreground="?attr/selectableItemBackground">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:srcCompat="@drawable/ic_delete_black_24dp"
+            android:scaleType="center"
+            android:tint="@color/icon"
+            android:contentDescription="@null"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="0dp"
+            android:onClick="@{(view) -> viewModel.deleteCustomer( item )}"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageView
             android:id="@+id/avatarImageView"
@@ -35,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginStart="72dp"
-            android:layout_marginEnd="56dp"
+            android:layout_marginEnd="52dp"
             android:textSize="16sp"
             android:textColor="@color/textColorPrimary"
             android:fontFamily="@string/roboto_regular"
@@ -48,24 +62,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:layout_marginStart="72dp"
-            android:layout_marginEnd="56dp"
+            android:layout_marginEnd="52dp"
             android:textSize="14sp"
             android:textColor="@color/textSecondary"
             android:fontFamily="@string/roboto_regular"
             android:text="@{item.number}"
             tools:text="270145" />
-
-        <ImageButton
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_delete_black_24dp"
-            android:tint="@color/icon"
-            android:contentDescription="@null"
-            android:layout_gravity="center_vertical|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginStart="0dp"
-            android:onClick="@{(view) -> viewModel.deleteCustomer( item )}"
-            style="@style/Widget.AppCompat.Button.Borderless"/>
 
     </FrameLayout>
 </layout>

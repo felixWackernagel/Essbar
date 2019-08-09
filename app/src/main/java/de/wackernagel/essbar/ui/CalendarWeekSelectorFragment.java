@@ -5,14 +5,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import javax.inject.Inject;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import javax.inject.Inject;
+
 import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.databinding.FragmentCalendarWeekSelectorBinding;
 import de.wackernagel.essbar.ui.lists.DataBindingClickListener;
@@ -30,9 +31,7 @@ public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment impl
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-
     private MenuViewModel viewModel;
-
     private FragmentCalendarWeekSelectorBinding binding;
 
     @Nullable

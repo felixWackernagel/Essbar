@@ -33,9 +33,12 @@ public class Menu implements Listable {
     private ObservableBoolean changed;
 
     public Menu(final Element element ) {
-        menuName = element.select("meal > mealtxt").text().replaceAll("\\(.*?\\) ?", ""); // remove braces
+        final Element nameElement = element.selectFirst("meal > mealtxt");
+        nameElement.select( "sup" ).remove();
+        menuName = nameElement.text();
         editable = element.select( "input" ).size() == 1;
-        ordered = element.select( ".ordered-label" ).size() == 1 || element.select( "input[checked]" ).size() == 1 || element.classNames().contains("in-order");
+        paused = element.classNames().contains( "delivery-break" );
+        ordered = element.select( ".ordered-label" ).size() == 1 || element.select( "input[checked]" ).size() == 1 || (element.classNames().contains("in-order") && !paused );
         if( editable ) {
             inputName = element.select( "input" ).get( 0 ).attr( "name" );
             inputValue = element.select( "input" ).get( 0 ).attr( "value" );
@@ -46,10 +49,9 @@ public class Menu implements Listable {
         typ = calculateType( element.classNames(), menuName );
         id = typ.getNumber() + ( 5 * weekday.getNumber() );
 
-        // TODO
-        paused = false;
+        // TODO check holiday name
         if( paused ) {
-            menuName = "<Grund>";
+            menuName = "Zustellpause";
         }
 
         actualOrdered = new ObservableBoolean( ordered );

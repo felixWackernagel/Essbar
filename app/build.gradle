@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+    buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "de.wackernagel.essbar"
         minSdkVersion 23
@@ -11,9 +12,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = ["room.schemaLocation" : "$projectDir/schemas".toString()]
+                arguments = [
+                    "room.schemaLocation" : "$projectDir/schemas".toString(),
+                    "room.incremental":"true" ]
             }
         }
+        vectorDrawables.useSupportLibrary = true
     }
     dataBinding {
         enabled = true
@@ -27,10 +31,6 @@ android {
     lintOptions {
         warning "MissingTranslation"
     }
-
-    aaptOptions {
-        additionalParameters "--no-version-vectors"
-    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -38,8 +38,9 @@ android {
 }
 
 ext {
-    roomVersion = '2.1.0-alpha04'
-    lifecycleVersion = '2.0.0'
+    roomVersion = '2.2.2'
+    lifecycleVersion = '2.1.0'
+    daggerVersion = '2.24'
 }
 
 dependencies {
@@ -48,34 +49,36 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.0.0'
 
-    implementation 'androidx.preference:preference:1.1.0-alpha02'
+    implementation 'androidx.preference:preference:1.1.0'
 
     implementation 'com.romandanylyk:pageindicatorview:1.0.3'
 
+    // Room
     implementation "androidx.room:room-runtime:$roomVersion"
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha02'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha02'
 
+    // Lifecycle Components
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
+    annotationProcessor "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
 
     implementation 'org.jsoup:jsoup:1.11.3'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.13.1'
 
     implementation 'com.flaviofaria:kenburnsview:1.0.7'
 
     // Dagger 2
-    implementation 'com.google.dagger:dagger:2.24'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.24'
-    implementation 'com.google.dagger:dagger-android:2.24'
-    implementation 'com.google.dagger:dagger-android-support:2.24'
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.24'
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+    implementation "com.google.dagger:dagger-android:$daggerVersion"
+    implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$daggerVersion"
 
     // ACRA
     implementation 'ch.acra:acra-mail:5.1.3'

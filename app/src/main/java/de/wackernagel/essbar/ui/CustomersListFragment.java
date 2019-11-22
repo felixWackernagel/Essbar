@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
+        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
         final DataBindingListAdapter<Customer> adapter = new DataBindingListAdapter<>( viewModel );
         adapter.setClickListener(customer -> {

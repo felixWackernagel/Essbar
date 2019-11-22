@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -52,7 +53,7 @@ public class CalendarWeekSelectorFragment extends BottomSheetDialogFragment impl
         binding.recyclerView.setHasFixedSize( true );
         binding.recyclerView.setAdapter( adapter );
 
-        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory).get( MenuViewModel.class );
         viewModel.getCalendarWeeks().observe( getViewLifecycleOwner(), adapter::submitList );
     }
 

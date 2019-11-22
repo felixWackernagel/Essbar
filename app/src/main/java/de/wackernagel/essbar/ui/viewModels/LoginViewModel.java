@@ -12,6 +12,8 @@ import org.jsoup.nodes.Document;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.web.DocumentParser;
@@ -28,6 +30,7 @@ public class LoginViewModel extends ViewModel {
     private String customerName = null;
     private Customer customer;
 
+    @Inject
     LoginViewModel(EssbarRepository repository) {
         this.repository = repository;
     }

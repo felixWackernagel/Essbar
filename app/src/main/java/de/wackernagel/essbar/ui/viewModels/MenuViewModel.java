@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import de.wackernagel.essbar.repository.EssbarRepository;
 import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
@@ -53,6 +55,7 @@ public class MenuViewModel extends ViewModel {
     private final MutableLiveData<ConfirmedMenusForm> confirmedMenus;
     private final LiveData<Event<Boolean>> successfulOrder;
 
+    @Inject
     MenuViewModel( final EssbarRepository repository ) {
         this.repository = repository;
 

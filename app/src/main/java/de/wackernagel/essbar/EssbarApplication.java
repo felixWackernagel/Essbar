@@ -11,8 +11,6 @@ import org.acra.data.StringFormat;
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
 import de.wackernagel.essbar.dagger.DaggerApplicationComponent;
-import de.wackernagel.essbar.dagger.RetrofitModule;
-import de.wackernagel.essbar.dagger.RoomModule;
 
 @AcraCore(
         buildConfigClass = BuildConfig.class,
@@ -37,9 +35,7 @@ public class EssbarApplication extends DaggerApplication {
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
         return DaggerApplicationComponent
                 .builder()
-                .roomModule( new RoomModule( this ) )
-                .retrofitModule( new RetrofitModule( this ) )
+                .application( this )
                 .build();
     }
-
 }

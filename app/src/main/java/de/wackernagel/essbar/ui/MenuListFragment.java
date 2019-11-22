@@ -15,6 +15,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import javax.inject.Inject;
@@ -61,7 +62,7 @@ public class MenuListFragment extends EssbarFragment implements ActionMode.Callb
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
         viewModel.getCalendarWeek().observe( getViewLifecycleOwner(), calendarWeek -> {
             if( calendarWeekNumberView != null )
                 calendarWeekNumberView.setText( String.valueOf( DateUtils.calculateCalendarWeek( calendarWeek ) ) );

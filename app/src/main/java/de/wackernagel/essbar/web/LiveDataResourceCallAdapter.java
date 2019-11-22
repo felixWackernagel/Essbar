@@ -1,5 +1,6 @@
 package de.wackernagel.essbar.web;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 
 import java.lang.reflect.Type;
@@ -21,13 +22,15 @@ public class LiveDataResourceCallAdapter<R> implements CallAdapter<R, LiveData<R
         this.responseType = responseType;
     }
 
+    @NonNull
     @Override
     public Type responseType() {
         return responseType;
     }
 
+    @NonNull
     @Override
-    public LiveData<Resource<R>> adapt( final Call<R> call ) {
+    public LiveData<Resource<R>> adapt( @NonNull final Call<R> call ) {
         return new LiveData<Resource<R>>() {
             AtomicBoolean started = new AtomicBoolean(false );
             @Override
@@ -36,14 +39,14 @@ public class LiveDataResourceCallAdapter<R> implements CallAdapter<R, LiveData<R
                 if( started.compareAndSet(false, true ) ) {
                     call.enqueue(new Callback<R>() {
                         @Override
-                        public void onResponse(Call<R> call, Response<R> response) {
+                        public void onResponse( @NonNull Call<R> call, @NonNull Response<R> response) {
                             if( call.isCanceled() )
                                 return;
                             postValue( Resource.success( response.code(), response.raw().request().url().toString(), response.body() ) );
                         }
 
                         @Override
-                        public void onFailure(Call<R> call, Throwable throwable) {
+                        public void onFailure( @NonNull Call<R> call, @NonNull Throwable throwable) {
                             if( call.isCanceled() )
                                 return;
                             postValue( Resource.error( call.request().url().toString(), throwable ) );

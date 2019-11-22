@@ -1,8 +1,6 @@
 package de.wackernagel.essbar.ui;
 
 import android.app.Activity;
-import android.app.KeyguardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import javax.inject.Inject;
 
@@ -53,7 +52,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
+        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
         if( !keyguardManager.isDeviceSecure() ) {
             binding.saveCredentialsContainer.setVisibility( View.GONE );

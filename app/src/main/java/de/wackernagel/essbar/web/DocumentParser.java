@@ -1,5 +1,7 @@
 package de.wackernagel.essbar.web;
 
+import androidx.annotation.Nullable;
+
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -7,9 +9,6 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.Nullable;
-
-import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
 import de.wackernagel.essbar.ui.pojos.Menu;
@@ -23,7 +22,7 @@ public class DocumentParser {
     public static boolean isLoginSuccessful( @Nullable final Document document ) {
         if( document != null ) {
             final Element headline = document.selectFirst("h1");
-            return headline != null && "speiseplan".equalsIgnoreCase( headline.text() );
+            return headline != null && headline.text().toLowerCase().contains( "speiseplan" );
         }
         return false;
     }
@@ -57,7 +56,7 @@ public class DocumentParser {
     public static List<CalendarWeek> getCalendarWeekList( @Nullable final Document document ) {
         final List<CalendarWeek> calendarWeeks = new ArrayList<>();
         if( document != null ) {
-            for( Element option : document.select( "site > content > form > label > select > option" ) ) {
+            for( Element option : document.select( "#time_dropdown > a > p" ) ) {
                 calendarWeeks.add( new CalendarWeek( option ) );
             }
         }

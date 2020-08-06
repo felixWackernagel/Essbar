@@ -46,8 +46,7 @@ public class ListableItemCallback<T extends Listable> extends DiffUtil.ItemCallb
     }
 
     private boolean calendarWeeksSame(CalendarWeek oldItem, CalendarWeek newItem) {
-        return TextUtils.equals( oldItem.getDateRange(), newItem.getDateRange() ) &&
-                oldItem.isSelected() == newItem.isSelected();
+        return TextUtils.equals( oldItem.getDateRange(), newItem.getDateRange() );
     }
 
     private boolean customersSame(Customer oldItem, Customer newItem) {

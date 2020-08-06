@@ -188,6 +188,13 @@ public class MenuViewModel extends ViewModel {
         return calendarWeek;
     }
 
+    /**
+     * @return (yyyy,cw) like (2019,26)
+     */
+    public String getCurrentCalendarWeek() {
+        return calendarWeek.getValue();
+    }
+
     public int getSelectedCalendarWeek() {
         return DateUtils.calculateCalendarWeek( calendarWeek.getValue() );
     }

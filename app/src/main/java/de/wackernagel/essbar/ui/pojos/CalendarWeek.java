@@ -14,13 +14,16 @@ public class CalendarWeek implements Listable {
     private final String dateRange;
     private final String number;
     private final long id;
+    private final String url;
 
     public CalendarWeek( final Element element ) {
         final String text = element.text(); // KW 26 || 24.06. - 30.06.2019
         this.dateRange = sliceOutDateRange( text );
         this.number = sliceOutNumber( text );
-        this.value = "(2019," + number + ")"; // (yyyy,cw) like (2019,26)
+        this.value = "(2020," + number + ")"; // (yyyy,cw) like (2019,26)
         this.id = DateUtils.getDayAsDate( Calendar.MONDAY, value ).getTime();
+        this.url = element.parent().attr("href");
+        Log.e("CalendarWeek", "url=" + url);
     }
 
     // KW 26 || 24.06. - 30.06.2019 or KW 6 || 24.06. - 30.06.2019
@@ -44,7 +47,7 @@ public class CalendarWeek implements Listable {
     }
 
     public boolean isSelected( final String currentCalendarWeek ) {
-        Log.e("CalendarWeek", currentCalendarWeek + ", " + value);
+        Log.e("CalendarWeek", "currentCW = " + currentCalendarWeek + ", thisCW = " + value);
         return value.equals( currentCalendarWeek );
     }
 

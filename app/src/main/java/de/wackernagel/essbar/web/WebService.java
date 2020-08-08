@@ -25,7 +25,7 @@ public interface WebService {
     @POST( EssbarConstants.Urls.LOGIN_PATH )
     LiveData<Resource<Document>> postLoginData( @FieldMap Map<String, String> fields );
 
-    @GET( "menu/0/{start}/{end}/" )
+    @GET( "sammel/eb/107182-pipapo2ee40dfbc6dfa5522adcf5d3c3750488/{start}/{end}/" )
     LiveData<Resource<Document>> getCalendarWeekMenusPage(@Path("start") String start, @Path("end") String end );
 
     @FormUrlEncoded

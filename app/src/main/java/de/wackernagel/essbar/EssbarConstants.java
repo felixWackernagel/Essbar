@@ -5,7 +5,7 @@ public class EssbarConstants {
     static final String ACRA_EMAIL = "felix.wackernagel@gmail.com";
 
     public final class Urls {
-        public static final String BASE = "https://bestellung-pipapo-catering.mms-rcs.de/de/";
+        public static final String BASE = "https://bestellung-pipapo-catering.de/de/";
 
         public static final String HOME_PATH = "content/";
         public static final String HOME = BASE + HOME_PATH;

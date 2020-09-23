@@ -1,5 +1,6 @@
 package de.wackernagel.essbar.web;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.jsoup.nodes.Document;
@@ -79,5 +80,15 @@ public class DocumentParser {
         } else {
             return Boolean.FALSE;
         }
+    }
+
+    public static String getSecret( @NonNull final String url ) {
+        String urlPaths = url.split("#")[0];
+        if( urlPaths.endsWith("/") ) {
+            urlPaths = urlPaths.substring( 0, urlPaths.length() - 1 );
+        }
+        final String[] segments = urlPaths.split( "/" );
+        final int lastIndex = segments.length - 1;
+        return segments[ lastIndex - 2 ];
     }
 }

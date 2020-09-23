@@ -8,6 +8,10 @@ import java.util.List;
 
 import de.wackernagel.essbar.room.Customer;
 import de.wackernagel.essbar.room.CustomerDao;
+import de.wackernagel.essbar.room.Meal;
+import de.wackernagel.essbar.room.MealDao;
+import de.wackernagel.essbar.ui.pojos.MealListItem;
+import de.wackernagel.essbar.ui.pojos.Type;
 import de.wackernagel.essbar.web.Resource;
 import de.wackernagel.essbar.web.WebService;
 import de.wackernagel.essbar.web.forms.CalendarWeekForm;
@@ -20,10 +24,12 @@ public class EssbarRepository {
     private final AppExecutors executors;
     private final WebService webService;
     private final CustomerDao customerDao;
+    private final MealDao mealDao;
 
-    public EssbarRepository( final WebService webService, final CustomerDao customerDao) {
+    public EssbarRepository( final WebService webService, final CustomerDao customerDao, final MealDao mealDao) {
         this.webService = webService;
         this.customerDao = customerDao;
+        this.mealDao = mealDao;
         this.executors = new AppExecutors();
     }
 
@@ -32,7 +38,7 @@ public class EssbarRepository {
     }
 
     public LiveData<Resource<Document>> getMenusDocumentByCalendarWeek(final CalendarWeekForm changeCalendarWeekForm ) {
-        return webService.getCalendarWeekMenusPage( changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate() );
+        return webService.getCalendarWeekMenusPage( changeCalendarWeekForm.getSecret(), changeCalendarWeekForm.getStartDate(), changeCalendarWeekForm.getEndDate() );
     }
 
     public LiveData<Resource<Document>> getLoginDocument( final LoginForm loginForm ) {
@@ -51,6 +57,18 @@ public class EssbarRepository {
         executors.diskIO().execute( () -> customerDao.insertCustomer( customer ) );
     }
 
+    public void upsertMeal(final Meal meal ) {
+        executors.diskIO().execute( () -> {
+            final Meal existingMeal = mealDao.queryMeal( meal.getType(), meal.getDate() );
+            if( existingMeal == null ) {
+                mealDao.insertMeal( meal );
+            } else {
+                meal.setId( existingMeal.getId() );
+                mealDao.updateMeal( meal );
+            }
+        } );
+    }
+
     public void deleteCustomer( final Customer customer ) {
         executors.diskIO().execute( () -> customerDao.deleteCustomer( customer ) );
     }
@@ -61,5 +79,11 @@ public class EssbarRepository {
 
     public LiveData<Resource<Document>> getHomeDocument() {
         return webService.getHomePage();
+    }
+
+    public LiveData<List<MealListItem>> getMealsOfTypeFromWeekOfYear( final Type type, final int weekOfYear, final int year ) {
+        // sqlite starts weekOfYear with 0 but java with 1
+        final String sqliteWeekOfYear = "" + ( weekOfYear - 1 );
+        return mealDao.queryMealsOfTypeFromWeekOfYear( type, sqliteWeekOfYear, "" + year );
     }
 }

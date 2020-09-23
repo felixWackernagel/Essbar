@@ -29,6 +29,7 @@ public class LoginViewModel extends ViewModel {
     private String password = "";
     private String customerName = null;
     private Customer customer;
+    private String urlSecret;
 
     @Inject
     LoginViewModel(EssbarRepository repository) {
@@ -107,5 +108,13 @@ public class LoginViewModel extends ViewModel {
             result.setValue( Boolean.FALSE );
         }
         return result;
+    }
+
+    public String getUrlSecret() {
+        return urlSecret;
+    }
+
+    public void setUrlSecret(String urlSecret) {
+        this.urlSecret = urlSecret;
     }
 }

@@ -3,6 +3,7 @@ package de.wackernagel.essbar.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import javax.inject.Inject;
 
@@ -52,7 +52,7 @@ public class CustomerFormFragment extends AbstractLoginFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory).get( LoginViewModel.class );
+        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
         if( !keyguardManager.isDeviceSecure() ) {
             binding.saveCredentialsContainer.setVisibility( View.GONE );
@@ -73,21 +73,23 @@ public class CustomerFormFragment extends AbstractLoginFragment {
     private void loginAtWebsite() {
         setFormEnabled( false );
 
-        viewModel.getLoginDocument().observe(this, resource -> {
+        viewModel.getLoginDocument().observe(getViewLifecycleOwner(), resource -> {
             Log.i(TAG, resource.toString() );
             if( resource.isStatusOk() && resource.isAvailable() ) {
                 if( !EssbarConstants.Urls.HOME.equals( resource.getUrl() ) && DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
+                    final String urlSecret = DocumentParser.getSecret( resource.getUrl() );
+                    viewModel.setUrlSecret( urlSecret );
                     if (binding.saveCredentials.isChecked()) {
                         viewModel.findCustomerName(resource.getResource());
-                        doEncryption();
+                        doEncryption( urlSecret );
                     } else {
-                        startMenuActivity();
+                        startMenuActivity( urlSecret );
                     }
                 } else {
                     showError( getString( R.string.username_password_error) );
                 }
             } else {
-                final String message = ( resource.getError() != null ? resource.getError().getMessage() : getString( R.string.unknown_error ) );
+                final String message = (TextUtils.isEmpty( resource.getError() )? getString( R.string.unknown_error ) : resource.getError() );
                 showError( message );
             }
 
@@ -95,12 +97,12 @@ public class CustomerFormFragment extends AbstractLoginFragment {
         } );
     }
 
-    private void doEncryption() {
+    private void doEncryption( final String urlSecret ) {
         EncryptionUtils.encrypt( viewModel.getPassword(), KEYSTORE_ALIAS, new EncryptionUtils.EncryptionCallback() {
             @Override
             public void onEncryptionSuccess(String encryptedPassword, String encryptionIV) {
                 viewModel.insertCustomer( encryptedPassword, encryptionIV );
-                startMenuActivity();
+                startMenuActivity( urlSecret );
             }
 
             @Override
@@ -127,9 +129,9 @@ public class CustomerFormFragment extends AbstractLoginFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if( requestCode == REQUEST_CODE_FOR_CREDENTIAL_ENCRYPTION ) {
             if( resultCode == Activity.RESULT_CANCELED ) {
-                startMenuActivity();
+                startMenuActivity( viewModel.getUrlSecret() );
             } else if( resultCode == Activity.RESULT_OK ) {
-                doEncryption();
+                doEncryption( viewModel.getUrlSecret() );
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

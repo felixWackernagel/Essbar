@@ -9,15 +9,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import dagger.android.support.AndroidSupportInjection;
 import de.wackernagel.essbar.R;
 
 public class AbstractLoginFragment extends EssbarFragment {
@@ -39,8 +36,9 @@ public class AbstractLoginFragment extends EssbarFragment {
         }
     }
 
-    void startMenuActivity() {
+    void startMenuActivity( final String urlSecret ) {
         final Intent intent = new Intent( requireContext(), MenuActivity.class );
+        intent.putExtra( "url:secret", urlSecret );
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity( intent );
         requireActivity().finish();

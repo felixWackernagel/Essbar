@@ -3,6 +3,7 @@ package de.wackernagel.essbar.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +12,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import javax.inject.Inject;
@@ -53,7 +53,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory).get( LoginViewModel.class );
+        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory).get( LoginViewModel.class );
 
         final DataBindingListAdapter<Customer> adapter = new DataBindingListAdapter<>( viewModel );
         adapter.setClickListener(customer -> {
@@ -74,7 +74,7 @@ public class CustomersListFragment extends AbstractLoginFragment {
                 return getString(R.string.profile_section);
             }
         }) );
-        viewModel.getAllCustomers().observe( this, adapter::submitList);
+        viewModel.getAllCustomers().observe( getViewLifecycleOwner(), adapter::submitList);
     }
 
     private void doDecryption() {
@@ -112,16 +112,15 @@ public class CustomersListFragment extends AbstractLoginFragment {
     }
 
     private void loginAtWebsite() {
-        viewModel.getLoginDocument().observe(this, resource -> {
-            Log.i(TAG, resource.toString() );
+        viewModel.getLoginDocument().observe(getViewLifecycleOwner(), resource -> {
             if( resource.isStatusOk() && resource.isAvailable() ) {
                 if( !EssbarConstants.Urls.LOGIN.equals( resource.getUrl() ) && DocumentParser.isLoginSuccessful( resource.getResource() ) ) {
-                    startMenuActivity();
+                    startMenuActivity( DocumentParser.getSecret( resource.getUrl() ) );
                 } else {
                     showError( getString( R.string.username_password_error) );
                 }
             } else {
-                final String message = ( resource.getError() != null ? resource.getError().getMessage() : getString( R.string.unknown_error ) );
+                final String message = (TextUtils.isEmpty( resource.getError() ) ? getString( R.string.unknown_error ) : resource.getError() );
                 Log.e( TAG, message );
                 showError( message );
             }

@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import javax.inject.Inject;
 
@@ -38,7 +37,7 @@ public class LoginActivity extends DaggerAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView( this, R.layout.activity_login );
-        viewModel = ViewModelProviders.of( this, viewModelFactory ).get( LoginViewModel.class );
+        viewModel = new ViewModelProvider( this, viewModelFactory ).get( LoginViewModel.class );
 
         final LoginPagerAdapter adapter = new LoginPagerAdapter( getSupportFragmentManager() );
         binding.viewPager.setAdapter( adapter );

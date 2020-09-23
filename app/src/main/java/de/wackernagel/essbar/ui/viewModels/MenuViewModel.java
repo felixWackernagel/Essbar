@@ -22,6 +22,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import de.wackernagel.essbar.repository.EssbarRepository;
+import de.wackernagel.essbar.room.Meal;
 import de.wackernagel.essbar.ui.lists.Listable;
 import de.wackernagel.essbar.ui.pojos.CalendarWeek;
 import de.wackernagel.essbar.ui.pojos.ChangedMenu;
@@ -42,6 +43,7 @@ public class MenuViewModel extends ViewModel {
 
     private final EssbarRepository repository;
 
+    // ToDo change String to CalendarWeek
     private final MutableLiveData<String> calendarWeek;
 
     private final LiveData<List<Listable>> menus;
@@ -54,6 +56,7 @@ public class MenuViewModel extends ViewModel {
 
     private final MutableLiveData<ConfirmedMenusForm> confirmedMenus;
     private final LiveData<Event<Boolean>> successfulOrder;
+    private String urlSecret = null;
 
     @Inject
     MenuViewModel( final EssbarRepository repository ) {
@@ -85,6 +88,7 @@ public class MenuViewModel extends ViewModel {
     private LiveData<Resource<Document>> getMenuDocument( final String calendarWeekWithYear ) {
         final int[] yearAndWeekOfYear = DateUtils.splitCalendarWeekWithYear( calendarWeekWithYear );
         return repository.getMenusDocumentByCalendarWeek( new CalendarWeekForm(
+                urlSecret,
                 DateUtils.getDay( Calendar.MONDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ),
                 DateUtils.getDay( Calendar.SUNDAY, yearAndWeekOfYear[1], yearAndWeekOfYear[0] ) ) );
     }
@@ -94,12 +98,25 @@ public class MenuViewModel extends ViewModel {
         if( resource != null && resource.isAvailable() ) {
             final List<Menu> menuList = DocumentParser.getMenuList( resource.getResource() );
             filterEqualPausedMenus( menuList );
+            saveMenus( menuList );
             final List<Listable> listItems = addSections( menuList );
             result.setValue( listItems );
         } else {
             result.setValue( Collections.emptyList() );
         }
         return result;
+    }
+
+    private void saveMenus( @NonNull final List<Menu> menus ) {
+        for( Menu menu : menus )
+        {
+            final Meal meal = new Meal(
+                    menu.getMenuName(),
+                    DateUtils.toDateString( menu.getDay() ),
+                    menu.getTyp()
+            );
+            repository.upsertMeal( meal );
+        }
     }
 
     private List<Listable> addSections( final List<Menu> menus ) {
@@ -247,7 +264,7 @@ public class MenuViewModel extends ViewModel {
         formFields.put( "csrfmiddlewaretoken", InMemoryCookieJar.get().getCSRFToken() );
 
         final List<Menu> allMenus = getMenusList();
-        if( allMenus != null && !allMenus.isEmpty() ) {
+        if( !allMenus.isEmpty() ) {
             for( Menu menu : allMenus ) {
                 if( TextUtils.isEmpty( menu.getInputName() ) || TextUtils.isEmpty( menu.getInputValue() ) ) {
                     continue;
@@ -297,5 +314,9 @@ public class MenuViewModel extends ViewModel {
                 updateNumberOfChangedMenus( menu, false );
             }
         }
+    }
+
+    public void setUrlSecret(String urlSecret) {
+        this.urlSecret = urlSecret;
     }
 }

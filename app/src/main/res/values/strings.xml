@@ -5,6 +5,7 @@
     <string name="login">Anmelden</string>
     <string name="today">\u00A0(Heute)</string>
     <string name="lunch">Mittag</string>
+    <string name="lunch_list_fragment_title">Mittagessen</string>
     <string name="menu_fragment_title">Speiseplan</string>
     <string name="menu_confirmation_fragment_title">Änderungen</string>
     <string name="username_password_error">Ihre Anmeldung ist fehlgeschlagen. Prüfen Sie Kundennummer und Passwort?</string>
@@ -16,6 +17,7 @@
     <string name="decryption_canceled_error">Sie müssen sich authentifizieren damit wir Ihr Passwort entschlüsseln können.</string>
     <string name="save_credentials">Daten verschlüsselt speichern?</string>
     <string name="profile_section">Kunden</string>
+    <string name="lunch_section">Mittagessen</string>
     <string name="login_section">Login</string>
     <plurals name="changed_orders">
         <item quantity="one">%1$d Menü</item>
@@ -23,7 +25,7 @@
     </plurals>
     <string name="action_menu_change">Ändern</string>
     <string name="action_buy">Bestellen</string>
-    <string name="menu_name_and_price">%s</string>
+    <string name="action_change_order">Bestellung</string>
 
     <string name="roboto_regular">sans-serif</string>
     <string name="roboto_light">sans-serif-light</string>

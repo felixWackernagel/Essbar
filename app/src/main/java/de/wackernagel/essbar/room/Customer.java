@@ -16,18 +16,14 @@ import de.wackernagel.essbar.ui.lists.Listable;
 public class Customer implements Listable {
     @PrimaryKey( autoGenerate = true)
     private long id;
-
     @NonNull
     private String number;
-
     @NonNull
     @ColumnInfo(name = "encryption_iv")
     private String encryptionIv;
-
     @NonNull
     @ColumnInfo(name = "encrypted_password")
     private String encryptedPassword;
-
     @NonNull
     private String name;
 
@@ -78,15 +74,14 @@ public class Customer implements Listable {
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
         return id == customer.id &&
-                Objects.equals(number, customer.number) &&
-                Objects.equals(encryptionIv, customer.encryptionIv) &&
-                Objects.equals(encryptedPassword, customer.encryptedPassword) &&
-                Objects.equals(name, customer.name);
+            Objects.equals(number, customer.number) &&
+            Objects.equals(encryptionIv, customer.encryptionIv) &&
+            Objects.equals(encryptedPassword, customer.encryptedPassword) &&
+            Objects.equals(name, customer.name);
     }
 
     @Override
     public int hashCode() {
-
         return Objects.hash(id, number, encryptionIv, encryptedPassword, name);
     }
 
@@ -94,11 +89,11 @@ public class Customer implements Listable {
     @NonNull
     public String toString() {
         return "Customer{" +
-                "id=" + id +
-                ", number='" + number + '\'' +
-                ", encryptionIv='" + encryptionIv + '\'' +
-                ", encryptedPassword='" + encryptedPassword + '\'' +
-                ", name='" + name + '\'' +
-                '}';
+            "id=" + id +
+            ", number='" + number + '\'' +
+            ", encryptionIv='" + encryptionIv + '\'' +
+            ", encryptedPassword='" + encryptedPassword + '\'' +
+            ", name='" + name + '\'' +
+            '}';
     }
 }

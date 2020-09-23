@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import javax.inject.Inject;
@@ -54,7 +53,7 @@ public class MenuConfirmationFragment extends FullscreenDialogFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
         viewModel.getSuccessfulOrder().observe( getViewLifecycleOwner(), successEvent -> {
         {
             if( Boolean.TRUE.equals( successEvent.getContentIfNotHandled() ) ) {

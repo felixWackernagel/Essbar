@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "de.wackernagel.essbar"
         minSdkVersion 23
@@ -19,8 +19,8 @@ android {
         }
         vectorDrawables.useSupportLibrary = true
     }
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding = true
     }
     buildTypes {
         release {
@@ -38,8 +38,8 @@ android {
 }
 
 ext {
-    roomVersion = '2.2.2'
-    lifecycleVersion = '2.1.0'
+    roomVersion = '2.2.5'
+    lifecycleVersion = '2.2.0'
     daggerVersion = '2.24'
 }
 
@@ -47,9 +47,9 @@ dependencies {
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.2.1'
 
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation 'androidx.preference:preference:1.1.1'
 
     implementation 'com.romandanylyk:pageindicatorview:1.0.3'
 
@@ -59,7 +59,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0-alpha02'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     // Lifecycle Components
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycleVersion"

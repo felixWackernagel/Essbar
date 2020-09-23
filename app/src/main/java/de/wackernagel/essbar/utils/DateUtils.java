@@ -1,5 +1,6 @@
 package de.wackernagel.essbar.utils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Calendar;
@@ -71,6 +72,15 @@ public class DateUtils {
         return calendar.get( Calendar.WEEK_OF_YEAR );
     }
 
+    public static int calculateCurrentYear() {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set( Calendar.DAY_OF_WEEK, Calendar.MONDAY );
+        calendar.set( Calendar.HOUR_OF_DAY, 0 );
+        calendar.set( Calendar.MINUTE, 0 );
+        calendar.set( Calendar.SECOND, 0 );
+        return calendar.get( Calendar.YEAR );
+    }
+
     /**
      *
      * @param calendarWeekWithYear (yyyy,cw) like (2019,26), (2020,1)
@@ -137,5 +147,17 @@ public class DateUtils {
         when.setTime(date);
 
         return currentYear == when.get( Calendar.YEAR );
+    }
+
+    public static String toDateString( @NonNull final Date day ) {
+        final StringBuilder sb = new StringBuilder();
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime( day );
+        sb.append( calendar.get( Calendar.YEAR ) );
+        sb.append( "-" );
+        sb.append( twoDigitFormat( calendar.get( Calendar.MONTH ) + 1 ) );
+        sb.append( "-" );
+        sb.append( twoDigitFormat( calendar.get( Calendar.DATE ) ) );
+        return sb.toString();
     }
 }

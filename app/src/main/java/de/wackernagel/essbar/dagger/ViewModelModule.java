@@ -7,6 +7,7 @@ import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
 import de.wackernagel.essbar.ui.viewModels.LoginViewModel;
+import de.wackernagel.essbar.ui.viewModels.LunchListViewModel;
 import de.wackernagel.essbar.ui.viewModels.MenuViewModel;
 
 @SuppressWarnings("unused")
@@ -22,6 +23,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(MenuViewModel.class)
     abstract ViewModel bindMenuViewModel( MenuViewModel viewModel );
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(LunchListViewModel.class)
+    abstract ViewModel bindLunchListViewModel( LunchListViewModel viewModel );
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory( ViewModelFactory factory );

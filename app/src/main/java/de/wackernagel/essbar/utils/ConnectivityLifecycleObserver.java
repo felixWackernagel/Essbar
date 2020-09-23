@@ -5,7 +5,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 
 import androidx.lifecycle.Lifecycle;
@@ -53,8 +52,7 @@ public class ConnectivityLifecycleObserver implements LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     void startMonitoringConnectivity() {
-        final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        final boolean connected = activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        final boolean connected = NetworkUtils.hasNetworkConnection( connectivityManager );
         connectedStatus.postValue( connected );
         connectivityManager.registerNetworkCallback(
                 new NetworkRequest.Builder().addCapability( NetworkCapabilities.NET_CAPABILITY_INTERNET ).build(),

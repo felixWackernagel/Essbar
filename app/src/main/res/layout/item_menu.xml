@@ -25,14 +25,14 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="56dp"
-            android:text="@{@string/menu_name_and_price(item.menuName, item.price)}"
+            android:text="@{item.menuName}"
             tools:text="Frühstück"
             style="@style/ListItemTitle"/>
 
         <CheckBox
             android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_marginEnd="16dp"
             android:layout_gravity="end|center_vertical"
             android:visibility="@{item.editable}"

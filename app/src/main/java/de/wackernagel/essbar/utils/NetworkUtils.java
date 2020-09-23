@@ -11,7 +11,10 @@ public final class NetworkUtils {
     }
 
     public static boolean hasNetworkConnection( final Context context ) {
-        final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return hasNetworkConnection( ( ConnectivityManager ) context.getSystemService( Context.CONNECTIVITY_SERVICE ) );
+    }
+
+    public static boolean hasNetworkConnection( final ConnectivityManager connectivityManager ) {
         final NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return networkInfo != null && networkInfo.isConnected();
     }

@@ -2,6 +2,8 @@ package de.wackernagel.essbar.web;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import java.io.IOException;
 
 import de.wackernagel.essbar.R;
@@ -18,8 +20,9 @@ public class NetworkConnectionInterceptor implements Interceptor {
         this.context = context;
     }
 
+    @NonNull
     @Override
-    public Response intercept( final Chain chain ) throws IOException {
+    public Response intercept( @NonNull final Chain chain ) throws IOException {
         if ( !NetworkUtils.hasNetworkConnection( context ) ) {
             throw new NoNetworkConnectionException( context.getString( R.string.no_network_connection_error ) );
         }

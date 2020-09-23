@@ -170,7 +170,7 @@ public class Menu implements Listable {
     @NonNull
     @Override
     public String toString() {
-        return "Menu{" +
+        return "Meal{" +
                 "id=" + id +
                 ", menuName='" + menuName + '\'' +
                 ", editable=" + editable +

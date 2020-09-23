@@ -15,7 +15,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import javax.inject.Inject;
@@ -62,10 +61,12 @@ public class MenuListFragment extends EssbarFragment implements ActionMode.Callb
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        viewModel = ViewModelProviders.of( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel = new ViewModelProvider( requireActivity(), viewModelFactory ).get( MenuViewModel.class );
+        viewModel.setUrlSecret( requireActivity().getIntent().getStringExtra( "url:secret" ) );
         viewModel.getCalendarWeek().observe( getViewLifecycleOwner(), calendarWeek -> {
-            if( calendarWeekNumberView != null )
+            if( calendarWeekNumberView != null ) {
                 calendarWeekNumberView.setText( String.valueOf( DateUtils.calculateCalendarWeek( calendarWeek ) ) );
+            }
         } );
 
         setupToolbar();
@@ -92,7 +93,7 @@ public class MenuListFragment extends EssbarFragment implements ActionMode.Callb
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if( item.getItemId() == R.id.action_calendar_week ) {
-            CalendarWeekSelectorFragment.newInstance().show( requireFragmentManager(), "calendar_week_selector" );
+            CalendarWeekSelectorFragment.newInstance().show( getParentFragmentManager(), "calendar_week_selector" );
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -161,7 +162,7 @@ public class MenuListFragment extends EssbarFragment implements ActionMode.Callb
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         if( item.getItemId() == R.id.action_change_menus_order_status ) {
-            MenuConfirmationFragment.newInstance().show(requireFragmentManager().beginTransaction(), MenuConfirmationFragment.TAG);
+            MenuConfirmationFragment.newInstance().show(getParentFragmentManager().beginTransaction(), MenuConfirmationFragment.TAG);
             return true;
         }
         return false;

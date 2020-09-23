@@ -16,12 +16,13 @@
         android:name=".EssbarApplication"
         android:fullBackupContent="false"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.LoginActivity" android:theme="@style/LoginAppTheme" android:windowSoftInputMode="adjustResize">
+        <activity android:name=".ui.LunchActivity" android:theme="@style/ToolbarAppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.LoginActivity" android:theme="@style/LoginAppTheme" android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".ui.MenuActivity" android:theme="@style/ToolbarAppTheme"/>
     </application>
 

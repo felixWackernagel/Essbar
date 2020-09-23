@@ -42,14 +42,17 @@ public class LiveDataResourceCallAdapter<R> implements CallAdapter<R, LiveData<R
                         public void onResponse( @NonNull Call<R> call, @NonNull Response<R> response) {
                             if( call.isCanceled() )
                                 return;
-                            postValue( Resource.success( response.code(), response.raw().request().url().toString(), response.body() ) );
+                            postValue( Resource.success( response.body() )
+                                    .setUrl( response.raw().request().url().toString() )
+                                    .setCode( response.code() ) );
                         }
 
                         @Override
                         public void onFailure( @NonNull Call<R> call, @NonNull Throwable throwable) {
                             if( call.isCanceled() )
                                 return;
-                            postValue( Resource.error( call.request().url().toString(), throwable ) );
+                            postValue( Resource.error( throwable.getMessage(), null )
+                                    .setUrl( call.request().url().toString() ) );
                         }
                     });
                 }
